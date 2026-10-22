@@ -1,0 +1,78 @@
+args:
+- description: Duplicate incident id.
+  name: duplicateId
+  required: true
+- auto: PREDEFINED
+  defaultValue: "false"
+  description: Whether if to raise error or return result with an error.
+  name: raise_error
+  predefined:
+  - "true"
+  - "false"
+comment: Close the current investigation as duplicate to other investigation.
+commonfields:
+  id: CloseInvestigationAsDuplicate
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 5.0.0
+    itemVersion: 1.22.58
+    packID: CommonScripts
+    packName: Common Scripts
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: CloseInvestigationAsDuplicate
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('CloseInvestigationAsDuplicate', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.22.58'
+  demisto.debug('pack id = CommonScripts, pack version = 1.22.58')
+
+
+
+  NO_INCIDENT_CLOSED_MSG = "0 incidents marked as duplicates"
+  INFORMATIVE_MSG_FOR_USER = "The incident was not closed. Check if the incident is missing a mandatory field by its type."
+
+
+  def is_incident_not_closed(response):
+      """Check if the incident was closed based on the response contents."""
+      content = response[0].get("Contents") or response[0].get("contents")
+      return content == NO_INCIDENT_CLOSED_MSG
+
+
+  def main():
+      current_incident_id = demisto.incidents()[0]["id"]
+      duplicate_id = demisto.args()["duplicateId"]
+      res = demisto.executeCommand(
+          "linkIncidents", {"incidentId": duplicate_id, "linkedIncidentIDs": current_incident_id, "action": "duplicate"}
+      )
+      raise_error = argToBoolean(demisto.args().get("raise_error", False))
+      if is_incident_not_closed(res):
+          if raise_error:
+              return_error(INFORMATIVE_MSG_FOR_USER)
+          else:
+              return_results(INFORMATIVE_MSG_FOR_USER)
+      else:
+          demisto.results(res)
+
+
+  if __name__ in ("__main__", "__builtin__", "builtins"):
+      main()
+
+  register_module_line('CloseInvestigationAsDuplicate', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags:
+- dedup
+type: python
