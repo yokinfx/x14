@@ -1,0 +1,669 @@
+args:
+- description: The command line input to analyze.
+  name: command_line
+  required: true
+- description: A list of custom regex patterns to search for within the command line.
+    Each pattern should be a valid regular expression string. When using multiple
+    patterns they must be dvided by a space, comma, space - i.e. <CP> , <CP>.
+  name: custom_patterns
+comment: |-
+  This script evaluates command-line threats by analyzing both original and decoded inputs. It assigns weighted scores to detected patterns, such as AMSI bypass or credential dumping, and applies risk combination bonuses for multiple detections. The total score is normalized to a 0-100 scale, with risk levels categorized as follows:
+
+  * 0-25: Low Risk
+  * 26-50: Medium Risk
+  * 51-90: High Risk
+  * 91-100: Critical Risk
+
+  The scoring mechanism provides a comprehensive risk assessment, considering both the severity and frequency of malicious behaviors.
+commonfields:
+  id: CommandLineAnalysis
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.10.0
+    itemVersion: 1.22.58
+    packID: CommonScripts
+    packName: Common Scripts
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.12042988
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: CommandLineAnalysis
+outputs:
+- contextPath: CommandLineAnalysis.original_command
+  description: The original command line string analyzed for potential risks.
+- contextPath: CommandLineAnalysis.decoded_command
+  description: The decoded Base64 command line string, if decoding was performed.
+- contextPath: CommandLineAnalysis.risk
+  description: The overall risk level derived from the command line analysis, classified
+    as "Low Risk", "Medium Risk", "High Risk", or "Critical Risk".
+- contextPath: CommandLineAnalysis.score
+  description: The normalized score (0-100) representing the risk associated with
+    the analyzed command line.
+- contextPath: CommandLineAnalysis
+  description: A detailed summary of the analysis results, including findings and
+    scores.
+- contextPath: CommandLineAnalysis.findings.original
+  description: Findings from the analysis of the original command line, highlighting
+    the detected patterns.
+- contextPath: CommandLineAnalysis.findings.decoded
+  description: Findings from the analysis of the decoded Base64 command line, if decoding
+    was applicable.
+- contextPath: CommandLineAnalysis.analysis.original.malicious_commands
+  description: Checks for malicious commands in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.windows_temp_path
+  description: Checks if the original command line accesses Windows temporary paths.
+- contextPath: CommandLineAnalysis.analysis.original.suspicious_parameters
+  description: Identifies suspicious parameters or content in the original command
+    line.
+- contextPath: CommandLineAnalysis.analysis.original.mixed_case_powershell
+  description: Detects mixed case PowerShell commands in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.powershell_suspicious_patterns
+  description: Searches for suspicious PowerShell patterns in the original command
+    line.
+- contextPath: CommandLineAnalysis.analysis.original.credential_dumping
+  description: Checks for credential dumping techniques in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.custom_patterns
+  description: Matches custom patterns (if provided) in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.reconnaissance
+  description: Checks for reconnaissance activities in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.lateral_movement
+  description: Identifies lateral movement techniques in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.data_exfiltration
+  description: Detects data exfiltration activities in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.amsi_techniques
+  description: Checks for AMSI bypass techniques in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.indicators
+  description: Extracts indicators of compromise (IOCs) from the original command
+    line.
+- contextPath: CommandLineAnalysis.analysis.original.base64_encoding
+  description: Decoded content from Base64 encoding in the original command line.
+- contextPath: CommandLineAnalysis.analysis.original.reversed_command
+  description: Indicates if the original command line was reversed.
+- contextPath: CommandLineAnalysis.analysis.decoded.malicious_commands
+  description: Checks for malicious commands in the decoded Base64 command line.
+- contextPath: CommandLineAnalysis.analysis.decoded.windows_temp_path
+  description: Checks if the decoded Base64 command line accesses Windows temporary
+    paths.
+- contextPath: CommandLineAnalysis.analysis.decoded.suspicious_parameters
+  description: Identifies suspicious parameters or content in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.mixed_case_powershell
+  description: Detects mixed case PowerShell commands in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.powershell_suspicious_patterns
+  description: Searches for suspicious PowerShell patterns in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.credential_dumping
+  description: Checks for credential dumping techniques in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.custom_patterns
+  description: Matches custom patterns (if provided) in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.reconnaissance
+  description: Checks for reconnaissance activities in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.lateral_movement
+  description: Identifies lateral movement techniques in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.data_exfiltration
+  description: Detects data exfiltration activities in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.decoded.amsi_techniques
+  description: Checks for AMSI bypass techniques in the decoded Base64 command line.
+- contextPath: CommandLineAnalysis.analysis.decoded.indicators
+  description: Extracts indicators of compromise (IOCs) from the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.analysis.original.macOS_suspicious_commands
+  description: Checks for suspicious macOS patterns in the decoded Base64 command
+    line.
+- contextPath: CommandLineAnalysis.Double Encoding Detected
+  description: Identifies nested Base64 strings.
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: "register_module_line('CommandLineAnalysis', 'start', __line__())\nCONSTANT_PACK_VERSION
+  = '1.22.58'\ndemisto.debug('pack id = CommonScripts, pack version = 1.22.58')\n\n\n\nimport
+  base64\nimport ipaddress\nimport json\nimport re\nfrom typing import Any\nfrom collections.abc
+  import Callable\n\n\nKNOWN_POWERSHELL_COMMANDS_BREAKPOINTS = [\n    \"[Convert]::FromBase64String\",\n
+  \   \"::ASCII\",\n    \"Replace\",\n    \"ForEach-Object\",\n    \"powershell\",\n
+  \   \"New-Object\",\n    \" \",\n    \"Windows.Forms\",\n]\n\n\nPOWERSHELL_SUSPICIOUS_PATTERNS
+  = [\n    r\"%\\w+:~\\d+,\\d+%\",\n    r\"(\\[char\\[[^\\]]+\\]\\]){3,}\",\n    r\"(cmd\\.exe.*\\/V:ON|setlocal.*EnableDelayedExpansion)\",\n
+  \   r\"\\$(env:[a-zA-Z]+)\\[\\d+\\]\\s*\\+\\s*\\$env:[a-zA-Z]+\\[\\d+\\]\",\n    r\"\\.AcceptTcpClient\\(\",\n
+  \   r\"\\.Connect\\(\",\n    r\"\\.ConnectAsync\\(\",\n    r\"\\.Receive\\(\",\n
+  \   r\"\\.Send\\(\",\n    r\"\\[char\\[\\]\\]\\s*\\([\\d,\\s]+\\)|-join\\s*\\(\\s*\\[char\\[\\]\\][^\\)]+\\)\",\n
+  \   r\"\\b(?:Invoke\\-Expression|IEX)\\b\",\n    r\"\\b(?:Invoke\\-WebRequest|\\biwr\\b)\",\n
+  \   r\"\\b(?:Upload|Download)String\\b\",\n    r\"\\bInvoke\\-RestMethod.*-Uri\\b\",\n
+  \   r\"\\bNew\\-Object\\s+(?:System\\.)?Net\\.WebClient\\b\",\n    r\"\\bNew\\-Object\\s+Net\\.Sockets\\.(?:TcpClient|UdpClient)\\b\",\n
+  \   r\"\\bOutFile\\b\",\n    r\"\\bSystem\\.Net\\.Sockets\\.Tcp(?:Client|listener)\\b\",\n
+  \   r\"\\bSystem\\.Net\\.WebSockets\\.ClientWebSocket\\b\",\n    r\"for\\s+%?\\w+%?\\s+in\\s*\\([^)]{50,}\\)\",\n
+  \   r\"if\\s+%?\\w+%?\\s+geq\\s+\\d+\\s+call\\s+%?\\w+%?:~\\d+%?\",\n]\n\nRECON_COMMANDS
+  = [\n    r\"\\barp\\b\",\n    r\"\\battrib\\b\",\n    r\"\\bdir\\b\",\n    r\"\\bfsutil\\b\",\n
+  \   r\"\\bhostname\\b\",\n    r\"\\bipconfig\\b\",\n    r\"\\bnet\\s+(?:group|localgroup|user)\\b\",\n
+  \   r\"\\bnetstat\\b\",\n    r\"\\bnslookup\\b\",\n    r\"\\bping\\b\",\n    r\"\\bquery\\s+user\\b\",\n
+  \   r\"\\breg\\s+query\\b\",\n    r\"\\broute\\s+print\\b\",\n    r\"\\bsc\\s+query\\b\",\n
+  \   r\"\\bsysteminfo\\b\",\n    r\"\\btasklist\\b\",\n    r\"\\btracert\\b\",\n
+  \   r\"\\btree\\b\",\n    r\"\\bwhoami\\b\",\n    r\"\\bwmic\\s+process\\s+list\\b\",\n]\n\n\nWINDOWS_TEMP_PATHS
+  = [\n    r\"%TEMP%\",\n    r\"%TMP%\",\n    r\"\\bC:\\\\Temp\\b\",\n    r\"\\bC:\\\\Windows\\\\System32\\\\Temp\\b\",\n
+  \   r\"\\\\AppData\\\\Local\\\\Temp\\b\",\n    r\"\\\\ProgramData\\\\Microsoft\\\\Windows\\\\Caches\\b\",\n
+  \   r\"\\\\Users\\\\Public\\\\Public\\s+Downloads\\b\",\n    r\"\\\\Windows\\\\(?:Tasks|debug|Temp)\\b\",\n
+  \   r\"\\\\Windows\\\\System32\\\\spool\\b\",\n]\n\n\nAMSI = [\n    r\"\\bamsiInitFailed\\b\",\n
+  \   r\"\\bAmsiScanBuffer\\(\\)\\b\",\n    r\"\\bLoadLibrary\\(\\\"amsi\\.dll\\\"\\)\\b\",\n
+  \   r\"\\bSystem\\.Management\\.Automation\\.AmsiUtils\\b\",\n]\n\n\nLATERAL_MOVEMENT
+  = [\n    r\"\\\\\\\\[a-zA-Z0-9_.-]+\\\\C\\$\\b\",\n    r\"\\bcopy\\s+\\\\\\\\[a-zA-Z0-9_.-]+\\\\[a-zA-Z0-9$]+\\b\",\n
+  \   r\"\\bmstsc(\\.exe)?\",\n    r\"\\bnet use \\\\\\\\.*\\\\IPC\\$\\b\",\n    r\"\\bpowershell.*(?:Enter-PSSession|Invoke\\-Command)\\s+-ComputerName\\s+[a-zA-Z0-9_.-]+\\s+-(?:Credential|ScriptBlock)\\b\",\n
+  \   r\"\\bpsexec([.]exe)?\",\n    r\"\\bpsexesvc[.](?:exe|log)\\b\",\n    r\"\\bssh.*?-o.*?StrictHostKeyChecking=no\\b\",\n
+  \   r\"\\bwmic\\s+/node:\\s*[a-zA-Z0-9_.-]+\",\n    r'\\bcrackmapexec\\s+smb\\s+[a-zA-Z0-9_.-]+\\s+-u\\s+[a-zA-Z0-9_.-]+\\s+-p\\s+[a-zA-Z0-9_.-]+\\s+-x\\s+\".*\"\\b',\n
+  \   r'\\bschtasks\\s+/create\\s+/tn\\s+[a-zA-Z0-9_.-]+\\s+/tr\\s+\".*\"\\s+/sc\\s+[a-zA-Z]+\\b',\n
+  \   r'\\bwmiexec\\.py\\s+[a-zA-Z0-9_.-]+\\s+\".*\"\\b',\n]\n\n\nMALICIOUS_COMMANDS
+  = [\n    r\"\\bb374k\\.php\\b\",\n    r\"\\bbeacon\\.exe\\b\",\n    r\"\\bbloodhound\\.exe\\b\",\n
+  \   r\"\\bc99\\.php\\b\",\n    r\"\\bchopper\\.php\\b\",\n    r\"\\bcme\\.exe\\b\",\n
+  \   r\"\\bcobaltstrike_beacon\\.exe\\b\",\n    r\"\\bcovenant\\.exe\\b\",\n    r\"\\bdarkcomet\\.exe\\b\",\n
+  \   r\"\\beternalblue\\.exe\\b\",\n    r\"\\beternalromance\\.exe\\b\",\n    r\"\\bGetUserSPNs\\.py\\b\",\n
+  \   r\"\\bimpacket\\-scripts\\b\",\n    r\"\\bInvoke\\-(?:ReflectivePEInjection|Shellcode|Expression|WmiMethod|KickoffAtomicRunner|SMBExec|Obfuscation|CradleCrafter|PSRemoting|TheHash)\\b\",\n
+  \   r\"\\bkoadic\\b\",\n    r\"\\bLaZagne\\.exe\\b\",\n    r\"\\blsassdump\\.py\\b\",\n
+  \   r\"\\bmeterpreter\\.exe\\b\",\n    r\"\\bmimikatz\\b\",\n    r\"\\bmsfconsole\\b\",\n
+  \   r\"\\bmsfvenom\\b\",\n    r\"\\bnanocore\\.exe\\b\",\n    r\"\\bnjRAT\\.exe\\b\",\n
+  \   r\"\\bPowerUp\\.ps1\\b\",\n    r\"\\bpowercat\\.ps1\\b\",\n    r\"\\bPowGoop\\.ps1\\b\",\n
+  \   r\"\\bprocdump\\.exe\\b\",\n    r\"\\bquasar\\.exe\\b\",\n    r\"\\bresponder\\.py\\b\",\n
+  \   r\"\\brubeus\\.exe\\b\",\n    r\"\\bseatbelt\\.exe\\b\",\n    r\"\\bsharphound\\.exe\\b\",\n
+  \   r\"\\bsharpview\\.exe\\b\",\n    r\"\\bsmbexec\\.py\\b\",\n    r\"\\bwinrm\\.vbs\\b\",\n
+  \   r\"\\bwso\\.php\\b\",\n]\n\n\nCREDENTIALS_DUMPING = [\n    r\"\\bGet\\-Credential\\b\",\n
+  \   r\"\\bInvoke\\-Mimikatz\\b\",\n    r\"\\blsass\\.dmp\\b\",\n    r\"\\bMiniDumpWriteDump\\b\",\n
+  \   r\"\\bntds\\.dit\\b\",\n    r\"\\bntdsutil\\.exe.*ntds.*create\\b\",\n    r\"\\bpowershell.*Invoke\\-BloodHound.*-CollectionMethod.*\",\n
+  \   r\"\\bprocdump(\\.exe)?\\s+-ma\\s+lsass\\.exe\\s+[a-zA-Z0-9_.-]+\\.dmp\",\n
+  \   r\"\\bprocdump.*lsass\\b\",\n    r\"\\bProcessHacker\\b\",\n    r\"\\breg\\s+save\\s+hklm\\\\(sam|system)\\s+[a-zA-Z0-9_.-]+\\.hive\",\n
+  \   r\"\\brundll32(\\.exe)?\\s+comsvcs\\.dll,\\s+MiniDump\\s+lsass\\.exe\\s+[a-zA-Z0-9_.-]+\\.dmp.*\",\n
+  \   r\"\\brundll32.*comsvcs\\.dll\\b\",\n    r\"\\bsecretsdump(\\.py)?\\s+.*domain/.*:.*@.*\",\n
+  \   r\"\\bsekurlsa\\:\\:\",\n    r\"\\btasklist.*lsass\\b\",\n    r\"\\btaskmgr(\\.exe)?\\s+/create\\s+/PID:\\d+\\s+/DumpFile:[a-zA-Z0-9_.-]+\\.dmp\",\n
+  \   r\"\\bwce(\\.exe)?\\s+-o\",\n    r\"\\bwmic\\s+process\\s+call\\s+create.*(?:lsass|mimikatz)\\b\",\n
+  \   r'\\bntdsutil(\\.exe)?\\s+\".*ac i ntds.*\" \"ifm\" \"create full\\s+[a-zA-Z]:\\\\.*\"',\n]\n\n\nDATA_EXFILTRATION
+  = [\n    r\"\\bcurl\\s+-X\\s+(POST|PUT)\\s+-d\\s+@[a-zA-Z0-9_.-]+\\s+https?://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\bwget\\s+--post-file=[a-zA-Z0-9_.-]+\\s+https?://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\bscp\\s+-i\\s+[a-zA-Z0-9_.-]+\\.pem\\s+[a-zA-Z0-9_.-]+\\s+[a-zA-Z0-9_.-]+:/.*\\b\",\n
+  \   r\"\\bftp\\s+-n\\s+[a-zA-Z0-9_.-]+\\s+<<END_SCRIPT.*put\\s+.*END_SCRIPT\\b\",\n
+  \   r\"\\bnc\\s+[a-zA-Z0-9_.-]+\\s+\\d+\\s+<\\s+[a-zA-Z0-9_.-]+\\b\",\n    r\"\\baws\\s+s3\\s+cp\\s+[a-zA-Z0-9_.-]+\\s+s3://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\bgsutil\\s+cp\\s+[a-zA-Z0-9_.-]+\\s+gs://[a-zA-Z0-9_.-]+/.*\\b\",\n    r\"\\baz\\s+storage\\s+blob\\s+upload\\s+-f\\s+[a-zA-Z0-9_.-]+\\s+-c\\s+[a-zA-Z0-9_.-]+.*\\b\",\n
+  \   r\"\\bpowershell.*System\\.Net\\.WebClient.*UploadFile.*https?://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\brsync\\s+-avz\\s+[a-zA-Z0-9_.-]+\\s+[a-zA-Z0-9_.-]+:/.*\\b\",\n    r\"\\bcurl\\s+-X\\s+(POST|PUT)\\s+-d\\s+@[a-zA-Z0-9_.-]+\\s+https?://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\bwget\\s+--post-file=[a-zA-Z0-9_.-]+\\s+https?://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\bscp\\s+-i\\s+[a-zA-Z0-9_.-]+\\.pem\\s+[a-zA-Z0-9_.-]+\\s+[a-zA-Z0-9_.-]+:/.*\\b\",\n
+  \   r\"\\bftp\\s+-n\\s+[a-zA-Z0-9_.-]+\\s+<<END_SCRIPT.*put\\s+.*END_SCRIPT\\b\",\n
+  \   r\"\\bnc\\s+[a-zA-Z0-9_.-]+\\s+\\d+\\s+<\\s+[a-zA-Z0-9_.-]+\\b\",\n    r\"\\baws\\s+s3\\s+cp\\s+[a-zA-Z0-9_.-]+\\s+s3://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\bgsutil\\s+cp\\s+[a-zA-Z0-9_.-]+\\s+gs://[a-zA-Z0-9_.-]+/.*\\b\",\n    r\"\\baz\\s+storage\\s+blob\\s+upload\\s+-f\\s+[a-zA-Z0-9_.-]+\\s+-c\\s+[a-zA-Z0-9_.-]+.*\\b\",\n
+  \   r\"\\bpowershell.*System\\.Net\\.WebClient.*UploadFile.*https?://[a-zA-Z0-9_.-]+/.*\\b\",\n
+  \   r\"\\brsync\\s+-avz\\s+[a-zA-Z0-9_.-]+\\s+[a-zA-Z0-9_.-]+:/.*\\b\",\n]\n\n\nMSHTA
+  = [\n    r\"mshta(?:\\.exe)?\\s*[\\\"\\']?.*?(?:vbscript|javascript)\\s*:\",\n    r\"mshta(?:\\.exe)?\\s*[\\\"\\']?\\s*(?:https?|ftp|file)://\",\n
+  \   r\"mshta(?:\\.exe)?.*(?:CreateObject|Wscript\\.Shell|Shell\\.Application|powershell|document\\.write)\",\n
+  \   r\"mshta(?:\\.exe)?.*(?:-enc|base64)\",\n]\n\n\nSUSPICIOUS_COMMAND_PATTERNS
+  = [\n    r\"\\-(?:EncodedCommand|enc|ec|e)\\b\",\n    r\"\\-(?:ExecutionPolicy|exec)\\s+Bypass\\b\",\n
+  \   r\"\\-(?:NonInteractive|noi)\\b\",\n    r\"\\-(?:noprofile|nop)\\b\",\n    r\"\\-(?:WindowStyle|window|w)\\s+(?:hidden|h)\\b\",\n
+  \   r\"\\bbcedit\\b\",\n    r\"\\bBypass\\b\",\n    r\"\\bcertutil.*\\-encodehex\\b\",\n
+  \   r\"\\bClipboardContents\\b\",\n    r\"\\bGet\\-GPPPassword\\b\",\n    r\"\\bGet\\-LSASecret\\b\",\n
+  \   r\"\\blsass\\b\",\n    r\"\\bnet\\s+user\\s+\\/\\s+add\\b\",\n    r\"\\bnetsh\\s+firewall\\s+set\\b\",\n
+  \   r\"\\breg\\s+add\\b\",\n    r\"\\brundll32\\b\",\n    r\"\\bschtasks\\b\",\n
+  \   r\"\\btaskkill\\b\",\n    r\"\\s*\\<NUL\\b\",\n    r\"wevtutil\\s+cl\\b\",\n
+  \   r\"(?i)opacity=0\\.0[0-9]?\\d*\",\n    r\"(?i)\\b(?P<filename>cmd[.]exe)[\\\"']?(?P<flags>(?:\\s+/[qc])+)\\b\",\n
+  \   r\"(?i)\\b(?:2>&1)\\b\",  # T1564: Hide Artifacts, T1059: Command and Scripting
+  Interpreter\n]\n\n\ndef check_for_obfuscation(command_line: str) -> tuple[dict[str,
+  bool], str]:\n    \"\"\"Checks for various obfuscation techniques in a command line
+  string.\n\n    This function analyzes the given command line string for common obfuscation
+  techniques\n    such as base64 encoding, double encoding, reversed text, and other
+  obfuscation methods.\n\n    Args:\n        command_line (str): The command line
+  string to analyze.\n\n    Returns:\n        tuple: A tuple containing two elements:\n
+  \           - A dictionary of flags indicating which obfuscation techniques were
+  detected.\n            - The deobfuscated/decoded command line string.\n\n    \"\"\"\n
+  \   flags = {\n        \"base64_encoding\": False,\n        \"obfuscated\": False,\n
+  \       \"double_encoding\": False,\n        \"reversed_command\": False,\n    }\n\n
+  \   parsed_command_line = command_line\n\n    reversed_command_line, flags[\"reversed_command\"]
+  = reverse_command(parsed_command_line)\n\n    if flags[\"reversed_command\"]:\n
+  \       parsed_command_line = reversed_command_line  # Use the reversed command
+  line for further analysis\n\n    decoded_command_line, flags[\"base64_encoding\"],
+  flags[\"double_encoding\"] = identify_and_decode_base64(parsed_command_line)\n\n
+  \   if flags[\"double_encoding\"] or flags[\"base64_encoding\"]:\n        parsed_command_line
+  = decoded_command_line\n\n    decoded_command_line, flags[\"obfuscated\"] = encode_hex_and_oct_chars(parsed_command_line)\n
+  \   decoded_command_line, flags[\"obfuscated\"] = concat_multiple_strings(parsed_command_line)\n\n
+  \   if flags[\"obfuscated\"]:\n        parsed_command_line = decoded_command_line\n\n
+  \   return flags, parsed_command_line\n\n\ndef encode_hex_and_oct_chars(command_line:
+  str):\n    \"\"\"Decodes hexadecimal and octal escape sequences in a command line
+  string.\n\n    This function searches for hexadecimal (\\\\xXX) and octal (\\\\OOO)
+  escape sequences\n    in the input string and replaces them with their corresponding
+  ASCII characters.\n\n    Args:\n        command_line (str): The input command line
+  string to process.\n\n    Returns:\n        tuple: A tuple containing two elements:\n
+  \           - The processed string with decoded escape sequences (if any were found).\n
+  \           - A boolean indicating whether any changes were made to the input string.\n\n
+  \   \"\"\"\n\n    def decode_match(match):\n        hex_part, octal_part = match.groups()\n
+  \       if hex_part:\n            return chr(int(hex_part, 16))\n        if octal_part:\n
+  \           return chr(int(octal_part, 8))\n        return \"\"\n\n    pattern =
+  re.compile(r\"\\\\x([0-9A-Fa-f]{2})|\\\\([0-7]{2,3})\")\n\n    parsed = pattern.sub(lambda
+  m: decode_match(m), command_line)\n\n    if parsed != command_line:\n        return
+  parsed, True\n\n    return command_line, False\n\n\ndef concat_multiple_strings(command_line:
+  str):\n    \"\"\"Detects and joins multiple string concatenations in a command line
+  string.\n\n    This function identifies patterns where strings are concatenated
+  using the '+'\n    operator (e.g., \"h\" + \"e\" + \"l\" + \"l\" + \"o\") and joins
+  them together by removing the\n    quotes and '+' symbols.\n\n    Args:\n        command_line
+  (str): The input command line string to process.\n\n    Returns:\n        tuple:
+  A tuple containing two elements:\n            - The processed string with concatenated
+  strings joined together (if any were found).\n            - A boolean indicating
+  whether any changes were made to the input string.\n\n    \"\"\"\n    if re.search(r\"\\\"\\s*\\+\\s*\\\"\",
+  command_line):\n        return re.sub(r\"\\\"(.*?)\\\"\\s*\\+\", r\"\\1\", command_line),
+  True\n\n    return command_line, False\n\n\ndef detect_final_powershell_script(data:
+  str) -> bool:\n    \"\"\"Determines if the data contains known PowerShell command
+  patterns.\n\n    This function checks if the given string contains any known PowerShell
+  commands\n    that would indicate the data is a PowerShell script and not an encoded
+  payload.\n\n    Args:\n        data (str): The string to analyze for PowerShell
+  commands.\n\n    Returns:\n        bool: True if PowerShell commands are detected,
+  False otherwise.\n\n    \"\"\"\n    for command in KNOWN_POWERSHELL_COMMANDS_BREAKPOINTS:\n
+  \       if command.lower() in data.lower():\n            return True\n\n        continue\n\n
+  \   return False\n\n\ndef try_decode(data: bytes) -> str:\n    \"\"\"Try decoding
+  the data with various encoding methods.\n\n    This function attempts to decode
+  binary data using different encodings:\n    1. If data starts with 'MZ' (PE file
+  signature), it decodes as UTF-8 after removing null bytes\n    2. If data contains
+  null bytes, it tries UTF-16-LE decoding\n    3. Otherwise, it uses UTF-8 decoding\n\n
+  \   Args:\n        data (bytes): The binary data to decode\n\n    Returns:\n        str:
+  The decoded string, or an empty string if decoding fails\n\n    \"\"\"\n    try:\n
+  \       if data.startswith(b\"MZ\"):\n            decoded_str = data.replace(b\"\\x00\",
+  b\"\").decode(\"utf-8\", errors=\"ignore\")\n\n        elif b\"\\x00\" in data:\n
+  \           # If they remain the same, try UTF-16-LE\n            decoded_str =
+  data.decode(\"utf-16-le\")\n\n        else:\n            decoded_str = data.decode(\"utf-8\")\n\n
+  \       return decoded_str\n\n    except (UnicodeDecodeError, AttributeError):\n
+  \       # If decoding fails, return None\n        return \"\"\n\n\ndef decode_base64_until_final_script(encoded_str:
+  str) -> tuple[str, int]:\n    \"\"\"Decode a base64 string until it reaches the
+  final PowerShell script.\n\n    This function iteratively decodes a base64 encoded
+  string until it can no longer be\n    decoded or until it identifies a final PowerShell
+  script. It keeps track of how many\n    decoding iterations were performed.\n\n
+  \   Args:\n        encoded_str (str): The base64 encoded string to decode\n\n    Returns:\n
+  \       tuple[str, int]: A tuple containing the decoded string and the number of
+  decoding iterations\n\n    \"\"\"\n    decoded_str = encoded_str\n    counter =
+  0\n\n    while not detect_final_powershell_script(decoded_str):\n        initial_string
+  = decoded_str\n\n        try:\n            counter += 1\n            decoded_bytes
+  = base64.b64decode(decoded_str)\n            decoded_str = try_decode(decoded_bytes)\n
+  \           if not decoded_str:\n                return initial_string, counter
+  - 1\n\n        except Exception:\n            break\n\n    return decoded_str, counter\n\n\ndef
+  is_base64(possible_base64: str | bytes) -> bool:\n    \"\"\"Validates if the provided
+  string is a Base64-encoded string.\n\n    This function performs multiple checks
+  to determine if a string is valid Base64:\n    1. Verifies the string contains only
+  valid Base64 characters (A-Z, a-z, 0-9, +, /, =)\n    2. Ensures the length is a
+  multiple of 4 (correct padding)\n    3. For strings of length 20 or less, requires
+  that the string contains '+', '/' or '='\n       as an additional heuristic to reduce
+  false positives\n    4. Attempts strict base64 decoding which validates the content\n\n
+  \   Args:\n        possible_base64 (str | bytes): The string or bytes to validate
+  as Base64\n\n    Returns:\n        bool: True if the input is valid Base64, False
+  otherwise\n\n    \"\"\"\n    try:\n        if isinstance(possible_base64, str):\n
+  \           possible_base64 = possible_base64.encode(\"ascii\")\n\n        # Check
+  for valid Base64 characters and correct padding\n        if not re.fullmatch(b\"[A-Za-z0-9+/]*={0,2}\",
+  possible_base64):\n            return False\n\n        # Ensure length is a multiple
+  of 4\n        if len(possible_base64) % 4 != 0:\n            return False\n\n        #
+  Apply heuristic for short strings: must contain '=' if <= 20\n        if len(possible_base64)
+  <= 20 and b\"=\" not in possible_base64:\n            return False\n\n        #
+  Attempt strict decoding\n        base64.b64decode(possible_base64, validate=True)\n
+  \       return True\n    except Exception:\n        return False\n\n\ndef handle_powershell_base64(command_line:
+  str) -> tuple[str, bool, bool]:\n    \"\"\"Detects and decodes Base64-encoded PowerShell
+  commands.\n\n    This function searches for PowerShell's -EncodedCommand parameter
+  and decodes\n    any Base64-encoded commands found. It can detect multiple levels
+  of encoding.\n\n    Args:\n        command_line (str): The PowerShell command line
+  to analyze\n\n    Returns:\n        tuple[str, bool, bool]: A tuple containing:\n
+  \           - The decoded command line\n            - A boolean indicating if encoding
+  was detected\n            - A boolean indicating if double encoding was detected\n\n
+  \   \"\"\"\n    double_encoded_detected = False\n    encoded = False\n    num_of_encodings
+  = 0\n    result = command_line\n    powershell_encoded_base64 = re.compile(\n        r\"\"\"\n
+  \       -(?:(?:e(?:n(?:c(?:o(?:d(?:e(?:d(?:C(?:o(?:m(?:m(?:a(?:n(?:d)?)?)?)?)?)?)?)?)?)?)?)?)?)|ec)\\s+\n
+  \       [\"']?([A-Za-z0-9+/]{4,}(?:={0,2}))[\"']?\n        \"\"\",\n        re.IGNORECASE
+  | re.VERBOSE,\n    )\n\n    while matches := powershell_encoded_base64.findall(result):\n
+  \       demisto.debug(f\"Detected -encodedCommand matches: {matches}\")\n\n        valid_matches
+  = [match for match in matches if is_base64(match)]\n\n        if not valid_matches:\n
+  \           demisto.debug(\"No valid Base64 matches found.\")\n            return
+  \"\", False, False\n\n        for match in valid_matches:\n            decoded_segment,
+  counter = decode_base64_until_final_script(match)\n            num_of_encodings
+  += counter\n            demisto.debug(f\"Decoded segment: {decoded_segment}\")\n\n
+  \           if decoded_segment:\n                escaped_match = match.replace(\"+\",
+  \"\\\\+\")\n                encoded_param = re.compile(\n                    f\"(?i)-(?:(?:e(?:n(?:c(?:o(?:d(?:e(?:d(?:C(?:o(?:m(?:m(?:a(?:n(?:d)?)?)?)?)?)?)?)?)?)?)?)?)?)|ec)\\\\s+[\\\"']?{escaped_match}\"\n
+  \               )\n                result = encoded_param.sub(r\"%%TEMP%%\", result)\n
+  \               result = result.replace(r\"%%TEMP%%\", f'\"{decoded_segment}\"')\n\n
+  \       if num_of_encodings > 1:\n            double_encoded_detected = True\n\n
+  \   if num_of_encodings != 0:\n        encoded = True\n\n    return result, encoded,
+  double_encoded_detected\n\n\ndef handle_general_base64(command_line: str) -> tuple[str,
+  bool, bool]:\n    \"\"\"Handles the general case of decoding Base64 in a command
+  line.\n\n    This function searches for any Base64-encoded strings in the given
+  command line\n    and attempts to decode them. It handles multiple encoding layers
+  and keeps track\n    of whether double encoding was detected.\n\n    Args:\n        command_line
+  (str): The command line string to analyze\n\n    Returns:\n        tuple[str, bool,
+  bool]: A tuple containing:\n            - The decoded command line\n            -
+  A boolean indicating if encoding was detected\n            - A boolean indicating
+  if double encoding was detected\n\n    \"\"\"\n    result = command_line\n    base64_pattern
+  = r\"[A-Za-z0-9+/]{4,}(?:={0,2})\"\n    num_of_encodings = 0\n    double_encoded_detected
+  = False\n    previous_matches: list[str] = []\n\n    while matches := re.findall(base64_pattern,
+  result):\n        valid_matches = [match for match in matches if is_base64(match)]\n\n
+  \       if not valid_matches or set(valid_matches).issubset(set(previous_matches)):\n
+  \           if valid_matches and set(valid_matches).issubset(set(previous_matches)):\n
+  \               num_of_encodings -= 1\n\n            if num_of_encodings > 1:\n
+  \               double_encoded_detected = True\n                return result, True,
+  double_encoded_detected\n\n            if num_of_encodings == 1:\n                return
+  result, True, double_encoded_detected\n\n            return result, False, double_encoded_detected\n\n
+  \       num_of_encodings += 1\n\n        for match in valid_matches:\n            decoded_bytes
+  = base64.b64decode(match)\n            decoded_segment = try_decode(decoded_bytes)\n\n
+  \           if decoded_segment:\n                result = result.replace(match,
+  f'\"{decoded_segment}\"')\n\n        previous_matches = valid_matches\n\n    return
+  result, False, double_encoded_detected\n\n\ndef identify_and_decode_base64(command_line:
+  str) -> tuple[str, bool, bool]:\n    \"\"\"Identifies and decodes all Base64 occurrences
+  in a command line.\n\n    This function checks if \"powershell\" is in the command
+  line and calls the\n    appropriate handler function: handle_powershell_base64 for
+  PowerShell commands\n    or handle_general_base64 for other command types.\n\n    Returns:\n
+  \       tuple[str, bool, bool]: A tuple containing:\n            - The command line
+  with decoded content\n            - A boolean indicating if any encoding was detected\n
+  \           - A boolean indicating if double encoding was detected\n\n    \"\"\"\n
+  \   if \"powershell\" in command_line.lower():\n        return handle_powershell_base64(command_line)\n\n
+  \   return handle_general_base64(command_line)\n\n\ndef reverse_command(command_line:
+  str) -> tuple[str, bool]:\n    \"\"\"Detects if the command line contains a reversed
+  PowerShell string and reverses it.\n\n    Args:\n        command_line (str): The
+  command line to check for reversed PowerShell strings.\n\n    Returns:\n        tuple[str,
+  bool]: A tuple containing:\n            - The command line, reversed if it contained
+  a reversed PowerShell string\n            - A boolean indicating if a reversal was
+  performed\n\n    \"\"\"\n    if \"llehsrewop\" in command_line.lower():\n        return
+  command_line[::-1], True\n    return command_line, False\n\n\ndef check_macOS_suspicious_commands(command_line:
+  str) -> dict[str, list[list[str]]]:\n    \"\"\"Checks for suspicious macOS/AppleScript
+  commands by grouping multiple sets\n    of required substrings under a category.
+  If all required substrings appear,\n    that combination is recorded under its category.\n\n
+  \   Args:\n        command_line (str): The command line to check for suspicious
+  macOS/AppleScript commands.\n\n    Returns:\n        dict[str, list[list[str]]]:
+  A dictionary where keys are categories of suspicious behavior\n                                    and
+  values are lists of matched substring combinations.\n\n    \"\"\"\n    text = command_line.lower()\n\n
+  \   # Define categories and the sets of required substrings belonging to each\n
+  \   patterns_by_category = {\n        \"infostealer_characteristics\": [\n            [\"telegram\",
+  \"deskwallet\"],\n            [\"to set visible\", \"false\"],\n            [\"chflags
+  hidden\"],\n            [\"osascript -e\", \"system_profiler\", \"hidden answer\"],\n
+  \           [\"tell application finder\", \"duplicate\"],\n            [\"tell application
+  finder\", \"duplicate\"],\n        ],\n        \"possible_exfiltration\": [\n            [\"display
+  dialog\", \"curl -\"],\n            [\"osascript -e\", \"curl -x\", \"system_profiler\"],\n
+  \           [\"osascript -e\", \"curl -\"],\n        ],\n    }\n\n    results: dict[str,
+  list[list[str]]] = {}\n    for category, pattern_groups in patterns_by_category.items():\n
+  \       matched_combinations = []\n        for required_phrases in pattern_groups:\n
+  \           # If all required substrings appear in text\n            if all(phrase
+  in text for phrase in required_phrases):\n                matched_combinations.append(required_phrases)\n
+  \       # Store only if we found matches\n        if matched_combinations:\n            results[category]
+  = matched_combinations\n\n    return results\n\n\ndef check_malicious_commands(command_line:
+  str) -> list[str]:\n    \"\"\"Checks for known malicious commands or patterns in
+  the given command line.\n\n    Args:\n        command_line (str): The command line
+  string to analyze.\n\n    Returns:\n        list[str]: A list of matched malicious
+  commands or patterns found in the command line.\n\n    \"\"\"\n    matches: list[str]
+  = []\n\n    demisto.debug(\"Checking for malicious commands.\")\n\n    for pattern
+  in MALICIOUS_COMMANDS:\n        matches.extend(re.findall(pattern, command_line,
+  re.IGNORECASE))\n\n    return matches\n\n\ndef check_reconnaissance_temp(command_line:
+  str) -> list[str]:\n    \"\"\"Checks for reconnaissance patterns in the given command
+  line.\n\n    Args:\n        command_line (str): The command line string to analyze.\n\n
+  \   Returns:\n        list[str]: A list of matched reconnaissance patterns found
+  in the command line.\n\n    \"\"\"\n    demisto.debug(\"Checking for reconnaissance
+  patterns.\")\n\n    matches: list[str] = []\n    for pattern in RECON_COMMANDS:\n
+  \       matches.extend(re.findall(pattern, command_line, re.IGNORECASE))\n\n    return
+  matches\n\n\ndef check_windows_temp_paths(command_line: str) -> list[str]:\n    \"\"\"Identifies
+  given occurrences of Windows temporary paths in the given command line.\n\n    This
+  function scans the command line for common Windows temporary directory paths\n    such
+  as %TEMP%, %TMP%, AppData\\\\Local\\\\Temp, or Windows\\\\Temp. Threat actors often\n
+  \   use these locations to store and execute malicious payloads.\n\n    Args:\n
+  \       command_line (str): The command line string to analyze.\n\n    Returns:\n
+  \       list[str]: A list of matched temporary paths found in the command line.\n\n
+  \   \"\"\"\n    demisto.debug(\"Checking for windows temp paths in command line.\")\n\n
+  \   matches: list[str] = []\n    for pattern in WINDOWS_TEMP_PATHS:\n        matches.extend(re.findall(pattern,
+  command_line, re.IGNORECASE))\n\n    return matches\n\n\ndef check_suspicious_content(command_line:
+  str) -> list[str]:\n    \"\"\"Scans the command line for suspicious content patterns.\n\n
+  \   This function examines the command line for potentially malicious patterns defined\n
+  \   in SUSPICIOUS_COMMAND_PATTERNS. These patterns could indicate suspicious activities\n
+  \   such as obfuscation, encoded commands, or other evasion techniques commonly
+  used\n    in malicious scripts.\n\n    Args:\n        command_line (str): The command
+  line string to analyze.\n\n    Returns:\n        list[str]: A list of suspicious
+  patterns found in the command line.\n\n    \"\"\"\n    demisto.debug(\"Checking
+  for suspicious content.\")\n\n    matches: list[str] = []\n    for pattern in SUSPICIOUS_COMMAND_PATTERNS:\n
+  \       matches.extend(match.group() for match in re.finditer(pattern, command_line,
+  re.IGNORECASE))\n\n    return matches\n\n\ndef check_amsi(command_line: str) ->
+  list[str]:\n    \"\"\"Detects potential AMSI (Antimalware Scan Interface) bypass
+  techniques in a command line.\n\n    This function searches for patterns associated
+  with AMSI bypass attempts, which are\n    commonly used by attackers to evade antimalware
+  detection when executing PowerShell code.\n\n    Args:\n        command_line (str):
+  The command line text to analyze\n\n    Returns:\n        list[str]: A list of matched
+  AMSI bypass patterns found in the command line\n\n    \"\"\"\n    demisto.debug(\"Checking
+  for amsi patterns.\")\n\n    matches: list[str] = []\n    for pattern in AMSI:\n
+  \       matches.extend(re.findall(pattern, command_line, re.IGNORECASE))\n\n    return
+  matches\n\n\ndef check_mixed_case_powershell(command_line: str) -> list[str]:\n
+  \   \"\"\"Detects mixed case obfuscation of the word 'powershell' in a command line.\n\n
+  \   This function searches for variations of the word 'powershell' that use mixed
+  case\n    characters (e.g. PoWeRsHeLL), which is a common obfuscation technique
+  used to evade\n    detection. Normal legitimate versions of the word are excluded
+  from the results.\n\n    Args:\n        command_line (str): The command line text
+  to analyze\n\n    Returns:\n        list[str]: A list of matched obfuscated 'powershell'
+  strings\n\n    \"\"\"\n    mixed_case_powershell_regex = re.compile(r\"\\b(?=.*[a-z])(?=.*[A-Z])[pP][oO][wW][eE][rR][sS][hH][eE][lL]{2}(\\.exe)?\\b\")\n\n
+  \   demisto.debug(\"Checking for mixed case powershell usage.\")\n\n    exclusions
+  = {\n        \"Powershell\",\n        \"PowerShell\",\n        \"powershell\",\n
+  \       \"Powershell.exe\",\n        \"PowerShell.exe\",\n        \"powershell.exe\",\n
+  \   }\n\n    return [match.group() for match in mixed_case_powershell_regex.finditer(command_line)
+  if match.group() not in exclusions]\n\n\ndef check_powershell_suspicious_patterns(command_line:
+  str) -> list[str]:\n    \"\"\"Detects suspicious PowerShell patterns in a given
+  command line.\n\n    This function searches for potentially malicious PowerShell
+  patterns such as:\n    - Obfuscation techniques\n    - Encoded commands\n    - Execution
+  policy bypass\n    - Hidden window usage\n    - Known malicious cmdlets and parameters\n
+  \   - Script execution with suspicious flags\n\n    Args:\n        command_line
+  (str): The command line text to analyze\n\n    Returns:\n        list[str]: A list
+  of matched suspicious PowerShell patterns\n\n    \"\"\"\n    demisto.debug(\"Checking
+  for powershell suspicious patterns.\")\n\n    matches: list[str] = []\n    for pattern
+  in POWERSHELL_SUSPICIOUS_PATTERNS:\n        matches.extend(re.findall(pattern, command_line,
+  re.IGNORECASE))\n\n    return matches\n\n\ndef check_credential_dumping(command_line:
+  str) -> list[str]:\n    \"\"\"Detects credential dumping attempts from a given command
+  line.\n\n    This function searches for patterns that indicate credential dumping
+  activities such as:\n    - LSASS dumping techniques\n    - Mimikatz commands and
+  parameters\n    - Registry operations targeting credential storage\n    - SAM/SYSTEM/SECURITY
+  file access\n    - Windows Credential Editor (WCE) usage\n    - Other known credential
+  extraction tools and commands\n\n    Args:\n        command_line (str): The command
+  line text to analyze\n\n    Returns:\n        list[str]: A list of matched suspicious
+  credential dumping patterns\n\n    \"\"\"\n    demisto.debug(\"Checking for credential
+  dumping.\")\n\n    matches: list[str] = []\n    for pattern in CREDENTIALS_DUMPING:\n
+  \       matches.extend(match.group() for match in re.finditer(pattern, command_line,
+  re.IGNORECASE))\n\n    return matches\n\n\ndef check_lateral_movement(command_line:
+  str) -> list[str]:\n    \"\"\"Detects techniques and commands commonly used for
+  lateral movement in a network.\n\n    This function searches for patterns that indicate
+  lateral movement attempts such as:\n    - Remote access tools (PsExec, WMI, WinRM)\n
+  \   - Remote file copy techniques\n    - Remote service creation\n    - Remote scheduled
+  task creation\n    - Use of administrative shares\n    - Pass-the-hash or pass-the-ticket
+  techniques\n\n    Args:\n        command_line (str): The command line text to analyze\n\n
+  \   Returns:\n        list[str]: A list of matched suspicious lateral movement patterns\n\n
+  \   \"\"\"\n    demisto.debug(\"Checking for lateral movement patterns.\")\n\n    matches:
+  list[str] = []\n    for pattern in LATERAL_MOVEMENT:\n        matches.extend(re.findall(pattern,
+  command_line, re.IGNORECASE))\n\n    return matches\n\n\ndef check_data_exfiltration(command_line:
+  str) -> list[str]:\n    \"\"\"Detects potential data exfiltration techniques from
+  a given command line.\n\n    This function searches for patterns that indicate data
+  exfiltration attempts such as:\n    - Data compression (zip, rar, tar)\n    - Network
+  data transfer commands (curl, wget, scp)\n    - Unusual upload/download behaviors\n
+  \   - Data staging before exfiltration\n    - DNS/ICMP tunneling techniques\n    -
+  Usage of non-standard ports or protocols for data transfer\n\n    Args:\n        command_line
+  (str): The command line text to analyze\n\n    Returns:\n        list[str]: A list
+  of matched suspicious data exfiltration patterns\n\n    \"\"\"\n    demisto.debug(\"Checking
+  for data exfiltration patterns.\")\n\n    matches: list[str] = []\n    for pattern
+  in DATA_EXFILTRATION:\n        matches.extend(re.findall(pattern, command_line,
+  re.IGNORECASE))\n\n    return matches\n\n\ndef check_suspicious_mshta(command_line:
+  str) -> list[str]:\n    \"\"\"Detects suspicious mshta usage in a given command
+  line.\n\n    This function searches for patterns that indicate potential abuse of\n
+  \   Microsoft HTML Application Host (mshta.exe) for malicious purposes.\n\n    Args:\n
+  \       command_line (str): The command line text to analyze\n\n    Returns:\n        list[str]:
+  A list of matched suspicious mshta patterns\n\n    \"\"\"\n    demisto.debug(\"Checking
+  for suspicious mshta usage.\")\n\n    matches: list[str] = []\n\n    for pattern
+  in MSHTA:\n        matches.extend(re.findall(pattern, command_line, re.IGNORECASE))\n\n
+  \   return matches\n\n\ndef check_social_engineering(command_line: str) -> list[str]:\n
+  \   \"\"\"Detects social engineering tactics in a given command line.\n\n    This
+  function searches for patterns that indicate social engineering attempts, such as:\n
+  \   - Use of checkmark emojis that might be used to suggest legitimacy\n    - Comment
+  characters in mshta commands that may be used to trick users\n\n    Args:\n        command_line
+  (str): The command line text to analyze\n\n    Returns:\n        list[str]: A list
+  of matched social engineering patterns\n\n    \"\"\"\n    checkmark_emojis = [\n
+  \       \"\\u2705\",  # ✅ Check Mark Button\n        \"\\u2714\",  # ✔️ Heavy Check
+  Mark\n        \"\\u2611\",  # ☑️ Ballot Box with Check\n        \"\\u1f5f8\",  #
+  \U0001F5F8 Light Check Mark\n        \"\\u1f5f9\",  # \U0001F5F9 Ballot Box with
+  Bold Check\n    ]\n\n    demisto.debug(\"Checking for social engineering patterns
+  in command.\")\n\n    for emoji in checkmark_emojis:\n        if emoji in command_line:\n
+  \           return [\"Emoji Found in command line\"]\n\n    if re.search(\"mshta.*?#\",
+  command_line, re.IGNORECASE):\n        # This is used by attackers to fool a victim
+  to run the mshta command via the explorer\n        return [\"Comment character detected
+  in mshta command line\"]\n\n    return []\n\n\ndef check_custom_patterns(command_line:
+  str, custom_patterns: list[str] | None = None) -> list[str]:\n    \"\"\"Checks for
+  user-defined patterns in a given command line.\n\n    This function matches custom
+  regular expression patterns against the command line\n    text to identify specific
+  patterns of interest defined by the user.\n\n    Args:\n        command_line (str):
+  The command line text to analyze\n        custom_patterns (list[str] | None, optional):
+  List of regex patterns to match. Defaults to None.\n\n    Returns:\n        list[str]:
+  A list of matched patterns from the command line\n\n    \"\"\"\n    matches: list[str]
+  = []\n    if custom_patterns:\n        # Ensure custom_patterns is a list\n        if
+  isinstance(custom_patterns, str):\n            custom_patterns = [custom_patterns]
+  \ # Convert single string to a list\n        for pattern in custom_patterns:\n            matches.extend(re.findall(pattern,
+  command_line, re.IGNORECASE))\n    return matches\n\n\ndef extract_indicators(command_line:
+  str) -> dict[str, list[str]]:\n    \"\"\"Extract various indicators (IP addresses,
+  domains, URLs, etc.) from the command line.\n\n    This function uses the Demisto
+  extractIndicators command to identify and extract\n    various indicators from the
+  command line text. It filters out reserved IPs and\n    special cases like '::'.\n\n
+  \   Args:\n        command_line (str): The command line text to extract indicators
+  from\n\n    Returns:\n        dict[str, list[str]]: A dictionary mapping indicator
+  types to lists of extracted values\n\n    \"\"\"\n\n    def is_reserved_ip(ip_str:
+  str) -> bool:\n        \"\"\"Check if an IP address is reserved (non-global).\n\n
+  \       Args:\n            ip_str (str): The IP address as a string\n\n        Returns:\n
+  \           bool: True if the IP is reserved (not globally routable), False otherwise\n\n
+  \       \"\"\"\n        try:\n            ip_obj = ipaddress.ip_address(ip_str)\n
+  \           return not ip_obj.is_global\n\n        except ValueError:\n            return
+  False\n\n    extracted_by_type: dict[str, list[str]] = {}\n\n    demisto.debug(\"Attempting
+  to extract indicators from command line.\")\n\n    try:\n        indicators = demisto.executeCommand(\"extractIndicators\",
+  {\"text\": command_line})\n\n        if indicators and isinstance(indicators, list):\n
+  \           contents = indicators[0].get(\"Contents\", {})\n\n            if isinstance(contents,
+  str):\n                try:\n                    contents = json.loads(contents)\n
+  \               except json.JSONDecodeError:\n                    return {}\n\n
+  \           if isinstance(contents, dict):\n                for indicator_type,
+  values in contents.items():\n                    if isinstance(values, list):\n
+  \                       for value in values:\n                            if value
+  == \"::\":\n                                continue\n                            if
+  indicator_type == \"IP\" and is_reserved_ip(value):\n                                continue
+  \ # Skip reserved IPs\n\n                            if indicator_type not in extracted_by_type:\n
+  \                               extracted_by_type[indicator_type] = []\n                            extracted_by_type[indicator_type].append(value)\n\n
+  \   except Exception as e:\n        demisto.debug(f\"Failed to extract indicators:
+  {e!s}\")\n\n    return extracted_by_type\n\n\ndef calculate_score(results: dict[str,
+  Any]) -> dict[str, Any]:\n    \"\"\"Aggregates findings from the analysis and assigns
+  a score (0-100).\n    Incorporates bonuses for certain risky combinations.\n\n    The
+  scoring algorithm works as follows:\n    1. Each detection adds points based on
+  predefined weights (e.g., obfuscation techniques, malicious commands)\n    2. Findings
+  are categorized into high-risk and medium-risk groups\n    3. Multiple high-risk
+  findings trigger additional bonus points\n    4. Multiple medium-risk findings trigger
+  smaller bonus points\n    5. A final score is calculated for both original and decoded
+  command lines\n    6. The score is normalized to a 0-100 scale, with higher scores
+  indicating more suspicious activity\n\n    Returns:\n        dict: Contains the
+  calculated scores and detailed findings for both original and decoded command lines\n\n
+  \   \"\"\"\n    # Define weights for base scoring\n    weights: dict[str, int] =
+  {\n        \"mixed_case_powershell\": 25,\n        \"reversed_command\": 25,\n        \"powershell_suspicious_patterns\":
+  35,\n        \"credential_dumping\": 25,\n        \"double_encoding\": 25,\n        \"amsi_techniques\":
+  25,\n        \"malicious_commands\": 25,\n        \"custom_patterns\": 25,\n        \"macOS_suspicious_commands\":
+  25,\n        \"suspicious_mshta\": 25,\n        \"social_engineering\": 25,\n        \"data_exfiltration\":
+  15,\n        \"lateral_movement\": 15,\n        \"obfuscated\": 15,\n        \"windows_temp_path\":
+  10,\n        \"indicators\": 10,\n        \"reconnaissance\": 10,\n        \"base64_encoding\":
+  5,\n        \"suspicious_parameters\": 5,\n    }\n\n    # Initialize findings and
+  scores for original and decoded\n    findings: dict[str, list[Any]] = {\"original\":
+  [], \"decoded\": []}\n    scores: dict[str, int] = {\"original\": 0, \"decoded\":
+  0}\n\n    # Define risk groups and bonus scores\n    high_risk_keys = {\n        \"mixed_case_powershell\",\n
+  \       \"double_encoding\",\n        \"amsi_techniques\",\n        \"malicious_commands\",\n
+  \       \"powershell_suspicious_patterns\",\n        \"credential_dumping\",\n        \"reversed_command\",\n
+  \       \"macOS_suspicious_commands\",\n        \"suspicious_mshta\",\n        \"custom_patterns\",\n
+  \       \"social_engineering\",\n    }\n\n    medium_risk_keys = {\n        \"data_exfiltration\",\n
+  \       \"lateral_movement\",\n        \"indicators\",\n        \"obfuscated\",\n
+  \   }\n\n    low_risk_keys = {\n        \"suspicious_parameters\",\n        \"windows_temp_path\",\n
+  \       \"reconnaissance\",\n        \"base64_encoding\",\n    }\n\n    risk_bonuses:
+  dict[str, int] = {\n        \"high\": 30,\n        \"medium\": 20,\n        \"low\":
+  10,\n    }\n\n    # Define the fixed theoretical maximum score\n    theoretical_max
+  = 120\n\n    # Helper function to calculate score and detect combinations\n    def
+  process_context(context_results: dict[str, Any]) -> tuple[int, list[str]]:\n        context_score
+  = 0\n        context_findings: list[str] = []\n        context_keys_detected = set()\n\n
+  \       # Calculate base score for each key (count each category once)\n        for
+  key, value in context_results.items():\n            if value and value != \"{}\":\n
+  \               context_keys_detected.add(key)\n                if isinstance(value,
+  list) and len(value) > 0:\n                    # Add weight once, report how many
+  instances were found\n                    context_score += weights.get(key, 0)\n
+  \                   context_findings.append(f\"{key.replace('_', ' ')} detected
+  ({len(value)} instances)\")\n                else:\n                    # Not a
+  list or empty list, just count once\n                    context_score += weights.get(key,
+  0)\n                    context_findings.append(f\"{key.replace('_', ' ')} detected\")\n\n
+  \       # Apply combination bonuses based on detected keys\n        if (high_risk_keys
+  & context_keys_detected) and len(context_keys_detected) > 1:\n            context_score
+  += risk_bonuses[\"high\"]\n            context_findings.append(\"High-risk combination
+  detected\")\n        elif (medium_risk_keys & context_keys_detected) and len(context_keys_detected)
+  > 1:\n            context_score += risk_bonuses[\"medium\"]\n            context_findings.append(\"Medium-risk
+  combination detected\")\n        elif (low_risk_keys & context_keys_detected) and
+  len(context_keys_detected) > 1:\n            context_score += risk_bonuses[\"low\"]\n
+  \           context_findings.append(\"Low-risk combination detected\")\n\n        return
+  context_score, context_findings\n\n    # Process original\n    original_results
+  = results.get(\"analysis\", {}).get(\"original\", {})\n    scores[\"original\"],
+  findings[\"original\"] = process_context(original_results)\n\n    # Check global
+  combinations (like double encoding globally)\n    if original_results.get(\"double_encoding\",
+  False):\n        scores[\"decoded\"] += weights[\"double_encoding\"]\n        findings[\"decoded\"].append(\"double_encoding\")\n\n
+  \   # Calculate total raw score\n    total_raw_score = scores[\"original\"]  # +
+  scores[\"decoded\"]\n\n    # Normalize the score to fit within 0-100 based on the
+  fixed theoretical max\n    normalized_score = (total_raw_score / theoretical_max)
+  * 100\n    normalized_score = min(normalized_score, 100)  # Cap at 100\n\n    #
+  Determine overall risk level\n    risk = \"Low Risk\"\n    if normalized_score >
+  90:\n        risk = \"Critical Risk\"\n    elif normalized_score > 50:\n        risk
+  = \"High Risk\"\n    elif normalized_score > 25:\n        risk = \"Medium Risk\"\n\n
+  \   return {\n        \"score\": int(round(normalized_score, 0)),\n        \"findings\":
+  findings,\n        \"risk\": risk,\n    }\n\n\ndef analyze_command_line(command_line:
+  str, custom_patterns: list[str] | None = None) -> dict[str, Any]:\n    \"\"\"Analyzes
+  a command line string for potential security threats and suspicious patterns.\n\n
+  \   This function performs a comprehensive analysis of the provided command line,
+  checking for\n    various indicators of malicious activity including obfuscation
+  techniques, suspicious commands,\n    credential dumping attempts, lateral movement,
+  and more.\n\n    Args:\n        command_line (str): The command line string to analyze.\n
+  \       custom_patterns (list[str] | None, optional): Additional custom patterns
+  to check for in the command line.\n                                                     Defaults
+  to None.\n\n    Returns:\n        dict[str, Any]: Analysis results containing:\n
+  \           - original_command: The input command line string\n            - parsed_command:
+  The command line after deobfuscation (if applicable)\n            - analysis: Detailed
+  analysis results for various security checks\n            - score: Numerical risk
+  score (0-100)\n            - findings: Detailed findings that contributed to the
+  score\n            - risk: Overall risk assessment (Low/Medium/High/Critical Risk)\n\n
+  \   \"\"\"\n    checks: dict[str, Callable] = {\n        \"malicious_commands\":
+  check_malicious_commands,\n        \"windows_temp_path\": check_windows_temp_paths,\n
+  \       \"suspicious_parameters\": check_suspicious_content,\n        \"mixed_case_powershell\":
+  check_mixed_case_powershell,\n        \"powershell_suspicious_patterns\": check_powershell_suspicious_patterns,\n
+  \       \"credential_dumping\": check_credential_dumping,\n        \"suspicious_mshta\":
+  check_suspicious_mshta,\n        \"reconnaissance\": check_reconnaissance_temp,\n
+  \       \"lateral_movement\": check_lateral_movement,\n        \"data_exfiltration\":
+  check_data_exfiltration,\n        \"amsi_techniques\": check_amsi,\n        \"indicators\":
+  extract_indicators,\n        \"social_engineering\": check_social_engineering,\n
+  \   }\n\n    results: dict[str, Any] = {\n        \"original_command\": command_line,\n
+  \       \"analysis\": {\"original\": {}},\n    }\n\n    flags, parsed_command_line
+  = check_for_obfuscation(command_line)\n\n    if parsed_command_line:\n        results[\"parsed_command\"]
+  = parsed_command_line\n\n    # Perform checks on the original command line\n    for
+  check_name, check in checks.items():\n        results[\"analysis\"][\"original\"][check_name]
+  = check(parsed_command_line)\n\n    results[\"analysis\"][\"original\"][\"custom_patterns\"]
+  = (\n        check_custom_patterns(parsed_command_line, custom_patterns) if custom_patterns
+  else []\n    )\n\n    # Only set \"base64_encoding\" if we actually decoded something\n\n
+  \   for flag, value in flags.items():\n        if value:\n            results[\"analysis\"][\"original\"][flag]
+  = value\n\n    # Handle macOS\n    if \"osascript\" in parsed_command_line.lower():\n
+  \       results[\"analysis\"][\"original\"][\"macOS_suspicious_commands\"] = check_macOS_suspicious_commands(parsed_command_line)\n\n
+  \   # results[\"analysis\"][\"original\"] = original_analysis\n    score_details
+  = calculate_score(results)\n    results.update(score_details)\n\n    return results\n\n\ndef
+  main():\n    \"\"\"Entry point for analyzing command lines for suspicious activities
+  and patterns.\"\"\"\n    args = demisto.args()\n    command_lines = argToList(args.get(\"command_line\",
+  []), separator=\" , \")\n    custom_patterns = argToList(args.get(\"custom_patterns\",
+  []), separator=\" , \")\n    readable_output = \"\"\n\n    # Analyze each command
+  line\n    results = [analyze_command_line(cmd, custom_patterns) for cmd in command_lines]\n\n
+  \   # Prepare readable output for the results\n\n    for result in results:\n        if
+  result.get(\"parsed_command\", None) != result[\"original_command\"]:\n            parsed_command
+  = f\"**Decoded Command**: {result['parsed_command']}\\n\"\n\n        else:\n            parsed_command
+  = None\n\n        readable_output += (\n            f\"**Command Line**: {result['original_command']}\\n\"\n
+  \           f\"{parsed_command if parsed_command else ''}\"\n            f\"**Risk**:
+  {result['risk']}\\n\"\n            f\"**Score**: {result['score']}\\n\"\n            f\"**Findings
+  (Original)**: {', '.join(result['findings']['original'])}\\n\\n\\n\"\n        )\n\n
+  \   # Return results\n    return_results(\n        CommandResults(\n            readable_output=readable_output,\n
+  \           outputs_prefix=\"CommandLineAnalysis\",\n            outputs_key_field=\"original_command\",\n
+  \           outputs=results,\n        )\n    )\n\n\nif __name__ in (\"__builtin__\",
+  \"builtins\", \"__main__\"):\n    main()\n\nregister_module_line('CommandLineAnalysis',
+  'end', __line__())\n"
+scripttarget: 0
+subtype: python3
+system: true
+tags: []
+type: python
