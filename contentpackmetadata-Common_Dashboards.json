@@ -1,0 +1,154 @@
+{
+	"author": "Cortex XSOAR",
+	"authorImage": "content/packs/Base/Author_image.png",
+	"beta": false,
+	"cacheVersn": 0,
+	"categories": [
+		"Utilities"
+	],
+	"certification": "certified",
+	"contentItemTypes": [
+		"automation",
+		"dashboard"
+	],
+	"contentItems": {
+		"automation": [
+			{
+				"description": "The dashboard provide a high level overview on the usage of Cortex XSOAR. It contains data points and metrics on enriched and observed threat intelligence, playbook and automation executions, and data sources being ingested into Cortex XSOAR.",
+				"name": "AdoptionMetrics",
+				"tags": [
+					"widget",
+					"dynamic-section"
+				]
+			}
+		],
+		"classifier": null,
+		"dashboard": [
+			{
+				"name": "SLA"
+			},
+			{
+				"name": "Threat Intelligence Feeds"
+			},
+			{
+				"name": "Cost Optimization Instances"
+			},
+			{
+				"name": "Cost Optimization Playbooks"
+			},
+			{
+				"name": "API Execution Metrics"
+			},
+			{
+				"name": "Troubleshooting Instances"
+			},
+			{
+				"name": "My Dashboard"
+			},
+			{
+				"name": "Troubleshooting Playbooks"
+			},
+			{
+				"name": "Incidents"
+			},
+			{
+				"name": "XSOAR Automation Insights"
+			},
+			{
+				"name": "My Threat Landscape"
+			}
+		],
+		"genericfield": null,
+		"generictype": null,
+		"incidentfield": null,
+		"incidenttype": null,
+		"indicatorfield": null,
+		"integration": null,
+		"layoutscontainer": null,
+		"list": null,
+		"playbook": null,
+		"report": null,
+		"reputation": null,
+		"widget": null,
+		"wizard": null
+	},
+	"currentVersion": "1.7.24",
+	"definitionId": "",
+	"dependencies": {
+		"Base": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": true,
+			"minVersion": "1.42.6",
+			"name": "Base"
+		},
+		"CommonWidgets": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": false,
+			"minVersion": "1.3.5",
+			"name": "Common Widgets"
+		},
+		"DemistoRESTAPI": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": true,
+			"minVersion": "1.5.2",
+			"name": "Cortex REST API"
+		}
+	},
+	"deprecated": false,
+	"description": "Frequently used dashboards pack.",
+	"disabledMonthly": false,
+	"downloads": 0,
+	"eulaLink": "https://github.com/demisto/content/blob/master/LICENSE",
+	"fromServerVersion": "5.0.0",
+	"general": [
+		"generalFieldCertified",
+		"generalFieldByCortexXSOAR",
+		"generalFieldFree",
+		"generalFieldSupportIncluded"
+	],
+	"id": "CommonDashboards",
+	"installMessage": "",
+	"integrations": [
+		{
+			"imagePath": "content/packs/DemistoRESTAPI/CoreRESTAPI_image.png",
+			"name": "Core REST API"
+		},
+		{
+			"imagePath": "content/packs/DemistoRESTAPI/DemistoRESTAPI_image.png",
+			"name": "Demisto REST API (Deprecated)"
+		}
+	],
+	"itemVersion": "1.7.24",
+	"keywords": [],
+	"legacy": true,
+	"name": "Common Dashboards",
+	"packID": "CommonDashboards",
+	"packName": "",
+	"premium": false,
+	"previewOnly": false,
+	"price": 0,
+	"propagationLabels": [
+		"all"
+	],
+	"rawKeywords": null,
+	"rawTags": null,
+	"rawUseCases": null,
+	"searchRank": 0,
+	"serverMaxVersion": "",
+	"serverMinVersion": "5.0.0",
+	"support": "xsoar",
+	"supportDetails": {
+		"email": "",
+		"url": "https://www.paloaltonetworks.com/cortex"
+	},
+	"tags": [],
+	"toServerVersion": "",
+	"updated": "2026-10-11T20:18:25Z",
+	"useCases": [],
+	"version": -1,
+	"versionInfo": "10935523",
+	"videos": []
+}
