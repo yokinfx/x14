@@ -1,0 +1,167 @@
+category: Data Enrichment & Threat Intelligence
+commonfields:
+  id: dnstwist
+  version: -1
+configuration: []
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 5.0.0
+    itemVersion: 1.1.20
+    packID: dnstwist
+    packName: Dnstwist
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+description: Use the DNSTwist integration to detect typosquatting, phishing, and corporate
+  espionage.
+detaileddescription: " \n\n---\n[View Integration Documentation](https://xsoar.pan.dev/docs/reference/integrations/dnstwist)"
+display: dnstwist
+image: data:image/png;base64,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
+name: dnstwist
+script:
+  commands:
+  - arguments:
+    - description: The domain name for which to check for variations.
+      name: domain
+      required: true
+    - default: true
+      defaultValue: "30"
+      description: Maximum number results to return in the context. This helps manage
+        browser performance. The Markdown entry will display all results.
+      name: limit
+    - auto: PREDEFINED
+      defaultValue: "no"
+      description: Whether to perform a query for the Whois creation or last updated
+        time (slow).
+      name: whois
+      predefined:
+      - "yes"
+      - "no"
+    description: Checks for variations of a phishing domain name.
+    name: dnstwist-domain-variations
+    outputs:
+    - contextPath: dnstwist.Domain.Domains.Name
+      description: Domain name variations.
+      type: String
+    - contextPath: dnstwist.Domain.Domains.IP
+      description: IP addresses that resolved to domain name variations.
+      type: string
+    - contextPath: dnstwist.Domain.Domains.DNS-MX
+      description: Mail exchange records that resolved to domain name variations.
+      type: string
+    - contextPath: dnstwist.Domain.Domains.DNS-NS
+      description: Server names that resolved to domain name variations.
+      type: string
+    - contextPath: dnstwist.Domain.Domains.WhoisUpdated
+      description: Whois updated for domain name variations.
+      type: string
+    - contextPath: dnstwist.Domain.Domains.WhoisCreated
+      description: Whois created for domain name variations.
+      type: string
+  dockerimage: demisto/dnstwist:1.0.0.13768061
+  runonce: false
+  script: |
+    register_module_line('dnstwist', 'start', __line__())
+    CONSTANT_PACK_VERSION = '1.1.20'
+    demisto.debug('pack id = dnstwist, pack version = 1.1.20')
+    import json
+    import subprocess
+
+
+
+    TWIST_EXE = "/dnstwist/dnstwist.py"
+
+    if demisto.command() == "dnstwist-domain-variations":
+        KEYS_TO_MD = ["whois_updated", "whois_created", "dns_a", "dns_mx", "dns_ns"]
+        DOMAIN = demisto.args()["domain"]
+        LIMIT = int(demisto.args()["limit"])
+        WHOIS = demisto.args().get("whois")
+
+        def get_dnstwist_result(domain, include_whois):
+            args = [TWIST_EXE, "-f", "json"]
+            if include_whois:
+                args.append("-w")
+            args.append(domain)
+            res = subprocess.check_output(args, stderr=subprocess.DEVNULL)
+            return json.loads(res)
+
+        def get_domain_to_info_map(dns_twist_result):
+            results = []
+            for x in dns_twist_result:
+                temp = {}  # type: dict
+                for k, v in x.items():
+                    if k in KEYS_TO_MD:
+                        if x["domain"] not in temp:
+                            temp["domain-name"] = x["domain"]
+                        if k == "dns_a":
+                            temp["IP Address"] = v
+                        else:
+                            temp[k] = v
+                if temp:
+                    results.append(temp)
+            return results
+
+        dnstwist_result = get_dnstwist_result(DOMAIN, WHOIS == "yes")
+        new_result = get_domain_to_info_map(dnstwist_result)
+        md = tableToMarkdown(
+            "dnstwist for domain - " + DOMAIN,
+            new_result,
+            headers=["domain-name", "IP Address", "dns_mx", "dns_ns", "whois_updated", "whois_created"],
+        )
+
+        domain_context = new_result[0]  # The requested domain for variations
+        domains_context_list = new_result[1 : LIMIT + 1]  # The variations domains
+
+        domains = []
+        for item in domains_context_list:
+            temp = {"Name": item["domain-name"]}
+            if "IP Address" in item:
+                temp["IP"] = item["IP Address"]
+            if "dns_mx" in item:
+                temp["DNS-MX"] = item["dns_mx"]
+            if "dns_ns" in item:
+                temp["DNS-NS"] = item["dns_ns"]
+            if "whois_updated" in item:
+                temp["WhoisUpdated"] = item["whois_updated"]
+            if "whois_created" in item:
+                temp["WhoisCreated"] = item["whois_created"]
+            domains.append(temp)
+
+        ec = {"Domains": domains}
+        if "domain-name" in domain_context:
+            ec["Name"] = domain_context["domain-name"]
+        if "IP Address" in domain_context:
+            ec["IP"] = domain_context["IP Address"]
+        if "dns_mx" in domain_context:
+            ec["DNS-MX"] = domain_context["dns_mx"]
+        if "dns_ns" in domain_context:
+            ec["DNS-NS"] = domain_context["dns_ns"]
+        if "whois_updated" in domain_context:
+            ec["WhoisUpdated"] = domain_context["whois_updated"]
+        if "whois_created" in domain_context:
+            ec["WhoisCreated"] = domain_context["whois_created"]
+
+        entry_result = {
+            "Type": entryTypes["note"],
+            "ContentsFormat": formats["json"],
+            "Contents": dnstwist_result,
+            "HumanReadable": md,
+            "ReadableContentsFormat": formats["markdown"],
+            "EntryContext": {"dnstwist.Domain(val.Name == obj.Name)": ec},
+        }
+
+        demisto.results(entry_result)
+
+    if demisto.command() == "test-module":
+        # This is the call made when pressing the integration test button.
+        subprocess.check_output([TWIST_EXE, "-h"], stderr=subprocess.STDOUT)
+        demisto.results("ok")
+        sys.exit(0)
+
+    register_module_line('dnstwist', 'end', __line__())
+  subtype: python3
+  type: python
+system: true
