@@ -266,7 +266,7 @@ contentitemexportablefields:
   contentitemfields:
     definitionid: ""
     fromServerVersion: 6.2.0
-    itemVersion: 1.42.30
+    itemVersion: 1.42.36
     packID: Base
     packName: Base
     packPropagationLabels:
@@ -274,7 +274,7 @@ contentitemexportablefields:
     prevname: ""
     propagationLabels: []
     toServerVersion: ""
-dockerimage: demisto/python3:3.12.13.10404775
+dockerimage: demisto/python3:3.12.14.13053055
 engineinfo: {}
 mainengineinfo: {}
 name: CreateIndicatorRelationship
@@ -283,8 +283,8 @@ runas: DBotWeakRole
 runonce: false
 script: |
   register_module_line('CreateIndicatorRelationship', 'start', __line__())
-  CONSTANT_PACK_VERSION = '1.42.30'
-  demisto.debug('pack id = Base, pack version = 1.42.30')
+  CONSTANT_PACK_VERSION = '1.42.36'
+  demisto.debug('pack id = Base, pack version = 1.42.36')
 
 
 
