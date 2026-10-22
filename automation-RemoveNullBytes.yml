@@ -1,0 +1,64 @@
+args:
+- default: true
+  description: The string value to remove null bytes.
+  name: value
+  required: true
+comment: Removes null bytes from string.
+commonfields:
+  id: RemoveNullBytes
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.10.0
+    itemVersion: 1.4.30
+    packID: FiltersAndTransformers
+    packName: Filters And Transformers
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: RemoveNullBytes
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('RemoveNullBytes', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.4.30'
+  demisto.debug('pack id = FiltersAndTransformers, pack version = 1.4.30')
+
+
+
+
+  def removenullbytes(value):
+      if isinstance(value, str):
+          result = value.replace("\x00", "")
+      else:
+          return "error"
+      return result
+
+
+  def main():
+      value = demisto.args()["value"]
+      result = removenullbytes(value)
+      if result == "error":
+          return_error("This transformer applies only to string")
+      return_results(result)
+
+
+  if __name__ == "__builtin__" or __name__ == "builtins":
+      main()
+
+  register_module_line('RemoveNullBytes', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags:
+- general
+- transformer
+type: python
