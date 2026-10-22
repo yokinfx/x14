@@ -1,0 +1,1348 @@
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.1.0
+    itemVersion: 2.8.9
+    packID: CommonPlaybooks
+    packName: Common Playbooks
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+description: 'This playbook searches and deletes emails with similar attributes of
+  a malicious email using one of the following integrations: * EWS * Microsoft Graph
+  Security * Gmail * Agari Phishing Defense.'
+id: Search And Delete Emails - Generic v2
+inputSections:
+- description: Generic group for inputs
+  inputs:
+  - From
+  - Subject
+  - AttachmentName
+  - SearchAndDeleteIntegration
+  - SearchThisWeek
+  - MsgCase
+  - MsgKQL
+  - MsgRecipients
+  - MsgMailboxScope
+  - MsgDeleteType
+  - MsgMailboxExclusion
+  name: General (Inputs group)
+inputs:
+- description: The value of the malicious email's "From" attribute.
+  key: From
+  playbookInputQuery: null
+  required: false
+  value:
+    complex:
+      accessor: emailfrom
+      root: incident
+- description: The value of the malicious email's "Subject" attribute.
+  key: Subject
+  playbookInputQuery: null
+  required: false
+  value:
+    complex:
+      accessor: emailsubject
+      root: incident
+- description: The value of the malicious email's "AttachmentName" attribute.
+  key: AttachmentName
+  playbookInputQuery: null
+  required: false
+  value:
+    complex:
+      accessor: attachmentname
+      root: incident
+- description: The integration in which to run the search and delete action. Can be
+    MS Graph, Gmail, EWS, or Agari Phishing Defense.
+  key: SearchAndDeleteIntegration
+  playbookInputQuery: null
+  required: true
+  value: {}
+- description: Whether to limit the search to the current week. Disabling this may
+    increase search scope, execution time, and risk of timeout for large mailboxes.
+  key: SearchThisWeek
+  playbookInputQuery: null
+  required: false
+  value:
+    simple: "true"
+- description: Used only with Microsoft Graph Security. The eDiscovery case name to
+    use. Looked up by name and created if missing.
+  key: MsgCase
+  playbookInputQuery: null
+  required: false
+  value:
+    simple: XSOAR Auto Phishing
+- description: Used only with Microsoft Graph Security. KQL query identifying the
+    emails to search and delete. Built automatically from the From, Subject, and AttachmentName
+    inputs if left empty.
+  key: MsgKQL
+  playbookInputQuery: null
+  required: false
+  value: {}
+- description: Used only with Microsoft Graph Security. CSV of recipient email addresses
+    to scope the search when MsgMailboxScope is recipientsOnly.
+  key: MsgRecipients
+  playbookInputQuery: null
+  required: false
+  value:
+    complex:
+      accessor: emailto
+      root: incident
+- description: Used only with Microsoft Graph Security. Determines which mailboxes
+    to search. Use recipientsOnly to limit to specific recipients, allTenantMailboxes
+    to search the entire tenant.
+  key: MsgMailboxScope
+  playbookInputQuery: null
+  required: false
+  value: {}
+- description: Used only with Microsoft Graph Security. The delete type to perform
+    on the search results. Possible values are Hard or Soft, or leave empty to select
+    manually (Hard = unrecoverable, Soft = recoverable).
+  key: MsgDeleteType
+  playbookInputQuery: null
+  required: false
+  value: {}
+- description: 'Used only with Microsoft Graph Security. CSV of mailboxes to exclude
+    from the search. Honored only when MsgMailboxScope is allTenantMailboxes. Note:
+    exclusion works at the message level, not the mailbox level — see subplaybook
+    description for details.'
+  key: MsgMailboxExclusion
+  playbookInputQuery: null
+  required: false
+  value: {}
+name: Search And Delete Emails - Generic v2
+outputSections:
+- description: Generic group for outputs
+  name: General (Outputs group)
+  outputs: []
+outputs: []
+starttaskid: "0"
+system: true
+tasks:
+  "0":
+    continueonerrortype: ""
+    id: "0"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "4"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: 9d36f834-c317-4754-8b4f-99b0f343ee99
+      iscommand: false
+      name: ""
+      version: -1
+    taskid: 9d36f834-c317-4754-8b4f-99b0f343ee99
+    timertriggers: []
+    type: start
+    view: |-
+      {
+        "position": {
+          "x": 1135,
+          "y": 50
+        }
+      }
+  "1":
+    continueonerrortype: ""
+    id: "1"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    loop:
+      exitCondition: ""
+      iscommand: false
+      max: 0
+      wait: 1
+    nexttasks:
+      '#none#':
+      - "2"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      AttachmentName:
+        complex:
+          root: inputs.AttachmentName
+      DeleteType:
+        simple: trash
+      From:
+        complex:
+          root: inputs.From
+      Limit:
+        simple: "20"
+      SearchThisWeek:
+        simple: "true"
+      Subject:
+        complex:
+          root: inputs.Subject
+    separatecontext: false
+    skipunavailable: true
+    task:
+      brand: ""
+      description: This playbook searches EWS to identify and delete emails with similar
+        attributes of a malicious email.
+      id: ec7c3830-586e-4e30-8f24-344bae4d0384
+      iscommand: false
+      name: Search And Delete Emails - EWS
+      playbookName: Search And Delete Emails - EWS
+      type: playbook
+      version: -1
+    taskid: ec7c3830-586e-4e30-8f24-344bae4d0384
+    timertriggers: []
+    type: playbook
+    view: |-
+      {
+        "position": {
+          "x": 1720,
+          "y": 1850
+        }
+      }
+  "2":
+    continueonerrortype: ""
+    id: "2"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: 354d75ed-3942-4bb1-8aa3-0f663e17dbc5
+      iscommand: false
+      name: Done
+      type: title
+      version: -1
+    taskid: 354d75ed-3942-4bb1-8aa3-0f663e17dbc5
+    timertriggers: []
+    type: title
+    view: |-
+      {
+        "position": {
+          "x": 1145,
+          "y": 2020
+        }
+      }
+  "4":
+    conditions:
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: EWS v2
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+          right:
+            value: {}
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: Microsoft Graph
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+      - - ignorecase: true
+          left:
+            iscontext: true
+            value:
+              complex:
+                root: inputs.SearchAndDeleteIntegration
+          operator: isEqualString
+          right:
+            value:
+              simple: MS Graph
+      label: Both Enabled, input is MS Graph
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: Microsoft Graph
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: EWS v2
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isEmpty
+      - - ignorecase: true
+          left:
+            iscontext: true
+            value:
+              complex:
+                root: inputs.SearchAndDeleteIntegration
+          operator: isEqualString
+          right:
+            value:
+              simple: MS Graph
+      label: Only MS Graph Enabled
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: EWS v2
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: Microsoft Graph
+                - - left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+      - - ignorecase: true
+          left:
+            iscontext: true
+            value:
+              complex:
+                root: inputs.SearchAndDeleteIntegration
+          operator: isEqualString
+          right:
+            value:
+              simple: EWS
+      label: Both Enabled, input is EWS
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: EWS v2
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: Microsoft Graph
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isEmpty
+      - - ignorecase: true
+          left:
+            iscontext: true
+            value:
+              complex:
+                root: inputs.SearchAndDeleteIntegration
+          operator: isEqualString
+          right:
+            value:
+              simple: EWS
+      label: Only EWS enabled
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: Gmail
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+      - - ignorecase: true
+          left:
+            iscontext: true
+            value:
+              complex:
+                root: inputs.SearchAndDeleteIntegration
+          operator: isEqualString
+          right:
+            value:
+              simple: Gmail
+      label: Gmail
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              complex:
+                filters:
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.brand
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: Agari Phishing Defense
+                - - ignorecase: true
+                    left:
+                      iscontext: true
+                      value:
+                        simple: modules.state
+                    operator: isEqualString
+                    right:
+                      value:
+                        simple: active
+                root: modules
+          operator: isNotEmpty
+      - - ignorecase: true
+          left:
+            iscontext: true
+            value:
+              complex:
+                root: inputs.SearchAndDeleteIntegration
+          operator: isEqualString
+          right:
+            value:
+              simple: Agari Phishing Defense
+      label: Agari Phishing Defense
+    continueonerrortype: ""
+    id: "4"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#default#':
+      - "2"
+      Agari Phishing Defense:
+      - "15"
+      Both Enabled, input is EWS:
+      - "10"
+      Both Enabled, input is MS Graph:
+      - "12"
+      Gmail:
+      - "13"
+      Only EWS enabled:
+      - "10"
+      Only MS Graph Enabled:
+      - "11"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Checks which integration and playbook should run the search and
+        delete action, by checking the SearchAndDeleteIntegration playbook input.
+      id: 5d3bcbb8-6d33-4586-b6fb-2e8512c4b930
+      iscommand: false
+      name: In what integration should emails be searched and deleted?
+      type: condition
+      version: -1
+    taskid: 5d3bcbb8-6d33-4586-b6fb-2e8512c4b930
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 1135,
+          "y": 195
+        }
+      }
+  "5":
+    conditions:
+    - condition:
+      - - ignorecase: true
+          left:
+            iscontext: true
+            value:
+              simple: inputs.MsgMailboxScope
+          operator: isNotEmpty
+      label: "yes"
+    continueonerrortype: ""
+    id: "5"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#default#':
+      - "6"
+      "yes":
+      - "19"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Checks whether MsgMailboxScope is provided. If empty, prompts the
+        analyst to select manually.
+      id: 05817b01-c9a3-4780-88e7-39224fb61aff
+      iscommand: false
+      name: Is mailbox scope specified?
+      type: condition
+      version: -1
+    taskid: 05817b01-c9a3-4780-88e7-39224fb61aff
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 500,
+          "y": 510
+        }
+      }
+  "6":
+    continueonerrortype: ""
+    id: "6"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#default#':
+      - "2"
+      allTenantMailboxes:
+      - "8"
+      recipientsOnly:
+      - "7"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Allows the analyst to decide where to search for and delete the
+        email - from the recipient's mailbox, or from all available mailboxes?
+      id: 65e328bb-ea91-46b6-8354-7d8341a98710
+      iscommand: false
+      name: Manually select mailbox scope
+      type: condition
+      version: -1
+    taskid: 65e328bb-ea91-46b6-8354-7d8341a98710
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 500,
+          "y": 670
+        }
+      }
+  "7":
+    continueonerrortype: ""
+    id: "7"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "19"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      key:
+        simple: MsgMailboxScope
+      value:
+        simple: recipientsOnly
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Set a value in context under the key you entered.
+      id: caaa2ac0-9a61-4b68-82a9-3b920f4948b6
+      iscommand: false
+      name: Set MsgMailboxScope = recipientsOnly
+      script: Set
+      type: regular
+      version: -1
+    taskid: caaa2ac0-9a61-4b68-82a9-3b920f4948b6
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 180,
+          "y": 850
+        }
+      }
+  "8":
+    continueonerrortype: ""
+    id: "8"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "19"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      key:
+        simple: MsgMailboxScope
+      value:
+        simple: allTenantMailboxes
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Set a value in context under the key you entered.
+      id: 4a9fa05f-ff6f-49d3-8425-1f78679c51dd
+      iscommand: false
+      name: Set MsgMailboxScope = allTenantMailboxes
+      script: Set
+      type: regular
+      version: -1
+    taskid: 4a9fa05f-ff6f-49d3-8425-1f78679c51dd
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 820,
+          "y": 850
+        }
+      }
+  "9":
+    continueonerrortype: ""
+    id: "9"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    loop:
+      exitCondition: ""
+      iscommand: false
+      max: 0
+      wait: 1
+    nexttasks:
+      '#none#':
+      - "2"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      case:
+        simple: ${inputs.MsgCase}
+      delete_type:
+        simple: ${inputs.MsgDeleteType}
+      kql:
+        simple: ${KQLQuery}
+      mailbox_exclusion:
+        simple: ${inputs.MsgMailboxExclusion}
+      mailbox_scope:
+        simple: ${inputs.MsgMailboxScope}
+      recipients:
+        simple: ${inputs.MsgRecipients}
+    separatecontext: true
+    skipunavailable: true
+    task:
+      brand: ""
+      description: |-
+        This playbook performs the following steps:
+          1. Checks that the Microsoft Graph integration is available and active.
+          2. Lists existing eDiscovery cases and finds the specified case, or creates it if missing.
+          3. Composes the KQL content query based on the mailbox scope (recipientsOnly, allTenantMailboxes, or other).
+          4. Creates a new eDiscovery search with the composed query, or reuses an existing search based on the force input.
+          5. Runs an estimate statistics operation to count emails matching the query.
+          6. Waits for the estimate operation to complete and checks whether any emails were found.
+          7. Optionally previews the results (statistics summary or full export), based on the preview input.
+          8. Purges the matching emails (Hard delete / Soft delete / manual analyst approval).
+          9. Cleans up the eDiscovery search based on the cleanup input.
+      id: 11423dc0-0239-45fd-b3af-33098fff4df7
+      iscommand: false
+      name: Search And Delete Emails - Microsoft Graph Security
+      playbookName: Search And Delete Emails - Microsoft Graph Security
+      type: playbook
+      version: -1
+    taskid: 11423dc0-0239-45fd-b3af-33098fff4df7
+    timertriggers: []
+    type: playbook
+    view: |-
+      {
+        "position": {
+          "x": 510,
+          "y": 1850
+        }
+      }
+  "10":
+    continueonerrortype: ""
+    id: "10"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "1"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: cc0f7aec-cf1d-4a99-8fa7-eb15de2da600
+      iscommand: false
+      name: Use EWS
+      type: title
+      version: -1
+    taskid: cc0f7aec-cf1d-4a99-8fa7-eb15de2da600
+    timertriggers: []
+    type: title
+    view: |-
+      {
+        "position": {
+          "x": 1460,
+          "y": 370
+        }
+      }
+  "11":
+    continueonerrortype: ""
+    id: "11"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "5"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: 8040a8a1-5ab9-4f77-8364-414650858628
+      iscommand: false
+      name: Use MS Graph
+      type: title
+      version: -1
+    taskid: 8040a8a1-5ab9-4f77-8364-414650858628
+    timertriggers: []
+    type: title
+    view: |-
+      {
+        "position": {
+          "x": 820,
+          "y": 370
+        }
+      }
+  "12":
+    continueonerrortype: ""
+    id: "12"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "5"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: 40d6be8a-cafc-4489-8599-69a39d2c213c
+      iscommand: false
+      name: Use MS Graph
+      type: title
+      version: -1
+    taskid: 40d6be8a-cafc-4489-8599-69a39d2c213c
+    timertriggers: []
+    type: title
+    view: |-
+      {
+        "position": {
+          "x": 210,
+          "y": 370
+        }
+      }
+  "13":
+    continueonerrortype: ""
+    id: "13"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "14"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: c24f2f3c-b0e8-4791-8d89-0a3087630dd7
+      iscommand: false
+      name: Use Gmail
+      type: title
+      version: -1
+    taskid: c24f2f3c-b0e8-4791-8d89-0a3087630dd7
+    timertriggers: []
+    type: title
+    view: |-
+      {
+        "position": {
+          "x": -275,
+          "y": 370
+        }
+      }
+  "14":
+    continueonerrortype: ""
+    id: "14"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    loop:
+      exitCondition: ""
+      iscommand: false
+      max: 100
+      wait: 1
+    nexttasks:
+      '#none#':
+      - "2"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: true
+    task:
+      brand: ""
+      id: 154c126e-d9a8-4bd8-872f-a302a6e18158
+      iscommand: false
+      name: Search And Delete Emails - Gmail
+      playbookId: Search And Delete Emails - Gmail
+      type: playbook
+      version: -1
+    taskid: 154c126e-d9a8-4bd8-872f-a302a6e18158
+    timertriggers: []
+    type: playbook
+    view: |-
+      {
+        "position": {
+          "x": -265,
+          "y": 1850
+        }
+      }
+  "15":
+    continueonerrortype: ""
+    id: "15"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "16"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: 2d02540f-1081-4a38-88fe-a028ffc6640a
+      iscommand: false
+      name: Agari Phishing Defense
+      type: title
+      version: -1
+    taskid: 2d02540f-1081-4a38-88fe-a028ffc6640a
+    timertriggers: []
+    type: title
+    view: |-
+      {
+        "position": {
+          "x": 2445,
+          "y": 370
+        }
+      }
+  "16":
+    continueonerrortype: ""
+    id: "16"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "2"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      id:
+        complex:
+          accessor: emailinternalmessageid
+          root: incident
+      operation:
+        simple: delete
+    separatecontext: false
+    skipunavailable: true
+    task:
+      brand: Agari Phishing Defense
+      description: Remediates the suspected message.
+      id: 470c2cb1-a79b-4240-8021-886fc7e5a9cd
+      iscommand: true
+      name: Search And Delete Emails - Agari Phishing Defense
+      script: Agari Phishing Defense|||apd-remediate-message
+      type: regular
+      version: -1
+    taskid: 470c2cb1-a79b-4240-8021-886fc7e5a9cd
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 2455,
+          "y": 1850
+        }
+      }
+  "17":
+    continueonerrortype: ""
+    id: "17"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "21"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      dateFormat:
+        simple: ISO
+      daysAgo:
+        simple: "7"
+      extend-context:
+        simple: Time7DaysAgo=.
+      ignore-outputs:
+        simple: "true"
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: |
+        Retrieves the current date and time.
+      id: 44d8e9c2-5138-4ffd-80e5-3f0f27014f4a
+      iscommand: false
+      name: Get time 7 days ago
+      script: GetTime
+      type: regular
+      version: -1
+    taskid: 44d8e9c2-5138-4ffd-80e5-3f0f27014f4a
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 190,
+          "y": 1340
+        }
+      }
+  "18":
+    continueonerrortype: ""
+    id: "18"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "9"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      key:
+        simple: KQLQuery
+      value:
+        simple: (${inputs.MsgKQL}) AND Received>=${Time7DaysAgo}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Set a value in context under the key you entered.
+      id: a56e76ce-59af-4c25-8ced-de4a75525aa7
+      iscommand: false
+      name: Create KQL query - provided query + search last 7 days
+      script: Set
+      type: regular
+      version: -1
+    taskid: a56e76ce-59af-4c25-8ced-de4a75525aa7
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 190,
+          "y": 1680
+        }
+      }
+  "19":
+    conditions:
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              simple: inputs.SearchThisWeek
+          operator: isEqualString
+          right:
+            value:
+              simple: "true"
+      - - left:
+            iscontext: true
+            value:
+              simple: inputs.MsgKQL
+          operator: notContainsString
+          right:
+            value:
+              simple: Received
+      label: "yes"
+    continueonerrortype: ""
+    id: "19"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#default#':
+      - "20"
+      "yes":
+      - "23"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Check whether to modify KQL to search this week (the last 7 days)
+        only. Only modify the KQL if the SearchThisWeek input is set to true AND the
+        provided KQL query is not already time-bounded (it does not already contain
+        Received).
+      id: 0ba16dcb-d66f-49d8-8a0f-2a3dd9dfe3dc
+      iscommand: false
+      name: Search this week only and query not already time-bounded?
+      type: condition
+      version: -1
+    taskid: 0ba16dcb-d66f-49d8-8a0f-2a3dd9dfe3dc
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 500,
+          "y": 1050
+        }
+      }
+  "20":
+    continueonerrortype: ""
+    id: "20"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "9"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      key:
+        simple: KQLQuery
+      value:
+        simple: ${inputs.MsgKQL}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Set a value in context under the key you entered.
+      id: 0df0eb77-44e1-4694-8f06-4573ab19cf47
+      iscommand: false
+      name: Set the non-modified KQL query
+      script: Set
+      type: regular
+      version: -1
+    taskid: 0df0eb77-44e1-4694-8f06-4573ab19cf47
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 830,
+          "y": 1210
+        }
+      }
+  "21":
+    conditions:
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              simple: inputs.MsgKQL
+          operator: isNotEmpty
+          right:
+            value: {}
+      label: "yes"
+    continueonerrortype: ""
+    id: "21"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#default#':
+      - "22"
+      "yes":
+      - "18"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Checks whether a KQL query is provided or not.
+      id: 561b42bf-a339-4ef0-8563-55c568c0117e
+      iscommand: false
+      name: KQL query provided?
+      type: condition
+      version: -1
+    taskid: 561b42bf-a339-4ef0-8563-55c568c0117e
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 190,
+          "y": 1495
+        }
+      }
+  "22":
+    continueonerrortype: ""
+    id: "22"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "9"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      key:
+        simple: KQLQuery
+      value:
+        simple: Received>=${Time7DaysAgo}
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: Set a value in context under the key you entered.
+      id: 858817e1-f175-4b51-8f0b-9635330c0898
+      iscommand: false
+      name: Create KQL query - search last 7 days
+      script: Set
+      type: regular
+      version: -1
+    taskid: 858817e1-f175-4b51-8f0b-9635330c0898
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 830,
+          "y": 1680
+        }
+      }
+  "23":
+    continueonerrortype: ""
+    id: "23"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "17"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      key:
+        simple: Time7DaysAgo
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      description: "Delete field from context.\n\nThis automation runs using the default
+        Limited User role, unless you explicitly change the permissions.\nFor more
+        information, see the section about permissions here:\n- For Cortex XSOAR 6
+        see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/6.x/Cortex-XSOAR-Playbook-Design-Guide/Automations
+        \n- For Cortex XSOAR 8 Cloud see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8/Cortex-XSOAR-Cloud-Documentation/Create-a-script\n-
+        For Cortex XSOAR 8.7 On-prem see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8.7/Cortex-XSOAR-On-prem-Documentation/Create-a-script"
+      id: 710dfa56-a795-496f-a742-f338c29040e8
+      iscommand: false
+      name: Delete Time7DaysAgo from Context
+      script: DeleteContext
+      type: regular
+      version: -1
+    taskid: 710dfa56-a795-496f-a742-f338c29040e8
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 190,
+          "y": 1210
+        }
+      }
+version: -1
+view: |-
+  {
+    "linkLabelsPosition": {
+      "21_22_#default#": 0.41,
+      "4_13_Gmail": 0.81,
+      "4_15_Agari Phishing Defense": 0.86,
+      "4_2_#default#": 0.9
+    },
+    "paper": {
+      "dimensions": {
+        "height": 2030,
+        "width": 3110,
+        "x": -275,
+        "y": 50
+      }
+    }
+  }
