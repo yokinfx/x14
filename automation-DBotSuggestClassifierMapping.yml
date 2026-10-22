@@ -19,7 +19,7 @@ contentitemexportablefields:
   contentitemfields:
     definitionid: ""
     fromServerVersion: 5.0.0
-    itemVersion: 1.42.30
+    itemVersion: 1.42.36
     packID: Base
     packName: Base
     packPropagationLabels:
@@ -37,8 +37,8 @@ runas: DBotWeakRole
 runonce: false
 script: |
   register_module_line('DBotSuggestClassifierMapping', 'start', __line__())
-  CONSTANT_PACK_VERSION = '1.42.30'
-  demisto.debug('pack id = Base, pack version = 1.42.30')
+  CONSTANT_PACK_VERSION = '1.42.36'
+  demisto.debug('pack id = Base, pack version = 1.42.36')
 
 
   import itertools
