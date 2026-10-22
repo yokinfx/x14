@@ -1,0 +1,3657 @@
+category: Data Enrichment & Threat Intelligence
+commonfields:
+  id: EDL
+  version: -1
+configuration:
+- additionalinfo: Enabling this prevents automatic list refresh.
+  advanced: true
+  display: Update list on demand only
+  name: on_demand
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: The query to run to update the indicators list. To view expected
+    results, run the following command from the Cortex XSOAR CLI `!findIndicators
+    query=<your query>`. An empty value may load unwanted indicators. See integration
+    docs for troubleshooting information.
+  display: Indicator Query
+  name: indicators_query
+  required: false
+  section: Collect
+  type: 0
+- additionalinfo: The format of the exported list.
+  advanced: true
+  defaultvalue: PAN-OS (text)
+  display: Outbound Format
+  name: format
+  options:
+  - PAN-OS (text)
+  - CSV
+  - JSON
+  - McAfee Web Gateway
+  - Symantec ProxySG
+  required: false
+  section: Collect
+  type: 15
+- additionalinfo: For use with JSON and CSV formats - select specific XSOAR fields
+    to export (comma separated list). If given the value 'all' - all XSOAR fields
+    are exported (in large quantities this can cause a performance issue). If left
+    empty - only value and type are exported.
+  advanced: true
+  display: Exported Fields
+  name: fields_filter
+  required: false
+  section: Collect
+  type: 0
+- additionalinfo: Maximum number of items in the list.
+  defaultvalue: "2500"
+  display: List Size
+  name: edl_size
+  required: false
+  section: Collect
+  type: 0
+- additionalinfo: How often to refresh the list (e.g., less than 1 minute, 5 minutes,
+    12 hours, 7 days, 3 months, 1 year). For performance reasons, we do not recommend
+    setting this value at less than 1 minute.
+  advanced: true
+  defaultvalue: 30 minutes
+  display: Refresh Rate
+  name: cache_refresh_rate
+  required: false
+  section: Collect
+  type: 0
+- additionalinfo: (For Cortex XSOAR 6.x) For use with HTTPS - the certificate that
+    the service should use. (For Cortex XSOAR 8 and Cortex XSIAM) Custom certificates
+    are not supported.
+  advanced: true
+  display: Certificate (Required for HTTPS)
+  name: certificate
+  required: false
+  section: Connect
+  type: 12
+- additionalinfo: (For Cortex XSOAR 6.x) For use with HTTPS - the private key that
+    the service should use.  <br> (For Cortex XSOAR 8 and Cortex XSIAM) When using
+    an engine, configure a private API key. Not supported on the Cortex XSOAR​​ 8
+    or Cortex XSIAM server.
+  advanced: true
+  display: Private Key (Required for HTTPS)
+  name: key
+  required: false
+  section: Connect
+  type: 14
+- additionalinfo: The parameter is deprecated and no longer used. Cache locking was
+    replaced by a two-tier fail-fast design that rejects excess concurrent cache-building
+    requests instead of queuing them.
+  advanced: true
+  defaultvalue: 1h
+  display: Cache Lock Timeout (Deprecated)
+  hidden: true
+  name: cache_lock_timeout
+  required: false
+  section: Connect
+  type: 0
+- additionalinfo: The parameter is deprecated and no longer used. Cache locking was
+    replaced by a two-tier fail-fast design that rejects excess concurrent cache-building
+    requests instead of queuing them.
+  advanced: true
+  defaultvalue: 1h
+  display: Cache Lock Age (Deprecated)
+  hidden: true
+  name: cache_lock_age
+  required: false
+  section: Connect
+  type: 0
+- additionalinfo: The TTL for 404 responses in the cache.
+  advanced: true
+  defaultvalue: 1m
+  display: Cache 404 TTL
+  name: cache_404_ttl
+  required: false
+  section: Connect
+  type: 0
+- additionalinfo: The default TTL for responses in the cache.
+  advanced: true
+  defaultvalue: 1m
+  display: Cache Default TTL
+  name: cache_default_ttl
+  required: false
+  section: Connect
+  type: 0
+- additionalinfo: Uses basic authentication for accessing the list. If empty, no authentication
+    is enforced. (For Cortex XSOAR 8 and Cortex XSIAM) Optional for engines, otherwise
+    mandatory.
+  display: Username
+  name: credentials
+  required: false
+  section: Connect
+  type: 9
+- additionalinfo: "Runs the service on this port from within Cortex XSOAR. Requires
+    a unique port for each long-running integration instance. Do not use the same
+    port for multiple instances.\nNote: If you click the **Test** button more than
+    once, a failure may occur mistakenly indicating that the port is already in use.
+    (For Cortex XSOAR 8 and Cortex XSIAM) If you do not enter a Listen Port, an unused
+    port for the EDL will automatically be generated when the instance is saved. However,
+    if using an engine, you must enter a Listen Port.                     "
+  display: Listen Port
+  name: longRunningPort
+  required: true
+  section: Connect
+  type: 0
+- additionalinfo: If selected, the comment "# Empty list" is added to an empty list.
+  advanced: true
+  defaultvalue: "true"
+  display: Add comment to empty list
+  name: add_comment_if_empty
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: If selected, ports in URLs are removed. For example, 'www.example.com:9999/path'
+    becomes 'www.example.com/path'.
+  advanced: true
+  defaultvalue: "true"
+  display: Strip ports from URLs
+  name: url_port_stripping
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: If selected, strips the protocol from URLs (http/https).
+  advanced: true
+  defaultvalue: "true"
+  display: Strip protocols from URLs
+  name: url_protocol_stripping
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: If selected, URLs are truncated to no more than 254 characters.
+  advanced: true
+  defaultvalue: "false"
+  display: Truncate URL length
+  name: url_truncate
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: If selected, it will force the list to contain only ASCII chars
+    (non-ASCII URLs will be dropped).
+  advanced: true
+  defaultvalue: "false"
+  display: Enforce ASCII only
+  name: enforce_ascii
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: For use with PAN-OS (text) format - String to add to beginning of
+    published list. Supports newline characters (\n).
+  advanced: true
+  display: Prepend string to list
+  name: prepend_string
+  required: false
+  section: Collect
+  type: 12
+- additionalinfo: For use with PAN-OS (text) format - String to add to end of published
+    list. Supports newline characters (\n).
+  advanced: true
+  display: Append string to list
+  name: append_string
+  required: false
+  section: Collect
+  type: 12
+- additionalinfo: For use with PAN-OS (text) format - collapse method for IPs (none,
+    range, CIDR).
+  advanced: true
+  defaultvalue: Don't Collapse
+  display: IP Collapsing
+  name: collapse_ips
+  options:
+  - Don't Collapse
+  - To CIDRS
+  - To Ranges
+  required: false
+  section: Collect
+  type: 15
+- additionalinfo: CIDRs with a lower network prefix bits number are not included.
+    For example - if the number is 8, then 0.0.0.0/2 is excluded from the list.
+  advanced: true
+  defaultvalue: "8"
+  display: Maximum Size of CIDR Block (by mask bit)
+  name: maximum_cidr_size
+  required: false
+  section: Collect
+  type: 0
+- additionalinfo: Option to remove top level domainGlobs from the list. For example
+    - *.com.
+  advanced: true
+  defaultvalue: "false"
+  display: Exclude top level domainGlobs
+  name: no_wildcard_tld
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: For use with PAN-OS (text) format - if selected, any URL entry that
+    is not compliant with PAN-OS URL format is dropped instead of rewritten.
+  advanced: true
+  display: 'PAN-OS: drop invalid URL entries'
+  name: drop_invalids
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: When set to true and the certificate and private key are provided,
+    the HSTS header is added to all requests.
+  defaultvalue: "false"
+  display: Add HSTS header
+  name: hsts_header
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: For use with McAfee Web Gateway format - set the indicator list
+    type.
+  advanced: true
+  defaultvalue: string
+  display: 'McAfee Gateway: Indicator List Type'
+  name: mwg_type
+  options:
+  - string
+  - applcontrol
+  - dimension
+  - category
+  - ip
+  - mediatype
+  - number
+  - regex
+  required: false
+  section: Collect
+  type: 15
+- additionalinfo: For use with Symantec ProxySG format - set the default category
+    for the output.
+  advanced: true
+  defaultvalue: bc_category
+  display: 'Symantec ProxySG: Default Category'
+  name: category_default
+  required: false
+  section: Collect
+  type: 0
+- additionalinfo: For use with Symantec ProxySG format - set the categories that should
+    be listed in the output (comma separated list). If not set, lists all existing
+    categories.
+  advanced: true
+  display: 'Symantec ProxySG: Listed Categories'
+  name: category_attribute
+  required: false
+  section: Collect
+  type: 0
+- additionalinfo: If selected, CSV format appears in a textual webpage instead of
+    initiating a file download.
+  display: Show CSV format as Text
+  name: csv_text
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: Internal page size used when querying Cortex XSOAR for the indicators.
+    Value can be up to 10,000 due to performance limitations.
+  advanced: true
+  defaultvalue: "10000"
+  display: XSOAR Indicator Page Size
+  name: page_size
+  required: false
+  section: Collect
+  type: 0
+- defaultvalue: "true"
+  display: Long Running Instance
+  hidden: true
+  name: longRunning
+  required: false
+  section: Connect
+  type: 8
+- additionalinfo: 'NGINX global directives to be passed on the command line using
+    the -g option. Each directive should end with `;`. For example: `worker_processes
+    4; timer_resolution 100ms;`. Advanced configuration to be used only if instructed
+    by Cortex XSOAR Support.'
+  advanced: true
+  display: NGINX Global Directives
+  name: nginx_global_directives
+  required: false
+  section: Connect
+  type: 0
+- additionalinfo: NGINX server configuration to be used instead of the default NGINX_SERVER_CONF
+    used in the integration code. Advanced configuration to be used only if instructed
+    by Cortex XSOAR Support.
+  advanced: true
+  display: NGINX Server Conf
+  name: nginx_server_conf
+  required: false
+  section: Connect
+  type: 12
+- additionalinfo: NGNIX read timeout in seconds.
+  advanced: true
+  display: NGINX Read Timeout
+  name: timeout
+  required: false
+  section: Connect
+  type: 0
+- additionalinfo: 'When enabled, the integration queries the server using full queries
+    (overwrites the "Exported Fields" parameter). Advanced configuration to be used
+    only if instructed by Cortex XSOAR Support, or you have encountered log errors
+    in the form of: msgpack: invalid code.'
+  advanced: true
+  display: 'Advanced: Use Legacy Queries'
+  name: use_legacy_query
+  required: false
+  section: Collect
+  type: 8
+- additionalinfo: This parameter will write additional data to the logs and should
+    only be used when you are directed to by XSOAR support.
+  advanced: true
+  defaultvalue: "false"
+  display: Extensive Logging
+  name: extensive_logging
+  required: false
+  section: Connect
+  type: 8
+- display: Incident type
+  name: incidentType
+  required: false
+  type: 13
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 5.5.0
+    itemVersion: 3.4.4
+    packID: EDL
+    packName: Generic Export Indicators Service
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+description: Use the Generic Export Indicators Service integration to provide an endpoint
+  with a list of indicators as a service for the system indicators.
+detaileddescription: "## Generic Export Indicators Service\n\nIf you have several
+  Generic Export Indicators Service integration instances, make sure to use **different
+  listening ports** to separate the outbound feeds.\nEach instance uses three consecutive
+  ports: the configured **Listen Port**, port + 1, and port + 2. NGINX listens on
+  the configured port (public), the Python process listens on port + 1, and NGINX
+  uses port + 2 internally for its fail-fast cache fetch tier. For example, if configured
+  for port 9009, ports 9009, 9010, and 9011 must all be free. Ensure no other instance
+  uses a **Listen Port** within 2 of another. When running without `--network=host`,
+  ports + 1 and + 2 are not exposed to the machine.\n\nThe Generic Export Indicators
+  Service is a long-running integration. For more information about long-running integrations,
+  check out the  \n\n\n\n\n\n\n\n### Access the Generic Export Indicators Service
+  by URL and Port (HTTP)\nIn a web browser, go to **http://<cortex-xsoar-server-address>:<listen_port>**.\n\n**Note**:
+  For security purposes, Cortex XSOAR recommends that you use HTTPS when accessing
+  the indicator service through the URL and port. To do so, you must provide a certificate
+  and private key, in the respective fields. In addition, make sure to provide credentials
+  that must be used to connect to the integration instance.\n\n**Note**: By default,
+  the route to access the Generic Export Indicators Service by instance name will
+  be open without security hardening and might expose you to network risks. Cortex
+  XSOAR recommends that you use the service with a username and password. Click **Switch
+  to username and password** and provide the credentials that must be used to access
+  the service.\n\n**Note**: The `Listen Port` parameter is required.\n\n1. Navigate
+  to **Settings > About > Troubleshooting**.\n2. In the **Server Configuration** section,
+  verify that the `instance.execute.external.<instance_name>` key is set to `true`.
+  If this key does not exist, click **+ Add Server Configuration** and add the `instance.execute.external.<instance_name>`
+  and set the value to `true`. See [this documentation](https://xsoar.pan.dev/docs/reference/articles/long-running-invoke)
+  for further information.\n3.  In a web browser, go to\n    `https://*<xsoar_address>*/instance/execute/*<instance_name>*`\n
+  \    (In Multi Tenant environments, go to `https://<cortex-xsoar-address>/acc-<account
+  name>/instance/execute/<instance_name>/`)\n\n\n\n\n#### Note:\nWhen using more than
+  one server in High Availability (HA) mode, the External Dynamic List (EDL) should
+  be configured to listen on a route, not on a port.\n\nIn \"route\" listen mode,
+  a request received by any of the app servers will be redirected to the one currently
+  running the NGINX container.\nThis does not happen in \"port\" listen mode, that's
+  why \"route\" mode should be used.\n\nIf the app server running the container fails,
+  the container should restart on a different app server.\nFailover time should be
+  about 1 minute plus the container startup time.\n\n### Modify Request Parameters
+  Through the URL\nUse the following arguments in the URL to change the request:\n\n|
+  argument | Description | Example |\n| --- | --- | --- |\n| **n** | The maximum number
+  of entries in the output. If no value is provided, will use the value specified
+  in the *List Size* parameter configured in the instance configuration. | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?n=50
+  |\n| **s** | The starting entry index from which to export the indicators when index
+  0 is the first position. | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?s=10&n=50
+  |\n| **v** | The output format. Supports `PAN-OS (text)`, `CSV`, `JSON`, `mwg` and
+  `proxysg` (alias: `bluecoat`). | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=json
+  |\n| **q** | The query used to retrieve indicators from the system. If you are using
+  this argument, no more than 100,000 can be exported through the EDL. | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?q=\"type:ip
+  and sourceBrand:my_source\" |\n| **t** | Only with `mwg` format. The type indicated
+  on the top of the exported list. Supports: string, applcontrol, dimension, category,
+  ip, mediatype, number and regex. | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=mwg&t=ip
+  |\n| **sp** | If set. will strip ports off URLs, otherwise will ignore URLs with
+  ports. | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=text&sp
+  |\n| **di** | Only with `PAN-OS (text)` format. If set, will ignore URLs which are
+  not compliant with PAN-OS URL format instead of being re-written. | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=text&di
+  |\n| **pr** | If set, will strip protocols off URLs.| https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=text&pr
+  |\n|**cd** | Only with `proxysg` format. The default category for the exported indicators.
+  | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=proxysg&cd=default_category
+  |\n| **ca** | Only with `proxysg` format. The categories which will be exported.
+  Indicators not in these categories will be classified as the default category. |
+  https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=proxysg&ca=category1,category2
+  |\n| **tr** | Only with `PAN-OS (text)` format. Whether to collapse IPs.<br/>* 0
+  - Do not collapse.<br/>* 1 - Collapse to ranges.<br/>* 2 - Collapse to CIDRs. |
+  https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?q=\"type:ip
+  and sourceBrand:my_source\"&tr=1 |\n| **tx** | Whether to output `CSV` formats as
+  textual web pages. | https://{cortex-xsoar_instance}/instance/execute/{ExportIndicators_instance_name}?v=csv&tx
+  |\n\n### When Running in On-Demand Mode\nMake sure you run the ***!export-indicators-list-update***
+  command for the first time to initialize the export process.\n\n### Important Notes:\n-
+  If you frequently use different queries for the same EDL instance through the *q*
+  inline argument, use separate EDL instances (one per query) and set a default query
+  for each to improve performance.\n- When using the *q* inline argument, the number
+  of exported indicators is limited to 100,000 for performance reasons. To export
+  more than 100,000 indicators, create a new integration instance with the desired
+  Indicator Query and List Size.\n- When the integration is configured with ***Update
+  list on demand only***, the indicator list refreshes based on the value set in the
+  ***Refresh Rate*** parameter.\n\n## Troubleshoot\n\nTo view logs concerning the
+  creation of the indicator list and its current status add the `/log` suffix to the
+  list URL.\n\n\n\n`https://*<xsoar_address>*/instance/execute/*<instance_name>*/log`\n\n\n\n---\n[View
+  Integration Documentation](https://xsoar.pan.dev/docs/reference/integrations/edl)"
+display: Generic Export Indicators Service
+image: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAAyCAYAAACXpx/YAAAABGdBTUEAALGPC/xhBQAADNlJREFUeAHtWgtwVNUZPufefeUdoqBUYnY3m5CQClR8YalSh9aiYqCVzuALaJVqO/XB1KqjYzO2+ADro2MZtXUyPLRaRE1ttU61ZIoWBwkgIRaS3ewGH6Ahj40J2WT33tPvv8m53F13SQJi1d47k5zXf/7/nO87/zn/OQlj9mcjYCNgI2AjYCNgI2AjYCNgI2AjYCNgI2AjYCNgI2AjYCNgI2AjYCNgI2AjYCNgI2AjYCPwf4oAH828o5eW3ci5aM2vC76UTr5rfqBG5cpr+S80v5Gu/YtQF/D66oUQ5w+Nhb8Ragt/6/MaV8Dr3SEEmz5s+2+wfcnnZVsZyVBXdeBmnekP64w911MdmJcq310duJfp4learr/Ss6B8Vmq7Xc6MwNTS0gnlfv+sQIn/R+Xl5adkljz6liMSTOQyIR4k9Vj9rlSSiVzU32aYFyLXJnn0RJSXlM7tS2gfaZq+WTD9SX1AP3X0vUcv6cgkaiVXyhgkc06efBnIPtck97CAJHnuF3m7lsP9KqYBb+AcRdFzNJ07PTmerWkJTkeuBGPIk5VKwUWVrLOmXAgoF2WoG9V5XFbi/z50/dLQwVnDlYsX/3xd7ZrbGWdXIUCYiLOrEW2vFJ5YtLKhoSEubS1cuFDdsW3bRWj/AeqmYIsJQL6fcR7EfvPyJOZ9pD5SH5PyI6VlPt95QmfXwO5UwZiXCdaCuGMXE45Hg23BHdb+M2bMcPZ0dV0qNDEfspWMi1IueC9S2FbqCk4Y93vrWK19M+cTf0Sc8IlsF0ypCUVCf6cyMOcBv/8aYHsRxjWVMZ4PW42Qedvpca3cs2dPB8lVVVW54v39OboQczH2dxL9Cf+ngqwjkUtKOOe3F9YF7xMLq1zdgwPPwbp5LkMZbPJrC18MPkmyo/kCXv/1Quirh2X3Q/9mTOiHqX05Z1sUl+vS5ubmg3Re6QPxesFEIFVOljGWVkeW5yw5+UxBFpHV3dH5KOZxLfp+Cg/OeAKT/m0w0mocRZV+f9mgLl6DfMYtFUqaVI975t69ew3C0gVZtEVrTHtZjjc15Qq/KhgOr6/wVngTLPY0FvLMVBkqY3wHFaYsa24LvRAIBNwiLs5VmH6RzsU2h+IOJZ3BoyXXMPTn3XHOxIfSaCq5oma2I1pdWjvGwAseO0QuiB6UuimlCYLU+ygP4GBXqJQ3P86jmO0BWYZn+RP9A4/IcqY02tF1B5QvQ7tJrtU2FpEDC/DWMq//OtKRPW5cBImH8vJDx04sgo9lGbartMFBY6yybqQUNntIj/yB/EBNTY2SjlzImjsZxneixrWny73lFcFgcMDhYINc5fB8NYqRR0yCx0IubRnR+YHVAP0nNHAMKslzDXK3v/+0LtiSMQdenO9TFX52S7jVwxzqGdAdluBgMkuxSqdggoJx5Q9DhPI7XQr3hiLhwlAkMpFz5W4pj3bs5AuTF4LZyFiF318Ocu8wqzhvge3pZNvhUGfBtrmAMedVsD2etl54TS3G8B52q1u401EcbIucAPsnYUzmghK6WGTqHU1GqN8jPeZPOLxhfe3a66yeC7sbVbdrPHDJUzijBYdQCJ9gHp3FH6Ps3lDozebW1tdpe6fdziD4KMk1VnQmckHGQjIIAGXgNaorlKLw5c3h8FYiMRQKNQDEmww9Q78UpmnnUjY7P/d3npycEtwpV8RV9RCuG3PougGD50t5kOJqbGgoleXUNC7EbPJQWQ9yfwrb75BtAgq2jW2Z2iGXC9vnUF51O1dM8pb4Q+HwA+6EOxHw+b5b6vNdy5l+NrUPf+O+7vOdJAtHkwquz7H061I9rqVEGnlqSyTyOI6tZ2Q75jprtne2R5ZlqhxXcqWVMZCsulz1shulKG+ylrFgjOBO07R47NChGwIl3pCIJz7GdeMfdN3ARE2CqR8CjowgI2gZfnwwLOjOrKx/JdlS1VTb36D2oqKixAdtbbeVen1tMdG3H976Kgw9AW8zFoDUgX00o20pM0Jq2BuS4Q3yTJd9BOf1Mo9U/VDZd5qlbGQVuHBxaqUsYyUbARWVAZzclkfnuVKJmQoVW7bbLGbI5OTk9FubHA7HAMpC1mFvzqazKdbb9wpAXYUGv2wbDogo6h7lx3OkIOaawHaekGVKYTtpLIiQsykoa99/oF7Xxa8BihlooT+2btZk7X+seczHMj7cEFI+2Euq03XFlJeiSkFdcLnC+UOyQqafKbmc9XOuzit8sfl1qT9TGu2I4hpw+IvFYrQqMZehD5P+z1Nr1y5A6QJZh7NvpUNVzhz/tZPzscXfbtaPkIHH7ZIitJ0/VfvUZFmmVMTj06xlprDG6MGuqyB7lqzHNlmDc3gGnYucKffI+rGmqkPA15K/pPExcRo5mVWC6yxpfO4ctzkfKWcoTSX5f0UuDUqIxAp4STbl6Uzhmp4CmrITQpatix0qPGHcnXtbW7dt2bKlX9eSt2jSk+lTFbbV2iZ44n66S1Id0txEQr/b2o7D+m2M0LQNnNpbwuG7cSZup3NR5+w8q/yR8tzBeqztCEbN46LS5yuhNoQCh8cnmLfMV3qj7FNWUlYJe3S1Mz4wH2pqauqUZZmaAQaRHK0O0F74Md1zSeCYt+UxeK4cENILogc7mgMlvh3vi7bpCG4myTZM4t/BSLAed+dKjE5WZ3d3dNThoWITxluJn6tlw0gpAqrNuB/XoU81ySKdF+s71FJa4mvEEXA6qiaaOrjy+J7W1mbY/gCCRjXkx8Pu8wiw3oQ3Tcd16nJTfoSMxnlzkohg92Is38EoSnDPngYCq1w5rgdifX1LMdWTSRb6H8LYrsSu0amL+DdRbziC0cbVXyTpGy4kbQtEciZyDXlcfAEynYlMXoXMaHlYoZkcHbnUfT/gOwV6L7GSi+Uc5dz5MxJws6wXsFUfpLzxCTYXZ+JK4L4UcnhNGv3n4bjqWcE2zlVxMTQcJpfxBk9OlgEgIuhn4bmHX5wEmz8UC4grkvSMMAR4fDvm8JwUw2LJo4WGOZAn42Esvow8EngvsdoD8jMgh4VwmFy6nuFa9KLUZU2TCJYNUJAUUB2uZwra1kQXlF4dxT33OJDLnKpyIez9U9pEqmO+b6gu5+ktkZadVN8UaTqA6BAk8N1SDiAM4qR+xpOTfQbySduflEmX7g6HP+IOdSrO7hXo126VAbgf0l339LPOOBtg91IbItkwQJ4HMltMWc5i8Kpah9t1JkhLCtRMmTQZxe28nsac2gRdm6B/E9UHI5FXcb5PgdzzGE+fRVaHzC68eF0YirTeZKlPyqJP+g/b9YO4Ytyc2mpMQLAr4Mp4ohRXprZjIKMOqKhvylMlc3jcp9BLlfFEJxITmZM1YbWnJYwW4hS//1Sd8/GaojTSOUg6J0+enJc1kGU8cJSdWfbJhg0bNDpTnX1O40iK58QTkjCSt350d40J1efwOFrkM6e1XebJNuz4dF0vLCgowHV76J0cjyH5uYlcw3HmL5nfg4hft9rW8/X4rl27rESxGX5/QTfnAVXXE568vGBqu7RJt4d169b5US6YMGHCuxRzyLZMaUaCqUMqycOr8/LCvwQ3CBjr3r5+TRLJYySXbGQimNrs79gRMIOsdKpk4EWebCWXZDlWJkheDJJRgicfBbnpbH6Z6+hZFF6f39jY2AWvLdq9e3fXNDxv0pychYW9rKvLGefceAsoKi7ubG9vz0ef7o0bNxZUVFT0tLzdkrczsrN75syZWZ2dnQ562KCbRKf6Xj71xy5xiNoGBwd5Xkeevt+930ky9I8DRVpxT7q/nh3RgyXY3dVlqxDCbSXPlXUyJU+O7lj/GA76Z0dzz5X9ZPpV8mB6J2cJbQdi0fNwQD6Bs30Oynj8EC8Jpm7gTJuGAJLOy+1CUa7nutiM59Ef65r+DBzkCjzoL8Bz55+w+/8GVyQ8nKhr0QcPZewGtA8iRrhL6LyMK6IIwdgcnM3LWSKBgIt/G3oP4D18icRVpmmDLNko08K6llvSkUvt5MmIvJcdDbnUfxI7tZYe0OXPokWLDlD9l/YTYhvAX22OH09vuHu46I/vCJjuh0ftdHC+vLW1dR8a3tU0cStE3gKpt4BUPAQpF+DhaTXIxH/LDL9F45UI+hDwsxjpxd+tF+O3QMyxHXLbcV3qha6TKC4w7Q5njrhFpwofj/LwtmIMnPQjkDgeZj4XnW63u3dA1/+qcv4WHi4uy83NjfdGo1vwty9tsL9/NgbxPAjZ5lZVI8hSmLpGV/SLXar64GBCu8ednf06j/G3YnrfXbgnqW63Y1U8kRiPPg+jbzHH0ymPx/fBrW5lQimlP3LAQ4sRZMZBMv5BAZbsz0bARsBGwEbARsBGwEbARsBGwEbARsBGwEbARsBGwEbARsBGwEbARsBGwEbARuCzROC/A75cYaeLqTEAAAAASUVORK5CYII=
+name: EDL
+script:
+  commands:
+  - arguments:
+    - description: The query to run to update the indicators list. To view expected
+        results, run the following command from the Cortex XSOAR CLI `!findIndicators
+        query=<your query>`.
+      name: query
+    - auto: PREDEFINED
+      defaultValue: PAN-OS (text)
+      description: The format of the exported list.
+      name: format
+      predefined:
+      - PAN-OS (text)
+      - JSON
+      - CSV
+      - McAfee Web Gateway
+      - Symantec ProxySG
+      required: true
+    - description: Maximum number of items in the list.
+      name: edl_size
+    - defaultValue: "0"
+      description: The starting entry index from which to export the indicators when
+        index 0 is the first position.
+      name: offset
+    - auto: PREDEFINED
+      defaultValue: string
+      description: For use with McAfee Web Gateway format - set the indicator list
+        type.
+      name: mwg_type
+      predefined:
+      - string
+      - applcontrol
+      - dimension
+      - category
+      - ip
+      - mediatype
+      - number
+      - regex
+    - auto: PREDEFINED
+      defaultValue: "True"
+      description: If selected, ports in URLs are removed. For example, 'www.example.com:9999/path'
+        becomes 'www.example.com/path'.
+      name: url_port_stripping
+      predefined:
+      - "True"
+      - "False"
+    - auto: PREDEFINED
+      defaultValue: "True"
+      description: If selected, strips the protocol from URLs (http/https).
+      name: url_protocol_stripping
+      predefined:
+      - "True"
+      - "False"
+    - auto: PREDEFINED
+      defaultValue: "False"
+      description: For use with PAN-OS (text) format - if selected, any URL entry
+        that is not compliant with PAN-OS URL format is dropped instead of rewritten.
+      name: drop_invalids
+      predefined:
+      - "False"
+      - "True"
+    - auto: PREDEFINED
+      defaultValue: Don't Collapse
+      description: For use with PAN-OS (text) format - collapse method for IPs (none,
+        range, CIDR).
+      name: collapse_ips
+      predefined:
+      - Don't Collapse
+      - To CIDRS
+      - To Ranges
+    - defaultValue: bc_category
+      description: For use with Symantec ProxySG format - set the default category
+        for the output.
+      name: category_default
+    - description: For use with Symantec ProxySG format - set the categories that
+        should be listed in the output. If not set, lists all existing categories.
+      name: category_attribute
+    - auto: PREDEFINED
+      defaultValue: "False"
+      description: If selected, CSV format appears in a textual webpage instead of
+        initiating a file download.
+      name: csv_text
+      predefined:
+      - "False"
+      - "True"
+    - auto: PREDEFINED
+      defaultValue: "false"
+      description: If selected, add to an empty list the comment "# Empty list".
+      name: add_comment_if_empty
+      predefined:
+      - "False"
+      - "True"
+    deprecated: true
+    description: Updates values stored in the EDL (only available On-Demand).
+    name: edl-update
+  - arguments:
+    - description: The query to run to update the indicators list. To view expected
+        results, run the following command from the Cortex XSOAR CLI `!findIndicators
+        query=<your query>`. An empty value may load unwanted indicators.
+      name: query
+      required: true
+    - auto: PREDEFINED
+      defaultValue: PAN-OS (text)
+      description: The format of the exported list.
+      name: format
+      predefined:
+      - PAN-OS (text)
+      - JSON
+      - CSV
+      - McAfee Web Gateway
+      - Symantec ProxySG
+      required: true
+    - description: Maximum number of items in the list.
+      name: edl_size
+    - defaultValue: "0"
+      description: The starting entry index from which to export the indicators when
+        index 0 is the first position.
+      name: offset
+    - auto: PREDEFINED
+      defaultValue: string
+      description: For use with McAfee Web Gateway format - set the indicator list
+        type.
+      name: mwg_type
+      predefined:
+      - string
+      - applcontrol
+      - dimension
+      - category
+      - ip
+      - mediatype
+      - number
+      - regex
+    - auto: PREDEFINED
+      defaultValue: "True"
+      description: If selected, ports in URLs are removed. For example, 'www.example.com:9999/path'
+        becomes 'www.example.com/path'.
+      name: url_port_stripping
+      predefined:
+      - "True"
+      - "False"
+    - auto: PREDEFINED
+      defaultValue: "True"
+      description: If selected, strips the protocol from URLs (http/https).
+      name: url_protocol_stripping
+      predefined:
+      - "True"
+      - "False"
+    - auto: PREDEFINED
+      defaultValue: "False"
+      description: For use with PAN-OS (text) format - if selected, any URL entry
+        that is not compliant with PAN-OS URL format is dropped instead of rewritten.
+      name: drop_invalids
+      predefined:
+      - "False"
+      - "True"
+    - auto: PREDEFINED
+      defaultValue: Don't Collapse
+      description: For use with PAN-OS (text) format - collapse method for IPs (none,
+        range, CIDR).
+      name: collapse_ips
+      predefined:
+      - Don't Collapse
+      - To CIDRS
+      - To Ranges
+    - defaultValue: bc_category
+      description: For use with Symantec ProxySG format - set the default category
+        for the output.
+      name: category_default
+    - description: For use with Symantec ProxySG format - set the categories that
+        should be listed in the output. If not set, lists all existing categories.
+      name: category_attribute
+    - auto: PREDEFINED
+      defaultValue: "False"
+      description: If selected, CSV format appears in a textual webpage instead of
+        initiating a file download.
+      name: csv_text
+      predefined:
+      - "False"
+      - "True"
+    - auto: PREDEFINED
+      defaultValue: "false"
+      description: If selected, add to an empty list the comment "# Empty list".
+      name: add_comment_if_empty
+      predefined:
+      - "False"
+      - "True"
+    description: Updates values stored in the List (only available On-Demand).
+    name: export-indicators-list-update
+  dockerimage: demisto/flask-nginx:1.0.0.12826098
+  longRunning: true
+  longRunningPort: true
+  runonce: false
+  script: |
+    register_module_line('EDL', 'start', __line__())
+    CONSTANT_PACK_VERSION = '3.4.4'
+    demisto.debug('pack id = EDL, pack version = 3.4.4')
+    import errno
+    import glob
+    import hashlib
+    import ipaddress
+    import os
+    import re
+    import socket
+    import tempfile
+    import uuid
+    import zipfile
+    from base64 import b64decode
+    from collections.abc import Callable, Iterable
+    from datetime import datetime
+    from enum import Enum
+    from math import ceil
+    from pathlib import Path
+    from typing import IO
+
+
+    import tldextract
+    import urllib3
+
+    from flask import Flask, Response, request, send_file
+    from netaddr import IPNetwork, IPRange, IPSet
+
+    # Disable insecure warnings
+    urllib3.disable_warnings()
+
+    """ GLOBAL VARIABLES """
+    INTEGRATION_NAME: str = "Generic Export Indicators service"
+    PAGE_SIZE: int = 2000
+    PAN_OS_MAX_URL_LEN = 255
+    APP: Flask = Flask("demisto-edl")
+    EDL_LIMIT_ERR_MSG: str = "Please provide a valid integer for List Size"
+    EDL_CIDR_SIZR_MSG: str = "Please provide a valid integer for CIDR size"
+    EDL_OFFSET_ERR_MSG: str = "Please provide a valid integer for Starting Index"
+    EDL_COLLAPSE_ERR_MSG: str = "The Collapse parameter can only get the following: 0 - none, 1 - range, 2 - CIDR"
+    EDL_MISSING_REFRESH_ERR_MSG: str = (
+        'Refresh Rate must be "number date_range_unit", examples: (2 hours, 4 minutes, 6 months, 1 day, etc.)'
+    )
+    EDL_FORMAT_ERR_MSG: str = "Please provide a valid format from: text, json, csv, mgw and proxysg"
+    EDL_MWG_TYPE_ERR_MSG: str = (
+        "The McAFee Web Gateway type can only be one of the following: string,"
+        " applcontrol, dimension, category, ip, mediatype, number, regex"
+    )
+    EDL_NO_URLS_IN_PROXYSG_FORMAT = "ProxySG format only outputs URLs - no URLs found in the current query"
+    MAX_LIST_SIZE_WITH_URL_QUERY = 100000
+
+    EDL_ON_DEMAND_KEY: str = "UpdateEDL"
+    EDL_ON_DEMAND_CACHE_PATH: str = ""
+    EDL_FULL_LOG_PATH: str = f"full_log_{demisto.uniqueFile()}"
+    EDL_FULL_LOG_PATH_WIP: str = f"wip_log_{demisto.uniqueFile()}"
+    LOGS_ZIP_FILE_PREFIX: str = "log_download"
+    EDL_ON_DEMAND_CACHE_ORIGINAL_SIZE: int = 0
+    EDL_SEARCH_LOOP_LIMIT: int = 10
+    MAX_DISPLAY_LOG_FILE_SIZE = 100000
+    LARGE_LOG_DISPLAY_MSG = "# Log exceeds max size. Refresh to download as file."
+
+    """ REFORMATTING REGEXES """
+    _PROTOCOL_REMOVAL = re.compile("^(?:[a-z]+:)*//")
+    _PORT_REMOVAL = re.compile(r"^((?:[a-z]+:)*//([a-z0-9\-\.]+)|([a-z0-9\-\.]+))(?:\:[0-9]+)*")
+    _URL_WITHOUT_PORT = r"\g<1>"
+    _INVALID_TOKEN_REMOVAL = re.compile(r"(?:[^\./+=\?&]+\*[^\./+=\?&]*)|(?:[^\./+=\?&]*\*[^\./+=\?&]+)")
+    _BROAD_PATTERN = re.compile(r"^(?:\*\.)+[a-zA-Z]+(?::[0-9]+)?$")
+
+    DONT_COLLAPSE = "Don't Collapse"
+    COLLAPSE_TO_CIDR = "To CIDRS"
+    COLLAPSE_TO_RANGES = "To Ranges"
+
+    MAXIMUM_CIDR_SIZE_DEFAULT = 8
+
+    MIMETYPE_JSON_SEQ: str = "application/json-seq"
+    MIMETYPE_JSON: str = "application/json"
+    MIMETYPE_CSV: str = "text/csv"
+    MIMETYPE_TEXT: str = "text/plain"
+
+    FORMAT_CSV: str = "CSV"
+    FORMAT_TEXT: str = "PAN-OS (text)"
+    FORMAT_JSON: str = "JSON"
+    FORMAT_ARG_MWG = "mwg"
+    FORMAT_ARG_BLUECOAT = "bluecoat"
+    FORMAT_ARG_PROXYSG = "proxysg"
+    FORMAT_MWG: str = "McAfee Web Gateway"
+    FORMAT_PROXYSG: str = "Symantec ProxySG"
+
+    MWG_TYPE_OPTIONS = ["string", "applcontrol", "dimension", "category", "ip", "mediatype", "number", "regex"]
+
+    INCREASE_LIMIT = 1.1
+
+    EXTENSIVE_LOGGING: bool = False
+
+
+    class IndicatorAction(Enum):
+        ADDED = "Added"
+        MODIFIED = "Modified"
+        DROPPED = "Dropped"
+
+
+    """Request Arguments Class"""
+
+
+    def debug_function(func):
+        def wrapper(*args, **kwargs):
+            if EXTENSIVE_LOGGING:
+                demisto.debug(f"edl: Entering function {func.__name__}")
+            results = func(*args, **kwargs)
+            if EXTENSIVE_LOGGING:
+                demisto.debug(f"edl: Exiting function {func.__name__}")
+            return results
+
+        return wrapper
+
+
+    class RequestArguments:
+        CTX_QUERY_KEY = "last_query"
+        CTX_OUT_FORMAT = "out_format"
+        CTX_LIMIT_KEY = "last_limit"
+        CTX_OFFSET_KEY = "last_offset"
+        CTX_INVALIDS_KEY = "drop_invalids"
+        CTX_PORT_STRIP_KEY = "url_port_stripping"
+        CTX_COLLAPSE_IPS_KEY = "collapse_ips"
+        CTX_EMPTY_EDL_COMMENT_KEY = "add_comment_if_empty"
+        CTX_MWG_TYPE = "mwg_type"
+        CTX_CATEGORY_DEFAULT = "bc_category"
+        CTX_CATEGORY_ATTRIBUTE = "category_attribute"
+        CTX_FIELDS_TO_PRESENT = "fields_to_present"
+        CTX_CSV_TEXT = "csv_text"
+        CTX_PROTOCOL_STRIP_KEY = "url_protocol_stripping"
+        CTX_URL_TRUNCATE_KEY = "url_truncate"
+        CTX_MAXIMUM_CIDR = "maximum_cidr_size"
+        CTX_NO_TLD = "no_wildcard_tld"
+
+        FILTER_FIELDS_ON_FORMAT_TEXT = "name,type"
+        FILTER_FIELDS_ON_FORMAT_MWG = "name,type,sourceBrands"
+        FILTER_FIELDS_ON_FORMAT_PROXYSG = "name,type,proxysgcategory"
+        FILTER_FIELDS_ON_FORMAT_CSV = "name,type"
+        FILTER_FIELDS_ON_FORMAT_JSON = "name,type"
+
+        def __init__(
+            self,
+            query: str = "",
+            out_format: str = FORMAT_TEXT,
+            limit: int = 10000,
+            offset: int = 0,
+            url_port_stripping: bool = False,
+            drop_invalids: bool = False,
+            collapse_ips: str = DONT_COLLAPSE,
+            add_comment_if_empty: bool = True,
+            mwg_type: str = "string",
+            category_default: str = "bc_category",
+            category_attribute: Optional[str] = None,
+            fields_to_present: str = "",
+            csv_text: bool = False,
+            url_protocol_stripping: bool = False,
+            url_truncate: bool = False,
+            maximum_cidr_size: int = MAXIMUM_CIDR_SIZE_DEFAULT,
+            no_wildcard_tld: bool = False,
+        ):
+            self.query = query
+            self.out_format = out_format
+            self.limit = try_parse_integer(limit, EDL_LIMIT_ERR_MSG)
+            self.offset = try_parse_integer(offset, EDL_OFFSET_ERR_MSG)
+            self.url_port_stripping = url_port_stripping
+            self.url_protocol_stripping = url_protocol_stripping
+            self.drop_invalids = drop_invalids
+            self.collapse_ips = collapse_ips
+            self.add_comment_if_empty = add_comment_if_empty
+            self.mwg_type = mwg_type
+            self.category_default = category_default
+            self.category_attribute = []  # type:List
+            self.fields_to_present = self.get_fields_to_present(fields_to_present)
+            self.csv_text = csv_text
+            self.url_truncate = url_truncate
+            self.maximum_cidr_size = maximum_cidr_size
+            self.no_wildcard_tld = no_wildcard_tld
+
+            if category_attribute is not None:
+                category_attribute_list = argToList(category_attribute)
+
+                if len(category_attribute_list) != 1 or "" not in category_attribute_list:
+                    self.category_attribute = category_attribute_list
+
+        def to_context_json(self):
+            return {
+                self.CTX_QUERY_KEY: self.query,
+                self.CTX_OUT_FORMAT: self.out_format,
+                self.CTX_LIMIT_KEY: self.limit,
+                self.CTX_OFFSET_KEY: self.offset,
+                self.CTX_INVALIDS_KEY: self.drop_invalids,
+                self.CTX_PORT_STRIP_KEY: self.url_port_stripping,
+                self.CTX_COLLAPSE_IPS_KEY: self.collapse_ips,
+                self.CTX_EMPTY_EDL_COMMENT_KEY: self.add_comment_if_empty,
+                self.CTX_MWG_TYPE: self.mwg_type,
+                self.CTX_CATEGORY_DEFAULT: self.category_default,
+                self.CTX_CATEGORY_ATTRIBUTE: self.category_attribute,
+                self.CTX_FIELDS_TO_PRESENT: self.fields_to_present,
+                self.CTX_CSV_TEXT: self.csv_text,
+                self.CTX_PROTOCOL_STRIP_KEY: self.url_protocol_stripping,
+                self.CTX_URL_TRUNCATE_KEY: self.url_truncate,
+                self.CTX_MAXIMUM_CIDR: self.maximum_cidr_size,
+                self.CTX_NO_TLD: self.no_wildcard_tld,
+            }
+
+        @classmethod
+        def from_context_json(cls, ctx_dict):
+            """Returns an initiated instance of the class from a json"""
+            return cls(
+                **assign_params(
+                    query=ctx_dict.get(cls.CTX_QUERY_KEY),
+                    out_format=ctx_dict.get(cls.CTX_OUT_FORMAT),
+                    limit=ctx_dict.get(cls.CTX_LIMIT_KEY),
+                    offset=ctx_dict.get(cls.CTX_OFFSET_KEY),
+                    drop_invalids=ctx_dict.get(cls.CTX_INVALIDS_KEY),
+                    url_port_stripping=ctx_dict.get(cls.CTX_PORT_STRIP_KEY),
+                    collapse_ips=ctx_dict.get(cls.CTX_COLLAPSE_IPS_KEY),
+                    add_comment_if_empty=ctx_dict.get(cls.CTX_EMPTY_EDL_COMMENT_KEY),
+                    mwg_type=ctx_dict.get(cls.CTX_MWG_TYPE),
+                    category_default=ctx_dict.get(cls.CTX_CATEGORY_DEFAULT),
+                    category_attributeself=ctx_dict.get(cls.CTX_CATEGORY_ATTRIBUTE),
+                    fields_to_present=ctx_dict.get(cls.CTX_FIELDS_TO_PRESENT),
+                    csv_text=ctx_dict.get(cls.CTX_CSV_TEXT),
+                    url_protocol_stripping=ctx_dict.get(cls.CTX_PROTOCOL_STRIP_KEY),
+                    url_truncate=ctx_dict.get(cls.CTX_URL_TRUNCATE_KEY),
+                    maximum_cidr_size=ctx_dict.get(cls.CTX_MAXIMUM_CIDR),
+                    no_wildcard_tld=ctx_dict.get(cls.CTX_NO_TLD),
+                )
+            )
+
+        def get_fields_to_present(self, fields_to_present: str) -> str:
+            # based on func ToIoC https://github.com/demisto/server/blob/master/domain/insight.go
+
+            # Fixes legacy query mode silently lost after the first refresh because
+            # `get_fields_to_present("")` returned "name,type" instead of ""
+            if fields_to_present == "use_legacy_query" or (not fields_to_present and self.out_format == FORMAT_TEXT):
+                return ""
+
+            fields_for_format = {
+                FORMAT_TEXT: self.FILTER_FIELDS_ON_FORMAT_TEXT,
+                FORMAT_CSV: self.FILTER_FIELDS_ON_FORMAT_CSV,
+                FORMAT_JSON: self.FILTER_FIELDS_ON_FORMAT_JSON,
+                FORMAT_MWG: self.FILTER_FIELDS_ON_FORMAT_MWG,
+                FORMAT_PROXYSG: self.FILTER_FIELDS_ON_FORMAT_PROXYSG,
+            }
+            if self.out_format in [FORMAT_CSV, FORMAT_JSON] and fields_to_present:
+                if "all" in argToList(fields_to_present):
+                    return ""
+                else:
+                    # replace "value" to "name"
+                    list_fields = argToList(fields_to_present)
+                    if "value" in list_fields:
+                        list_fields[list_fields.index("value")] = "name"
+                        fields_to_present = ",".join(list_fields)
+                    return fields_to_present
+
+            return fields_for_format.get(self.out_format, self.FILTER_FIELDS_ON_FORMAT_TEXT)
+
+
+    """ HELPER FUNCTIONS """
+
+
+    def iterable_to_str(iterable: Iterable, delimiter: str = "\n") -> str:
+        """
+        Transforms an iterable object to an str, with a custom delimiter between each item
+        """
+        str_res = ""
+        if iterable:
+            try:
+                iter(iterable)
+            except TypeError:
+                raise DemistoException(f"non iterable object provided to iterable_to_str: {iterable}")
+            str_res = delimiter.join(map(str, iterable))
+        return str_res
+
+
+    @debug_function
+    def log_iocs_file_data(formatted_indicators: str, max_length: int = 100) -> None:
+        """Prints a debug log of the first `max_length` characters in the formatted indicators data.
+
+        Args:
+            formatted_indicators (str): The IOCs formatted data.
+            max_length (int, optional): max # of chars to print. Defaults to 100.
+        """
+        if formatted_indicators:
+            truncated_data = formatted_indicators[:max_length]
+            demisto.debug(f"Formatted IOC data (first {max_length} characters):\n{truncated_data}")
+        else:
+            demisto.debug("No data from IOC search.")
+
+
+    @debug_function
+    def create_new_edl(request_args: RequestArguments) -> tuple[str, int, dict]:
+        """
+        Retrieves indicators using the IndicatorsSearcher and formats them according to the request arguments.
+        Applies optional cleanup (invalid removal, IP collapsing) and collects statistics on the changes.
+
+        Args:
+            request_args (RequestArguments): User-defined settings for formatting, filtering, and pagination.
+
+        Returns:
+            tuple[str, int, dict]:
+                - str: A formatted string of indicators, ready to be returned in an EDL (one per line).
+                - int: The number of original indicators fetched before formatting.
+                - dict: Logging statistics about actions taken on indicators (added, dropped, modified).
+        """
+        limit = request_args.offset + request_args.limit
+        offset = request_args.offset
+        indicator_searcher = IndicatorsSearcher(
+            filter_fields=request_args.fields_to_present, query=request_args.query, size=PAGE_SIZE, limit=limit
+        )
+        demisto.debug(f"Creating a new EDL file in {request_args.out_format} format")
+        formatted_indicators = ""
+        new_log_stats = {}
+        if request_args.out_format == FORMAT_TEXT:
+            if request_args.drop_invalids or request_args.collapse_ips != "Don't Collapse":
+                # Because there may be illegal indicators or they may turn into cider, the limit is increased
+                indicator_searcher.limit = int(limit * INCREASE_LIMIT)
+            new_iocs_file, original_indicators_count = get_indicators_to_format(indicator_searcher, request_args)
+            # we collect first all indicators because we need all ips to collapse_ips
+            new_iocs_file, new_log_stats = create_text_out_format(new_iocs_file, request_args)
+            new_iocs_file.seek(0)
+            iocs_set = set()
+            for count, line in enumerate(new_iocs_file):
+                # continue searching iocs if 1) iocs was truncated or 2) got all available iocs
+                if count + 1 > limit:
+                    break
+                if count < offset:
+                    continue
+                elif line not in iocs_set:
+                    iocs_set.add(line)
+                    formatted_indicators += line
+
+            demisto.debug(f"Finished formatting ioc. Count after collapse: {len(iocs_set)}")
+
+        else:
+            new_iocs_file, original_indicators_count = get_indicators_to_format(indicator_searcher, request_args)
+            new_iocs_file.seek(0)
+            formatted_indicators = new_iocs_file.read()
+        new_iocs_file.close()
+        if EXTENSIVE_LOGGING:
+            log_iocs_file_data(formatted_indicators)
+        return formatted_indicators, original_indicators_count, new_log_stats
+
+
+    @debug_function
+    def replace_field_name_to_output_format(fields: str):
+        """
+        convert from the request name field to the name in the response from the server
+        """
+        fields_list = argToList(fields)
+        new_list = []
+        for field in fields_list:
+            if field == "name":
+                field = "value"
+            elif field == "type":
+                field = "indicator_type"
+            new_list.append(field)
+        return new_list
+
+
+    @debug_function
+    def get_indicators_to_format(indicator_searcher: IndicatorsSearcher, request_args: RequestArguments) -> tuple[IO | IO[str], int]:
+        """
+        Finds indicators using demisto.searchIndicators, and returns the indicators in file written in the requested format
+        Parameters:
+            indicator_searcher (IndicatorsSearcher): The indicator searcher used to look for indicators
+            request_args (RequestArguments):  all the request arguments.
+        Returns:
+            tuple[IO | IO[str], int]: A tuple of indicators in the requested format (IO | IO[str]),
+                and the total number of indicators found by indicator_searcher (int).
+        """
+        f = tempfile.TemporaryFile(mode="w+t")
+        list_fields = replace_field_name_to_output_format(request_args.fields_to_present)
+        headers_was_written = False
+        files_by_category = {}  # type:Dict
+        ioc_counter = 0
+        # While iterating over a large number of indicators, the main thread can hold the stdout lock longer than
+        # the default 60s timeout, causing the heartbeat thread to fail with "Timeout acquiring stdout lock".
+        # Instead of disabling the heartbeat thread (which can make the server consider the container unresponsive),
+        # we temporarily raise the stdout lock timeout to 10 minutes so the heartbeat keeps running safely, and
+        # restore the original value afterwards. This attribute is dynamically injected by the server runtime; when
+        # it is not present (e.g. older servers or unit tests) we skip the tweak entirely so this stays a true no-op.
+        # It is not part of the demistomock type stub, so mypy's attr-defined check is suppressed on the assignments.
+        stdout_lock_timeout_supported = hasattr(demisto, "_stdout_lock_timeout")
+        original_stdout_lock_timeout = getattr(demisto, "_stdout_lock_timeout", 60)
+        try:
+            if stdout_lock_timeout_supported:
+                demisto._stdout_lock_timeout = 600  # type: ignore[attr-defined]  # 10 minutes
+                demisto.debug(
+                    f"Temporarily set demisto._stdout_lock_timeout to 600 seconds "
+                    f"(was {original_stdout_lock_timeout}) for the indicators iteration."
+                )
+            for ioc_res in indicator_searcher:
+                fetched_iocs = ioc_res.get("iocs") or []
+                for ioc in fetched_iocs:
+                    if EXTENSIVE_LOGGING:
+                        demisto.debug(f"Parsing the following indicator: {ioc.get('value')}")
+
+                    ioc_counter += 1
+                    if request_args.out_format == FORMAT_PROXYSG:
+                        files_by_category = create_proxysg_out_format(ioc, files_by_category, request_args)
+
+                    elif request_args.out_format == FORMAT_MWG:
+                        f.write(create_mwg_out_format(ioc, request_args, headers_was_written))
+                        headers_was_written = True
+
+                    elif request_args.out_format == FORMAT_JSON:
+                        f.write(create_json_out_format(list_fields, ioc, request_args, headers_was_written))
+                        headers_was_written = True
+
+                    elif request_args.out_format == FORMAT_TEXT:
+                        # save only the value and type of each indicator
+                        f.write(str(json.dumps({"value": ioc.get("value"), "indicator_type": ioc.get("indicator_type")})) + "\n")
+
+                    elif request_args.out_format == FORMAT_CSV:
+                        f.write(create_csv_out_format(headers_was_written, list_fields, ioc, request_args))
+                        headers_was_written = True
+                    if ioc_counter >= indicator_searcher.limit:
+                        break
+
+        except Exception as e:
+            demisto.error(f"Error in parsing the indicators, error: {e!s}")
+            # 429 error can only be raised when the Elasticsearch instance encountered an error
+            if "[429] Failed with error" in str(e):
+                version = demisto.demistoVersion()
+                # NG + XSIAM can recover from a shutdown
+                if version.get("platform") == "x2" or is_demisto_version_ge("8") or version.get("platform") == "unified_platform":
+                    raise SystemExit("Encountered issue in Elastic Search query. Restarting container and trying again.")
+        finally:
+            if stdout_lock_timeout_supported:
+                demisto._stdout_lock_timeout = original_stdout_lock_timeout  # type: ignore[attr-defined]
+                demisto.debug(f"Restored demisto._stdout_lock_timeout to {original_stdout_lock_timeout} seconds.")
+        demisto.debug(f"Completed IOC search & format, found {ioc_counter} IOCs.")
+        if request_args.out_format == FORMAT_JSON:
+            f.write("]")
+        elif request_args.out_format == FORMAT_PROXYSG:
+            f = create_proxysg_all_category_out_format(f, files_by_category)
+        return f, ioc_counter
+
+
+    @debug_function
+    def create_json_out_format(list_fields: List, indicator: dict, request_args: RequestArguments, not_first_call=True) -> str:
+        """format the indicator to json format.
+
+        Args:
+            list_fields (list): the fields to return.
+            indicator (dict): the indicator info
+            request_args (RequestArguments): all the request arguments.
+            not_first_call (bool): Indicates if this is the first call to the function.
+
+        Returns:
+            An indicator to add to the file in json format.
+        """
+        if (indicator_value := indicator.get("value")) and indicator.get("indicator_type") == "URL":
+            indicator["value"] = url_handler(
+                indicator_value, request_args.url_protocol_stripping, request_args.url_port_stripping, request_args.url_truncate
+            )
+        filtered_json = {}
+        if list_fields:
+            for field in list_fields:
+                value = indicator.get(field) or indicator.get("CustomFields", {}).get(field)
+                filtered_json[field] = value
+            indicator = filtered_json
+        if not_first_call:
+            return ", " + json.dumps(indicator)
+        return "[" + json.dumps(indicator)
+
+
+    @debug_function
+    def create_mwg_out_format(indicator: dict, request_args: RequestArguments, headers_was_writen: bool) -> str:
+        """format the indicator to mwg format.
+
+        Args:
+            indicator (dict): the indicator info
+            request_args (RequestArguments): Request Arguments
+            headers_was_writen (bool): Whether if the headers was writen to the file.
+
+        Returns:
+            An indicator to add to the file in mwg format.
+        """
+        if (indicator_value := indicator.get("value")) and indicator.get("indicator_type") == "URL":
+            indicator["value"] = url_handler(
+                indicator_value, request_args.url_protocol_stripping, request_args.url_port_stripping, request_args.url_truncate
+            )
+
+        value = '"' + indicator.get("value", "") + '"'
+        sources = indicator.get("sourceBrands")
+        if sources:
+            sources_string = '"' + ",".join(sources) + '"'
+        else:
+            sources_string = '"from CORTEX XSOAR"'
+
+        if not headers_was_writen:
+            mwg_type = request_args.mwg_type
+            if isinstance(mwg_type, list):
+                mwg_type = mwg_type[0]
+            return "type=" + mwg_type + "\n" + value + " " + sources_string
+        return "\n" + value + " " + sources_string
+
+
+    @debug_function
+    def create_proxysg_all_category_out_format(indicators_file: IO, files_by_category: dict):
+        """write all indicators to file in proxysg format.
+
+        Args:
+            indicators_file (IO): the fields to return.
+            files_by_category (dict): all indicators by category
+
+        Returns:
+            a file in proxysg format.
+        """
+        # the first time "define category" will be writen without a new line
+        new_line = ""
+        for category, category_file in files_by_category.items():
+            indicators_file.write(f"{new_line}define category {category}\n")
+            new_line = "\n"
+            category_file.seek(0)
+            indicators_file.write(category_file.read())
+            category_file.close()
+            indicators_file.write("end")
+
+        return indicators_file
+
+
+    @debug_function
+    def create_proxysg_out_format(indicator: dict, files_by_category: dict, request_args: RequestArguments) -> dict:
+        """format the indicator to proxysg.
+
+        Args:
+            indicator (dict): the indicator info
+            files_by_category (list): a dict of the formatted indicators by category.
+            request_args (RequestArguments): Request Arguments
+
+        Returns:
+            a dict of the formatted indicators by category.
+        """
+        if (indicator_value := indicator.get("value")) and indicator.get("indicator_type") in ["IP", "URL", "Domain", "DomainGlob"]:
+            stripped_indicator = url_handler(
+                indicator_value, request_args.url_protocol_stripping, request_args.url_port_stripping, request_args.url_truncate
+            )
+            indicator_proxysg_category = indicator.get("CustomFields", {}).get("proxysgcategory")
+            # if a ProxySG Category is set and it is in the category_attribute list or that the attribute list is empty
+            # than list add the indicator to it's category list
+            if indicator_proxysg_category is not None and (
+                indicator_proxysg_category in request_args.category_attribute or len(request_args.category_attribute) == 0
+            ):
+                # handle indicators in multiple categories
+                if isinstance(indicator_proxysg_category, list):
+                    for category in indicator_proxysg_category:
+                        files_by_category = add_indicator_to_category(stripped_indicator, category, files_by_category)
+                else:
+                    files_by_category = add_indicator_to_category(stripped_indicator, indicator_proxysg_category, files_by_category)
+            else:
+                # if ProxySG Category is not set or does not exist in the category_attribute list
+                files_by_category = add_indicator_to_category(stripped_indicator, request_args.category_default, files_by_category)
+
+        return files_by_category
+
+
+    @debug_function
+    def add_indicator_to_category(indicator: str, category: str, files_by_category: dict):
+        if category in files_by_category:
+            files_by_category[category].write(indicator + "\n")
+
+        else:
+            files_by_category[category] = tempfile.TemporaryFile(mode="w+t")
+            files_by_category[category].write(indicator + "\n")
+
+        return files_by_category
+
+
+    @debug_function
+    def create_csv_out_format(headers_was_writen: bool, list_fields: List, ioc, request_args: RequestArguments):
+        """format the ioc to csv format.
+
+        Args:
+            headers_was_writen (bool): Whether if the headers was writen to the file.
+            list_fields (list): the fields to return.
+            ioc (dict): the indicator info
+            request_args (RequestArguments): all the request arguments.
+
+        Returns:
+            a one indicator to add to the file in csv format.
+        """
+
+        if (indicator_value := ioc.get("value")) and ioc.get("indicator_type") == "URL":
+            ioc["value"] = url_handler(
+                indicator_value, request_args.url_protocol_stripping, request_args.url_port_stripping, request_args.url_truncate
+            )
+        if not list_fields:
+            values = list(ioc.values())
+            if not headers_was_writen:
+                headers = list(ioc.keys())
+                headers_str = list_to_str(headers) + "\n"
+                return headers_str + list_to_str(values, map_func=lambda val: f'"{val}"')
+            return "\n" + list_to_str(values, map_func=lambda val: f'"{val}"')
+        else:
+            fields_value_list = []
+            for field in list_fields:
+                value = ioc.get(field) or ioc.get("CustomFields", {}).get(field)
+                fields_value_list.append(value)
+            if not headers_was_writen:
+                headers_str = request_args.fields_to_present + "\n"
+                return headers_str + list_to_str(fields_value_list, map_func=lambda val: f'"{val}"')
+            return "\n" + list_to_str(fields_value_list, map_func=lambda val: f'"{val}"')
+
+
+    @debug_function
+    def ip_groups_to_cidrs(ip_range_groups: Iterable[IPNetwork]) -> set[str]:
+        """Collapse IP groups list to CIDRs
+
+        Args:
+            ip_range_groups (Iterable[IPNetwork]): An iterable of IPNetwork objects representing connected IPs.
+
+        Returns:
+            set[str]: A set of CIDR strings (e.g., {'192.168.1.0/24', '10.0.0.1'})
+        """
+        ip_ranges: set[str] = set()
+        for cidr in ip_range_groups:
+            # handle single IPs
+            # Use .size property instead of len() to avoid IndexError for very large ranges
+            try:
+                cidr_size = cidr.size
+            except Exception as e:
+                demisto.error(f"edl: Failed to collapse IP group {cidr} to CIDRs. Got error: {e}.")
+                raise
+
+            if cidr_size == 1:
+                # CIDR with a single IP appears with "/32" suffix so handle them differently
+                ip_ranges.add(str(cidr[0]))
+                continue
+
+            ip_ranges.add(str(cidr))
+
+        return ip_ranges
+
+
+    @debug_function
+    def ip_groups_to_ranges(ip_range_groups: Iterable[IPRange]) -> set[str]:
+        """Collapse IP groups to ranges.
+
+        Args:
+            ip_range_groups (Iterable[IPRange]): An iterable of IPRange objects representing connected IPs.
+
+        Returns:
+            set[str]: A set of IP range strings (e.g., {'192.168.1.1-192.168.1.255', '10.0.0.1'})
+        """
+        ip_ranges: set[str] = set()
+        for group in ip_range_groups:
+            # handle single IPs
+            # Use .size property instead of len() to avoid IndexError for very large ranges
+            try:
+                group_size = group.size
+            except Exception as e:
+                demisto.error(f"edl: Failed to collapse IP group {group} to range. Got error: {e}.")
+                raise
+
+            if group_size == 1:
+                ip_ranges.add(str(group[0]))
+                continue
+
+            ip_ranges.add(str(group))
+
+        return ip_ranges
+
+
+    @debug_function
+    def ips_to_ranges(ips: Iterable, collapse_ips: str):
+        """Collapse IPs to Ranges or CIDRs.
+
+        Args:
+            ips (Iterable): a group of IP strings.
+            collapse_ips (str): Whether to collapse to Ranges or CIDRs.
+
+        Returns:
+            Set. a list to Ranges or CIDRs.
+        """
+        invalid_ips = []
+        valid_ips = []
+
+        for ip_or_cidr in ips:
+            if is_valid_cidr(ip_or_cidr) or is_valid_ip(ip_or_cidr):
+                valid_ips.append(ip_or_cidr)
+            else:
+                invalid_ips.append(ip_or_cidr)
+
+        if collapse_ips == COLLAPSE_TO_RANGES:
+            ips_range_groups = IPSet(valid_ips).iter_ipranges()
+            collapsed_list = ip_groups_to_ranges(ips_range_groups)
+        else:
+            cidrs = IPSet(valid_ips).iter_cidrs()
+            collapsed_list = ip_groups_to_cidrs(cidrs)
+
+        collapsed_list.update(invalid_ips)
+        return collapsed_list
+
+
+    def is_valid_ip(ip: str) -> bool:
+        """
+        Args:
+            ip: IP address
+        Returns: True if the string represents an IPv4 or an IPv6 address, false otherwise.
+        """
+        try:
+            ipaddress.IPv4Address(ip)
+            return True
+        except ValueError:
+            try:
+                ipaddress.IPv6Address(ip)
+                return True
+            except ValueError:
+                return False
+
+
+    def is_large_cidr(cidr: str, prefix_threshold: int):
+        try:
+            return IPNetwork(cidr).prefixlen < prefix_threshold
+        except Exception as e:
+            demisto.debug(str(e))
+            return False
+
+
+    def is_valid_cidr(cidr: str) -> bool:
+        """
+        Args:
+            cidr: CIDR string
+        Returns: True if the string represents an IPv4 network or an IPv6 network, false otherwise.
+        """
+        if "/" not in cidr:
+            return False
+        try:
+            ipaddress.IPv4Network(cidr, strict=False)
+            return True
+        except ValueError:
+            try:
+                ipaddress.IPv6Network(cidr, strict=False)
+                return True
+            except ValueError:
+                return False
+
+
+    @debug_function
+    def list_to_str(inp_list: list, delimiter: str = ",", map_func: Callable = str) -> str:
+        """
+        Transforms a list to an str, with a custom delimiter between each list item
+        """
+        str_res = ""
+        if inp_list:
+            if isinstance(inp_list, list):
+                str_res = delimiter.join(map(map_func, inp_list))
+            else:
+                raise AttributeError(f"Invalid inp_list provided to list_to_str: \n{inp_list}")
+        return str_res
+
+
+    def log_indicator_line(raw_indicator: str, indicator: str, action: str, reason: str, log_stats: dict) -> dict:
+        """Create and store a log line for the indicator.
+
+        Args:
+            raw_indicator (str): The raw indicator before modification.
+            indicator (str): The indicator after modification.
+            action (str): The action preformed, Added / Dropped / Modified.
+            reason (str): The reason for the action.
+            log_stats (dict): Stats of previous log entries.
+
+        Returns:
+            (dict) Updated log stats
+        """
+        log_line = f"\n{action} | {indicator} | {raw_indicator} | {reason}"
+        append_log_edl_data(log_line)
+        log_stats[action] = log_stats.get(action, 0) + 1
+
+        return log_stats
+
+
+    def store_log_data(request_args: RequestArguments, created: datetime, log_stats: dict) -> None:
+        """Finalizes and writes the full EDL log file by adding a summary header and appending logged indicator actions.
+
+        Args:
+            request_args (RequestArguments): The request args, they will be added to the header.
+            created (datetime): The time the log was created. This will be added to the header.
+            log_stats (dict): A statistics dict for the indicator modifications (e.g. {'Added': 5, 'Dropped': 3, 'Modified': 2}
+        """
+        log_file_wip = Path(EDL_FULL_LOG_PATH_WIP)
+        if log_file_wip.exists():
+            added_count = log_stats.get(IndicatorAction.ADDED.value, 0)
+            dropped_count = log_stats.get(IndicatorAction.DROPPED.value, 0)
+            modified_count = log_stats.get(IndicatorAction.MODIFIED.value, 0)
+
+            total_count = added_count + dropped_count + modified_count
+
+            header = (
+                f"# Created new EDL at {created.isoformat()}\n\n"
+                f"## Configuration Arguments: {request_args.to_context_json()}\n\n"
+                f"## EDL stats: {total_count} indicators in total, {modified_count} modified, {dropped_count} dropped, "
+                f"{added_count} added.\n"
+                f"\nAction | Indicator | Raw Indicator | Reason"
+            )
+
+            with open(EDL_FULL_LOG_PATH, "w+") as new_full_log_file, log_file_wip.open("r") as log_file_data:
+                # Finalize the current log: write the headers and the WIP log to full_log_path
+                new_full_log_file.write(header)
+                for log_line in log_file_data:
+                    new_full_log_file.write(log_line)
+
+            with open(EDL_FULL_LOG_PATH_WIP, "w+") as log_file_data:
+                # Empty WIP log file after finalization.
+                log_file_data.seek(0)
+
+
+    @debug_function
+    def create_text_out_format(iocs: IO, request_args: RequestArguments) -> tuple[Union[IO, IO[str]], dict]:
+        """
+        Formats a stream of indicators (IOCs) into a standardized text output and logs processing actions.
+        Args:
+            iocs (IO): A file-like object with JSON lines, each representing an indicator with "value" and "indicator_type".
+            request_args (RequestArguments): An object containing formatting preferences such as from the following categories:
+                * IP / CIDR:
+                    1) if collapse_ips, collapse IPs/CIDRs
+                * URL:
+                    1) if drop_invalids, drop invalids (length > 254 or has invalid chars)
+                    2) if port_stripping, strip ports
+                    3) if protocol_stripping, strip protocols
+                    4) if url_truncate, truncate urls
+                * Other indicator types:
+                    1) if drop_invalids, drop invalids (has invalid chars)
+                    2) if port_stripping, strip ports
+        Returns:
+            tuple:
+                - A temporary file-like object containing the formatted indicators, one per line.
+                - A dictionary with statistics about dropped, added, and modified indicators.
+
+        Behavior:
+            - Skips indicators missing a value or non-ASCII (if configured).
+            - For URLs/domains: applies cleaning (strip protocol/port, truncate) and filtering (length, invalid chars).
+            - For IPs/CIDRs: can collapse into ranges or drop if too large.
+            - Wildcard domains and TLDs are handled according to config.
+            - All actions (add, drop, modify) are logged and counted in the result.
+        """
+        enforce_ascii = argToBoolean(demisto.params().get("enforce_ascii", False))
+        ipv4_formatted_indicators = set()
+        ipv6_formatted_indicators = set()
+        iocs.seek(0)
+        formatted_indicators = tempfile.TemporaryFile(mode="w+t")
+        log_stats: dict = {}
+        new_line = ""  # For the first time he will not add a new line
+        for str_ioc in iocs:
+            ioc = json.loads(str_ioc.rstrip())
+            indicator_raw = ioc.get("value")
+            if not indicator_raw:
+                continue
+            if enforce_ascii:
+                try:
+                    indicator_raw.encode("ascii")
+                except UnicodeEncodeError:
+                    continue
+            ioc_type = ioc.get("indicator_type")
+
+            indicator = indicator_raw
+
+            if ioc_type not in [FeedIndicatorType.IP, FeedIndicatorType.IPv6, FeedIndicatorType.CIDR, FeedIndicatorType.IPv6CIDR]:
+                indicator = url_handler(
+                    indicator_raw, request_args.url_protocol_stripping, request_args.url_port_stripping, request_args.url_truncate
+                )
+
+                if request_args.drop_invalids:
+                    if indicator != _PORT_REMOVAL.sub(_URL_WITHOUT_PORT, indicator) or indicator != _INVALID_TOKEN_REMOVAL.sub(
+                        "*", indicator
+                    ):
+                        # check if the indicator held invalid tokens or port
+                        log_stats = log_indicator_line(
+                            raw_indicator=indicator_raw,
+                            indicator=indicator,
+                            action=IndicatorAction.DROPPED.value,
+                            reason="Invalid tokens or port.",
+                            log_stats=log_stats,
+                        )
+                        continue
+
+                    if ioc_type == FeedIndicatorType.URL and len(indicator) >= PAN_OS_MAX_URL_LEN:
+                        # URL indicator exceeds allowed length - ignore the indicator
+                        log_stats = log_indicator_line(
+                            raw_indicator=indicator_raw,
+                            indicator=indicator,
+                            action=IndicatorAction.DROPPED.value,
+                            reason=f"URL exceeds max length {PAN_OS_MAX_URL_LEN}.",
+                            log_stats=log_stats,
+                        )
+
+                        continue
+
+                # for PAN-OS *.domain.com does not match domain.com
+                # we should provide both
+                # this could generate more than num entries according to PAGE_SIZE
+                # Handle DomainGlob type indicators even when value doesn't start with "*."
+                if indicator.startswith("*.") or ioc_type == FeedIndicatorType.DomainGlob:
+                    domain = str(indicator.lstrip("*."))
+                    # if we should ignore TLDs and the domain is a TLD
+                    if request_args.no_wildcard_tld and tldextract.extract(domain).suffix == domain:
+                        log_stats = log_indicator_line(
+                            raw_indicator=indicator_raw,
+                            indicator=domain,
+                            action=IndicatorAction.DROPPED.value,
+                            reason="Domain is a TLD.",
+                            log_stats=log_stats,
+                        )
+                        continue
+                    formatted_indicators.write(new_line + domain)
+                    new_line = "\n"
+
+            if ioc_type in [FeedIndicatorType.CIDR, FeedIndicatorType.IPv6CIDR] and is_large_cidr(
+                indicator, request_args.maximum_cidr_size
+            ):
+                log_stats = log_indicator_line(
+                    raw_indicator=indicator_raw,
+                    indicator=indicator,
+                    action=IndicatorAction.DROPPED.value,
+                    reason=f"CIDR exceeds max length {request_args.maximum_cidr_size}.",
+                    log_stats=log_stats,
+                )
+                continue
+
+            if request_args.collapse_ips != DONT_COLLAPSE and ioc_type in (FeedIndicatorType.IP, FeedIndicatorType.CIDR):
+                ipv4_formatted_indicators.add(indicator)
+
+            elif request_args.collapse_ips != DONT_COLLAPSE and ioc_type == FeedIndicatorType.IPv6:
+                ipv6_formatted_indicators.add(indicator)
+
+            else:
+                formatted_indicators.write(new_line + str(indicator))
+                new_line = "\n"
+                log_stats = log_indicator_line(
+                    raw_indicator=indicator_raw,
+                    indicator=indicator,
+                    action=IndicatorAction.ADDED.value,
+                    reason=f"Found new {ioc_type}.",
+                    log_stats=log_stats,
+                )
+
+        iocs.close()
+        if len(ipv4_formatted_indicators) > 0:
+            ipv4_formatted_indicators_collapsed = ips_to_ranges(ipv4_formatted_indicators, request_args.collapse_ips)
+            for ip in ipv4_formatted_indicators_collapsed:
+                formatted_indicators.write(new_line + str(ip))
+                new_line = "\n"
+
+            for ip in ipv4_formatted_indicators:
+                if ip not in ipv4_formatted_indicators_collapsed:
+                    log_stats = log_indicator_line(
+                        raw_indicator=ip,
+                        indicator=ip,
+                        action=IndicatorAction.MODIFIED.value,
+                        reason=f"Collapsed IPv4 {request_args.collapse_ips}.",
+                        log_stats=log_stats,
+                    )
+
+                else:
+                    log_stats = log_indicator_line(
+                        raw_indicator=ip,
+                        indicator=ip,
+                        action=IndicatorAction.ADDED.value,
+                        reason="Found new IPv4.",
+                        log_stats=log_stats,
+                    )
+
+        if len(ipv6_formatted_indicators) > 0:
+            ipv6_formatted_indicators_collapsed = ips_to_ranges(ipv6_formatted_indicators, request_args.collapse_ips)
+            for ip in ipv6_formatted_indicators_collapsed:
+                formatted_indicators.write(new_line + str(ip))
+                new_line = "\n"
+
+            for ip in ipv6_formatted_indicators:
+                if ip not in ipv6_formatted_indicators_collapsed:
+                    log_stats = log_indicator_line(
+                        raw_indicator=ip,
+                        indicator=ip,
+                        action=IndicatorAction.MODIFIED.value,
+                        reason=f"Collapsed IPv6 {request_args.collapse_ips}.",
+                        log_stats=log_stats,
+                    )
+
+                else:
+                    log_stats = log_indicator_line(
+                        raw_indicator=ip,
+                        indicator=ip,
+                        action=IndicatorAction.ADDED.value,
+                        reason="Found new IPv6.",
+                        log_stats=log_stats,
+                    )
+        # Log on the logs files all the modification of the indicators
+        return formatted_indicators, log_stats
+
+
+    def url_handler(indicator: str, url_protocol_stripping: bool, url_port_stripping: bool, url_truncate: bool) -> str:
+        """
+        * URL:
+           1) if port_stripping, strip ports
+           2) if protocol_stripping, strip protocols
+           3) if url_truncate, truncate urls
+        """
+
+        # protocol stripping
+        if url_protocol_stripping:
+            indicator = _PROTOCOL_REMOVAL.sub("", indicator)
+
+        if url_port_stripping:
+            # remove port from indicator - from demisto.com:369/rest/of/path -> demisto.com/rest/of/path
+            indicator = _PORT_REMOVAL.sub(_URL_WITHOUT_PORT, indicator)
+
+        if url_truncate and len(indicator) >= PAN_OS_MAX_URL_LEN:
+            indicator = indicator[0 : PAN_OS_MAX_URL_LEN - 1]
+
+        return indicator
+
+
+    def get_outbound_mimetype(request_args: RequestArguments) -> str:
+        """Returns the mimetype of the export_iocs"""
+        if request_args.out_format == FORMAT_JSON:
+            return MIMETYPE_JSON
+
+        elif request_args.out_format == FORMAT_CSV and not request_args.csv_text:
+            return MIMETYPE_CSV
+
+        else:
+            return MIMETYPE_TEXT
+
+
+    def append_log_edl_data(log_edl_data: str) -> None:
+        """Store the generated log string in the log file.
+
+        Args:
+            log_edl_data (str): The generated log data string.
+        """
+        try:
+            with open(EDL_FULL_LOG_PATH_WIP, "a") as last_full_log_file:
+                last_full_log_file.write(log_edl_data)
+
+        except Exception as e:
+            demisto.debug(f"edl: Error in writing to log file: {e!s}")
+            raise e
+
+
+    @debug_function
+    def get_edl_on_demand() -> tuple[str, int]:
+        """
+        Use the local file system to store the on-demand result, using a lock to
+        limit access to the file from multiple threads.
+
+        Returns:
+            tuple[str, int]: A tuple of formatted indicators to display in EDL's response (str),
+                and the number of original indicators received from the server before formatting (int).
+        """
+        global EDL_ON_DEMAND_CACHE_ORIGINAL_SIZE
+        ctx = get_integration_context()
+
+        if EDL_ON_DEMAND_KEY in ctx:
+            ctx.pop(EDL_ON_DEMAND_KEY, None)
+            request_args = RequestArguments.from_context_json(ctx)
+            edl_data, EDL_ON_DEMAND_CACHE_ORIGINAL_SIZE, edl_data_stats = create_new_edl(request_args)
+            created_time = datetime.now(timezone.utc)
+            store_log_data(request_args, created_time, edl_data_stats)
+
+            try:
+                demisto.debug("edl: Writing EDL data to cache")
+
+                with open(EDL_ON_DEMAND_CACHE_PATH, "w") as file:
+                    file.write(edl_data)
+
+            except Exception as e:
+                demisto.debug(f"edl: Error in writing to file: {e!s}")
+                raise e
+
+            if EXTENSIVE_LOGGING:
+                demisto.debug("edl: Finished writing EDL data to cache")
+            set_integration_context(ctx)
+
+        else:
+            demisto.debug("edl: Reading EDL data from cache")
+
+            try:
+                with open(EDL_ON_DEMAND_CACHE_PATH) as file:
+                    edl_data = file.read()
+
+            except Exception as e:
+                demisto.debug(f"edl: Error reading cache file: {e!s}")
+                raise e
+            demisto.debug("edl: Finished reading EDL data from cache")
+
+        return edl_data, EDL_ON_DEMAND_CACHE_ORIGINAL_SIZE
+
+
+    def validate_basic_authentication(headers: dict, username: str, password: str) -> bool:
+        """
+        Checks whether the authentication is valid.
+        :param headers: The headers of the http request
+        :param username: The integration's username
+        :param password: The integration's password
+        :return: Boolean which indicates whether the authentication is valid or not
+        """
+        credentials: str = headers.get("Authorization", "")
+        if not credentials or "Basic " not in credentials:
+            return False
+        encoded_credentials: str = credentials.split("Basic ")[1]
+        credentials: str = b64decode(encoded_credentials).decode("utf-8")
+        if ":" not in credentials:
+            return False
+        credentials_list = credentials.split(":")
+        if len(credentials_list) != 2:
+            return False
+        user, pwd = credentials_list
+        return user == username and pwd == password
+
+
+    def get_bool_arg_or_param(args: dict, params: dict, key: str):
+        val = args.get(key)
+        return val.lower() == "true" if isinstance(val, str) else params.get(key, False)
+
+
+    """ ROUTE FUNCTIONS """
+
+
+    def authenticate_app(params: dict, request_headers: Any) -> Optional[Response]:
+        """Make sure the user is authenticated on API request.
+
+        Args:
+            params (dict): The demisto params, where the credentials are stored.
+            request_headers: The request headers.
+
+        Returns:
+            (Response) '401 Login Required' on failure to authenticate.
+            None on success.
+        """
+        credentials = params.get("credentials", {})
+        username: str = credentials.get("identifier", "")
+        password: str = credentials.get("password", "")
+        if EXTENSIVE_LOGGING:
+            demisto.debug("Attempting authentication for incoming request.")
+        if username and password:
+            headers: dict = cast(dict[Any, Any], request_headers)
+            if not validate_basic_authentication(headers, username, password):
+                err_msg: str = "Basic authentication failed. Make sure you are using the right credentials."
+                demisto.debug(err_msg)
+                return Response(
+                    err_msg,
+                    status=401,
+                    mimetype="text/plain",
+                    headers=[
+                        ("WWW-Authenticate", 'Basic realm="Login Required"'),
+                    ],
+                )
+
+        return None
+
+
+    def get_edl_log_file() -> str:
+        """Check if edl log file exists, if it does return its contents (str)."""
+        edl_data_log = ""
+        if os.path.exists(EDL_FULL_LOG_PATH):
+            demisto.debug("found log file")
+            if os.path.getsize(EDL_FULL_LOG_PATH) > MAX_DISPLAY_LOG_FILE_SIZE:
+                if EXTENSIVE_LOGGING:
+                    demisto.debug("EDL log file too large to display")
+                return LARGE_LOG_DISPLAY_MSG
+
+            with open(EDL_FULL_LOG_PATH) as log_file:
+                log_file.seek(0)
+                edl_data_log = log_file.read()
+                log_file.seek(0)
+
+        return edl_data_log
+
+
+    def prepare_response_data(data: str, prepend_str: str, append_str: str) -> str:
+        """Prepare data for app response.
+
+        Args:
+            data (str): The raw data.
+            prepend_str (str): The string to prepend to the data.
+            append_str (str): The string to append to the data.
+
+        Returns:
+            (str) The prepared data.
+        """
+        if append_str:
+            append_str = append_str.replace("\\n", "\n")
+            data = f"{data}{append_str}"
+        if prepend_str:
+            prepend_str = prepend_str.replace("\\n", "\n")
+            data = f"{prepend_str}\n{data}"
+
+        return data
+
+
+    def get_request_id() -> str:
+        """Return the per-request correlation id for log lines.
+
+        Reuses the ``X-Request-ID`` header that nginx forwards (the SAME id appears in
+        the nginx access log and the WSGI ``wsgi request:``/``wsgi access:`` lines), so
+        a single id can be grepped across NGINX -> WSGI -> EDL. Falls back to a fresh
+        short uuid if the header is missing (e.g. a direct hit that bypassed nginx).
+        """
+        try:
+            forwarded = request.headers.get("X-Request-ID")
+        except RuntimeError:
+            # No active Flask request context (e.g. called outside a route).
+            demisto.debug("get_request_id called without an active Flask request context; generating a fresh id.")
+            forwarded = None
+        return forwarded if forwarded else uuid.uuid4().hex[:12]
+
+
+    @APP.route("/", methods=["GET"])
+    def route_edl() -> Response:
+        """
+        Main handler for values saved in the integration context
+        """
+        params = demisto.params()
+        rid = get_request_id()
+        cache_refresh_rate: str = params.get("cache_refresh_rate")
+        start = datetime.now(timezone.utc)
+        demisto.info(f"edl: rid={rid} route=/ start handling request")
+        auth_resp = authenticate_app(params, request.headers)
+        if auth_resp:
+            demisto.info(f"edl: rid={rid} authentication failed; returning auth response")
+            return auth_resp
+        if EXTENSIVE_LOGGING:
+            demisto.debug(f"edl: rid={rid} authentication successful")
+        request_args = get_request_args(request.args, params)
+        on_demand = params.get("on_demand")
+        if EXTENSIVE_LOGGING:
+            demisto.debug(f"edl: rid={rid} {'Using' if on_demand else 'Not using'} on-demand cache to serve EDL.")
+
+        created = datetime.now(timezone.utc)
+        if on_demand:
+            edl_data, original_indicators_count = get_edl_on_demand()
+        else:
+            edl_data, original_indicators_count, edl_data_stats = create_new_edl(request_args)
+            store_log_data(request_args, created, edl_data_stats)
+
+        query_time = (datetime.now(timezone.utc) - created).total_seconds()
+        etag = f'"{hashlib.sha1(edl_data.encode()).hexdigest()}"'  # nosec
+        edl_size = 0
+
+        if edl_data.strip():
+            edl_size = edl_data.count("\n") + 1  # add 1 as last line doesn't have a \n
+
+        if (len(edl_data) == 0 and request_args.add_comment_if_empty) or (edl_data == "]" and request_args.add_comment_if_empty):
+            edl_data = "# Empty List"
+
+        # if the case there are strings to add to the EDL, add them if the output type is text
+        elif request_args.out_format == FORMAT_TEXT:
+            edl_data = prepare_response_data(
+                data=edl_data, append_str=params.get("append_string"), prepend_str=params.get("prepend_string")
+            )
+        if EXTENSIVE_LOGGING:
+            demisto.debug(f"edl: rid={rid} Final EDL size: {len(edl_data)} characters, {edl_size} lines")
+
+        mimetype = get_outbound_mimetype(request_args)
+        max_age = ceil((datetime.now() - dateparser.parse(cache_refresh_rate)).total_seconds())  # type: ignore[operator]
+
+        headers = [
+            ("X-EDL-Created", created.isoformat()),
+            ("X-EDL-Query-Time-Secs", f"{query_time:.3f}"),
+            ("X-EDL-Size", str(edl_size)),
+            ("X-EDL-Origin-Size", original_indicators_count),
+            ("ETag", etag),
+            # Echo the correlation id back so the client and nginx ($sent_http_x_request_id)
+            # observe the same id that EDL/WSGI logged.
+            ("X-Request-ID", rid),
+        ]  # type: ignore[assignment]
+
+        demisto.debug(
+            f'edl: rid={rid} Returning response with the following headers:\n'
+            f'{[f"{header[0]}: {header[1]}" for header in headers]}'
+        )
+
+        resp = Response(edl_data, status=200, mimetype=mimetype, headers=headers)
+        resp.cache_control.max_age = max_age
+        # number of seconds we are willing to serve stale content when there is an error
+        resp.cache_control["stale-if-error"] = "600"
+
+        total_time = (datetime.now(timezone.utc) - start).total_seconds()
+        demisto.info(
+            f"edl: rid={rid} route=/ done status=200 edl_size={edl_size} "
+            f"chars={len(edl_data)} query_time_secs={query_time:.3f} total_secs={total_time:.3f}"
+        )
+
+        return resp
+
+
+    @APP.route("/log_download", methods=["GET"])
+    def log_download() -> Response:
+        """Flask route to download the full EDL log file as a zip.
+        The log file zipped is located at EDL_FULL_LOG_PATH.
+
+        Return:
+            Response: A Flask Response object that sends a ZIP file containing the full log.
+        """
+        params = demisto.params()
+        rid = get_request_id()
+        demisto.debug(f"edl: rid={rid} Starting EDL route/log_download handler")
+        auth_resp = authenticate_app(params, request.headers)
+        if EXTENSIVE_LOGGING:
+            demisto.debug(f"edl: rid={rid} authentication successful")
+        if auth_resp:
+            return auth_resp
+
+        demisto.debug(f"edl: rid={rid} Getting log file to show")
+
+        created = datetime.now(timezone.utc)
+
+        for previous_zip in glob.glob(f"{LOGS_ZIP_FILE_PREFIX}_*.zip"):
+            os.remove(previous_zip)
+        log_zip_filename = f'{LOGS_ZIP_FILE_PREFIX}_{created.strftime("%Y%m%d-%H%M%S")}.zip'
+        zipf = zipfile.ZipFile(log_zip_filename, "w", zipfile.ZIP_DEFLATED)
+        zipf.write(EDL_FULL_LOG_PATH)
+        zipf.close()
+        return send_file(log_zip_filename, mimetype="zip", download_name=log_zip_filename, as_attachment=True)
+
+
+    @APP.route("/log", methods=["GET"])
+    def route_edl_log() -> Response:
+        """
+        Flask route to serve the EDL indicators log via HTTP.
+
+        Returns:
+            Response: A Flask Response containing either:
+                - The log contents as plain text (with optional prepend/append formatting), or
+                - A ZIP file download containing the log, if the log is too large to display.
+        """
+        params = demisto.params()
+        rid = get_request_id()
+
+        cache_refresh_rate: str = params.get("cache_refresh_rate")
+        demisto.debug(f"edl: rid={rid} Starting EDL route/log handler")
+        auth_resp = authenticate_app(params, request.headers)
+        if EXTENSIVE_LOGGING:
+            demisto.debug(f"edl: rid={rid} authentication successful")
+        if auth_resp:
+            return auth_resp
+
+        edl_data_log = get_edl_log_file() or "# Empty"
+        request_args = get_request_args(request.args, params)
+        created = datetime.now(timezone.utc)
+        ctx = demisto.getIntegrationContext()
+
+        # If edl_data_log is too large, first return a corresponding message as text.
+        # Second, return the log as a file.
+        # Alternate between the two via log_as_file context data key.
+        if edl_data_log == LARGE_LOG_DISPLAY_MSG:
+            # If we should return the log as a file this time
+            if ctx.get("log_as_file", False):
+                # Reset the log_as_file context key. Next time a message will be returned.
+                ctx["log_as_file"] = False
+                set_integration_context(ctx)
+                # Remove previous zip versions of the log file if they exist.
+                for previous_zip in glob.glob(f"{LOGS_ZIP_FILE_PREFIX}_*.zip"):
+                    os.remove(previous_zip)
+                # zip the current log file and return it.
+                log_zip_filename = f'{LOGS_ZIP_FILE_PREFIX}_{created.strftime("%Y%m%d-%H%M%S")}.zip'
+                zipf = zipfile.ZipFile(log_zip_filename, "w", zipfile.ZIP_DEFLATED)
+                zipf.write(EDL_FULL_LOG_PATH)
+                zipf.close()
+                return send_file(log_zip_filename, mimetype="zip", download_name=log_zip_filename, as_attachment=True)
+            else:
+                # Reset the log_as_file context key. Next time a file will be returned.
+                ctx["log_as_file"] = True
+                set_integration_context(ctx)
+
+        if request_args.out_format == FORMAT_TEXT and edl_data_log not in ["# Empty", LARGE_LOG_DISPLAY_MSG]:
+            ctx["log_as_file"] = False
+            set_integration_context(ctx)
+            edl_data_log = prepare_response_data(
+                data=edl_data_log, append_str=params.get("append_string"), prepend_str=params.get("prepend_string")
+            )
+
+        etag = f'"{hashlib.sha3_256(edl_data_log.encode()).hexdigest()}"'
+        headers = [("X-EDL-LOG-Request-Created", created.isoformat()), ("ETag", etag)]  # type: ignore[assignment]
+        headers_str = f'{[f"{header[0]}: {header[1]}" for header in headers]}'
+        demisto.debug(f"edl: Returning log response with the following headers:\n{headers_str}")
+        max_age = ceil((datetime.now() - dateparser.parse(cache_refresh_rate)).total_seconds())  # type: ignore[operator]
+        if edl_data_log == "# Empty":
+            # If log file content was not created yet, refresh after 15 seconds.
+            # If EDL indicator list refresh rate is less than 30s, refresh the log after half of the time.
+            # This way, the corresponding log will be shown after at most 15 seconds.
+            max_age = min(ceil(max_age / 2), 15)
+        if edl_data_log == LARGE_LOG_DISPLAY_MSG:
+            max_age = 0
+
+        mimetype = get_outbound_mimetype(request_args)
+        resp = Response(edl_data_log, status=200, mimetype=mimetype, headers=headers)
+        resp.cache_control.max_age = max_age
+        # number of seconds we are willing to serve stale content when there is an error
+        resp.cache_control["stale-if-error"] = "600"
+
+        return resp
+
+
+    def get_request_args(request_args: dict, params: dict) -> RequestArguments:
+        """
+        Processing a flask request arguments and generates a RequestArguments instance from it.
+        Args:
+            request_args: Flask request arguments
+            params: Integration configuration parameters
+
+        Returns:
+            RequestArguments instance with processed arguments
+        """
+        if EXTENSIVE_LOGGING:
+            demisto.debug("Parsing EDL request args...")
+        limit = try_parse_integer(request_args.get("n", params.get("edl_size") or 10000), EDL_LIMIT_ERR_MSG)
+        offset = try_parse_integer(request_args.get("s", 0), EDL_OFFSET_ERR_MSG)
+        out_format = request_args.get("v", params.get("format", FORMAT_TEXT))
+        query = request_args.get("q", params.get("indicators_query") or "")
+        mwg_type = request_args.get("t", params.get("mwg_type", "string"))
+        strip_port = request_args.get("sp", params.get("url_port_stripping") or False)
+        strip_protocol = request_args.get("pr", params.get("url_protocol_stripping") or False)
+        drop_invalids = request_args.get("di", params.get("drop_invalids") or False)
+        category_default = request_args.get("cd", params.get("category_default", "bc_category"))
+        category_attribute = request_args.get("ca", params.get("category_attribute", ""))
+        collapse_ips = request_args.get("tr", params.get("collapse_ips", DONT_COLLAPSE))
+        csv_text = request_args.get("tx", params.get("csv_text", False))
+        add_comment_if_empty = request_args.get("ce", params.get("add_comment_if_empty", True))
+        fields_to_present = request_args.get("fi", params.get("fields_filter", ""))
+        url_truncate = request_args.get("ut", params.get("url_truncate", ""))
+        maximum_cidr_size = try_parse_integer(
+            request_args.get("mc", params.get("maximum_cidr_size", MAXIMUM_CIDR_SIZE_DEFAULT)), EDL_CIDR_SIZR_MSG
+        )
+        no_wildcard_tld = argToBoolean(request_args.get("nt", params.get("no_wildcard_tld")))
+
+        # handle flags
+        if drop_invalids == "":
+            drop_invalids = True
+
+        if strip_port == "":
+            strip_port = True
+
+        if strip_protocol == "":
+            strip_port = True
+
+        if collapse_ips not in [DONT_COLLAPSE, COLLAPSE_TO_CIDR, COLLAPSE_TO_RANGES]:
+            collapse_ips = try_parse_integer(collapse_ips, EDL_COLLAPSE_ERR_MSG)
+
+            if collapse_ips not in [0, 1, 2]:
+                raise DemistoException(EDL_COLLAPSE_ERR_MSG)
+
+            collapse_options = {0: DONT_COLLAPSE, 1: COLLAPSE_TO_RANGES, 2: COLLAPSE_TO_CIDR}
+            collapse_ips = collapse_options[collapse_ips]
+        if out_format not in [
+            FORMAT_PROXYSG,
+            FORMAT_TEXT,
+            FORMAT_JSON,
+            FORMAT_CSV,
+            FORMAT_MWG,
+            FORMAT_ARG_BLUECOAT,
+            FORMAT_ARG_MWG,
+            FORMAT_ARG_PROXYSG,
+        ]:
+            raise DemistoException(EDL_FORMAT_ERR_MSG)
+
+        elif out_format in [FORMAT_ARG_PROXYSG, FORMAT_ARG_BLUECOAT]:
+            out_format = FORMAT_PROXYSG
+
+        elif out_format == FORMAT_ARG_MWG:
+            out_format = FORMAT_MWG
+
+        if out_format == FORMAT_MWG and mwg_type not in MWG_TYPE_OPTIONS:
+            raise DemistoException(EDL_MWG_TYPE_ERR_MSG)
+
+        if params.get("use_legacy_query"):
+            # workaround for "msgpack: invalid code" error
+            demisto.info(
+                "Note: You are using a legacy query, it may have an impact on the performance of the integration."
+                "This parameter is deprecated, make sure to adjust your queries accordingly."
+            )
+            fields_to_present = "use_legacy_query"
+
+        if query and request_args.get("q"):
+            demisto.debug(
+                "Adjusting the number of exported indicators if above 100,000, due to using the q URL inline parameter."
+                "For more information, review the documentation."
+            )
+            limit = min(limit, MAX_LIST_SIZE_WITH_URL_QUERY)
+
+        demisto.debug(
+            f"RequestArguments resolved:\n"
+            f"limit={limit}, offset={offset}, format={out_format}, query='{query}', "
+            f"mwg_type={mwg_type}, collapse_ips={collapse_ips}, drop_invalids={drop_invalids}, "
+            f"strip_port={strip_port}, strip_protocol={strip_protocol}, "
+            f"url_truncate={url_truncate}, maximum_cidr_size={maximum_cidr_size}, no_wildcard_tld={no_wildcard_tld}, "
+            f"fields_to_present={fields_to_present}, category_default={category_default}, "
+            f"category_attribute={category_attribute}, csv_text={csv_text}, comment_if_empty={add_comment_if_empty}"
+        )
+
+        return RequestArguments(
+            query,
+            out_format,
+            limit,
+            offset,
+            strip_port,
+            drop_invalids,
+            collapse_ips,
+            add_comment_if_empty,
+            mwg_type,
+            category_default,
+            category_attribute,
+            fields_to_present,
+            csv_text,
+            strip_protocol,
+            url_truncate,
+            maximum_cidr_size,
+            no_wildcard_tld,
+        )
+
+
+    """ COMMAND FUNCTIONS """
+
+
+    def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
+        """Check whether a TCP port is already bound (i.e. in use) on the given host.
+
+        We try to bind to the port ourselves: if the bind fails with an "address already
+        in use" error, the port is taken. Any other outcome is treated as "free" so we
+        don't wrongly block the test on transient socket errors.
+
+        Args:
+            port (int): The TCP port to check.
+            host (str): The host/interface to check the port on. Defaults to "127.0.0.1".
+
+        Returns:
+            bool: True if the port is already in use, False otherwise.
+        """
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            try:
+                sock.bind((host, port))
+                return False
+            except OSError as err:
+                if err.errno in (errno.EADDRINUSE, errno.EADDRNOTAVAIL):
+                    demisto.debug(f"edl: port {port} on {host} is already in use ({err}).")
+                    return True
+                # Any other error - assume the port is not blocking us.
+                demisto.debug(f"edl: unexpected error while checking port {port} on {host}: {err}. Treating as free.")
+                return False
+
+
+    def is_our_edl_instance_running(nginx_port: int, params: dict) -> bool:
+        """Verify that the process already holding the EDL ports is a healthy, running EDL instance.
+
+        Each long-running integration instance runs in its own dedicated, persistent container, so
+        within this container the only process that can be holding these ports is this instance's own
+        long-running server.
+        When the ports are already bound we therefore only need to confirm that server is healthy
+        (rather than re-binding the ports, which would fail). We validate it by:
+            1. Connectivity + the nginx health endpoint (/nginx-test) returning the expected
+               "Welcome to nginx" response (nginx is up and its config is serving correctly).
+            2. The EDL route ("/") being reachable (any HTTP status, including 401 when
+               credentials are configured, proves our EDL app is answering behind nginx).
+
+        Note:
+            Only the nginx_port is health-checked directly. Because a live EDL instance binds
+            both nginx_port and the WSGI server_port (nginx_port + 1) together, a healthy nginx
+            answering here implies our own instance owns the paired WSGI port as well; the
+            container-isolation invariant (one instance per container) guarantees no foreign
+            process could be holding only the WSGI port.
+
+            test_nginx_web_server retries internally (see NGINX_MAX_POLLING_TRIES) to avoid a
+            false negative from a momentarily busy nginx.
+
+        Args:
+            nginx_port (int): The nginx listen port of the running instance.
+            params (dict): The integration parameters (used to determine http/https).
+
+        Returns:
+            bool: True if a healthy EDL instance is answering on the ports, False otherwise.
+        """
+        protocol = "https" if params.get("key") else "http"
+        base_url = f"{protocol}://localhost:{nginx_port}"
+        no_proxy = {"http": "", "https": ""}
+
+        # 1. nginx health endpoint - confirms nginx is up and its config is serving correctly.
+        #    test_nginx_web_server polls with retries, so a transient hiccup won't fail us.
+        try:
+            test_nginx_web_server(nginx_port, params=params)
+        except Exception as ex:
+            demisto.debug(f"edl: connectivity/nginx health check against port {nginx_port} failed: {ex}.")
+            return False
+
+        # 2. EDL route - confirms our Flask EDL app is answering behind nginx.
+        #    Any HTTP response (including 401 when authentication is enforced) proves it is our app.
+        try:
+            edl_resp = requests.get(base_url, verify=False, proxies=no_proxy, timeout=10)  # guardrails-disable-line # nosec
+            demisto.debug(f"edl: EDL route on port {nginx_port} responded with status {edl_resp.status_code}.")
+        except Exception as ex:
+            demisto.debug(f"edl: EDL route check against port {nginx_port} failed: {ex}.")
+            return False
+
+        demisto.debug(f"edl: detected an existing healthy EDL instance on port {nginx_port}.")
+        return True
+
+
+    def validate_test_module_params(params: dict) -> None:
+        """Validate the integration configuration parameters used by test-module.
+
+        Validates:
+            1. Valid port.
+            2. Valid cache_refresh_rate (when not running on-demand).
+
+        Args:
+            params (dict): The integration parameters.
+        """
+        get_params_port(params)
+        on_demand = params.get("on_demand", None)
+        if not on_demand:
+            try_parse_integer(params.get("edl_size"), EDL_LIMIT_ERR_MSG)  # validate EDL Size was set
+            cache_refresh_rate = params.get("cache_refresh_rate", "")
+            if not cache_refresh_rate:
+                raise ValueError(EDL_MISSING_REFRESH_ERR_MSG)
+            # validate cache_refresh_rate value
+            range_split = cache_refresh_rate.split(" ")
+            if len(range_split) != 2:
+                raise ValueError(EDL_MISSING_REFRESH_ERR_MSG)
+            try_parse_integer(range_split[0], "Invalid time value for the Refresh Rate. Must be a valid integer.")
+            if range_split[1] not in ["minute", "minutes", "hour", "hours", "day", "days", "month", "months", "year", "years"]:
+                raise ValueError("Invalid time unit for the Refresh Rate. Must be minutes, hours, days, months, or years.")
+            parse_date_range(cache_refresh_rate, to_timestamp=True)
+
+
+    def test_module(_: dict, params: dict) -> tuple[str, dict, dict]:
+        """
+        Validates the integration configuration and, if a long-running instance is already up,
+        verifies it is a healthy EDL instance instead of failing on the already-bound ports.
+
+        Each long-running integration instance runs in its own dedicated, persistent container, so
+        within this container the only process that could be holding the EDL ports is this instance's
+        own long-running server.
+
+        Flow:
+            1. Validate configuration params (port, cache_refresh_rate).
+            2. If the EDL ports are free - run the regular nginx/WSGI test.
+            3. If the ports are already in use:
+                a. If a healthy EDL instance is answering (connectivity + nginx health are OK) -
+                   the test passes (we must not re-bind the ports of a live instance).
+                b. Otherwise - raise an exception: the ports are used by a different process.
+        """
+        if not params.get("longRunningPort"):
+            params["longRunningPort"] = "1111"
+
+        validate_test_module_params(params)
+
+        nginx_port = get_params_port(params)
+        server_port = nginx_port + 1
+
+        nginx_port_in_use = is_port_in_use(nginx_port)
+        server_port_in_use = is_port_in_use(server_port)
+
+        if not nginx_port_in_use and not server_port_in_use:
+            # Ports are free - safe to run the full nginx/WSGI test.
+            demisto.debug(f"edl: ports {nginx_port} and {server_port} are free. Running the standard test.")
+            run_long_running(params, is_test=True)
+            return "ok", {}, {}
+
+        # At least one of the ports is in use - determine whether a healthy EDL instance owns it.
+        demisto.debug(
+            f"edl: ports in use (nginx {nginx_port}={nginx_port_in_use}, wsgi {server_port}={server_port_in_use}). "
+            "Checking whether a healthy EDL instance is already running."
+        )
+        if is_our_edl_instance_running(nginx_port, params):
+            demisto.debug(
+                "edl: an existing EDL instance is already running and serving on the configured ports. "
+                "Connectivity and nginx configuration were verified successfully."
+            )
+            return "ok", {}, {}
+
+        raise DemistoException(
+            f"Ports {nginx_port} and/or {server_port} are already in use, but a healthy EDL instance "
+            "could not be verified on them. This usually means a different process is holding the ports "
+            "(or the existing EDL instance is not responding). Please free the ports or configure a "
+            "different Listen Port and test again."
+        )
+
+
+    @debug_function
+    def update_edl_command(args: dict, params: dict):
+        """
+        Updates the context to update the EDL values on demand the next time it runs.
+        """
+        on_demand = params.get("on_demand")
+        if not on_demand:
+            raise DemistoException('"Update EDL On Demand" is off. If you want to update the EDL manually please toggle it on.')
+        limit = try_parse_integer(args.get("edl_size", params.get("edl_size")), EDL_LIMIT_ERR_MSG)
+        query = args.get("query", "")
+        collapse_ips = args.get("collapse_ips", DONT_COLLAPSE)
+        url_port_stripping = get_bool_arg_or_param(args, params, "url_port_stripping")
+        strip_protocol = get_bool_arg_or_param(args, params, "url_protocol_stripping")
+        drop_invalids = get_bool_arg_or_param(args, params, "drop_invalids")
+        add_comment_if_empty = get_bool_arg_or_param(args, params, "add_comment_if_empty")
+        offset = try_parse_integer(args.get("offset", 0), EDL_OFFSET_ERR_MSG)
+        mwg_type = args.get("mwg_type", "string")
+        category_default = args.get("category_default", "bc_category")
+        category_attribute = args.get("category_attribute", "")
+        fields_to_present = args.get("fields_filter", "")
+        out_format = args.get("format", FORMAT_TEXT)
+        csv_text = get_bool_arg_or_param(args, params, "csv_text") == "True"
+        url_truncate = get_bool_arg_or_param(args, params, "url_truncate")
+        maximum_cidr_size = try_parse_integer(params.get("maximum_cidr_size", MAXIMUM_CIDR_SIZE_DEFAULT), EDL_CIDR_SIZR_MSG)
+        no_wildcard_tld = argToBoolean(params.get("no_wildcard_tld", False))
+
+        if params.get("use_legacy_query"):
+            demisto.info(
+                "Note: You are using a legacy query, it may have an impact on the performance of the integration."
+                "This parameter is deprecated, make sure to adjust your queries accordingly."
+            )
+            # workaround for "msgpack: invalid code" error
+            fields_to_present = "use_legacy_query"
+
+        request_args = RequestArguments(
+            query,
+            out_format,
+            limit,
+            offset,
+            url_port_stripping,
+            drop_invalids,
+            collapse_ips,
+            add_comment_if_empty,
+            mwg_type,
+            category_default,
+            category_attribute,
+            fields_to_present,
+            csv_text,
+            strip_protocol,
+            url_truncate,
+            maximum_cidr_size,
+            no_wildcard_tld,
+        )
+
+        ctx = request_args.to_context_json()
+        ctx[EDL_ON_DEMAND_KEY] = True
+        set_integration_context(ctx)
+        hr = "EDL will be updated the next time you access it."
+
+        if not query:
+            warning = "\n**Warning**: Updating EDL, while not specifying a query, may load unwanted indicators."
+
+            if param_query := params.get("query"):
+                warning += f" Hint: use {param_query} to update indicators using the configured integration instance parameter."
+
+            hr += warning
+            demisto.info(warning)
+
+        return hr, {}, {}
+
+
+    def initialize_edl_context(params: dict):
+        global EDL_ON_DEMAND_CACHE_PATH
+        limit = try_parse_integer(params.get("edl_size"), EDL_LIMIT_ERR_MSG)
+        query = params.get("indicators_query", "")
+        collapse_ips = params.get("collapse_ips", DONT_COLLAPSE)
+        url_port_stripping = params.get("url_port_stripping", False)
+        url_protocol_stripping = params.get("url_protocol_stripping", False)
+        drop_invalids = params.get("drop_invalids", False)
+        add_comment_if_empty = params.get("add_comment_if_empty", True)
+        mwg_type = params.get("mwg_type", "string")
+        category_default = params.get("category_default", "bc_category")
+        category_attribute = params.get("category_attribute", "")
+        fields_to_present = params.get("fields_filter", "")
+        out_format = params.get("format", FORMAT_TEXT)
+        csv_text = argToBoolean(params.get("csv_text", False))
+        url_truncate = params.get("url_truncate", False)
+        maximum_cidr_size = try_parse_integer(params.get("maximum_cidr_size", MAXIMUM_CIDR_SIZE_DEFAULT), EDL_CIDR_SIZR_MSG)
+        no_wildcard_tld = argToBoolean(params.get("no_wildcard_tld", False))
+
+        if params.get("use_legacy_query"):
+            # workaround for "msgpack: invalid code" error
+            demisto.info(
+                "Note: You are using a legacy query, it may have an impact on the performance of the integration."
+                "This parameter is getting deprecated, make sure to adjust your queries accordingly."
+            )
+            fields_to_present = "use_legacy_query"
+        offset = 0
+        request_args = RequestArguments(
+            query,
+            out_format,
+            limit,
+            offset,
+            url_port_stripping,
+            drop_invalids,
+            collapse_ips,
+            add_comment_if_empty,
+            mwg_type,
+            category_default,
+            category_attribute,
+            fields_to_present,
+            csv_text,
+            url_protocol_stripping,
+            url_truncate,
+            maximum_cidr_size,
+            no_wildcard_tld,
+        )
+
+        EDL_ON_DEMAND_CACHE_PATH = demisto.uniqueFile()
+        demisto.debug(f"The full log path: {EDL_FULL_LOG_PATH}")
+        ctx = request_args.to_context_json()
+        ctx[EDL_ON_DEMAND_KEY] = True
+        set_integration_context(ctx)
+        demisto.debug("Setting context data on demand to true.")
+
+
+    def check_platform_and_version(params: dict) -> bool:
+        """
+        Args:
+            - params: The demisto params from the integration configuration.
+        Returns:
+            (bool): True if the platform is xsoar or xsoar hosted and no port specified, false otherwise
+        """
+        platform = demisto.demistoVersion().get("platform", "xsoar")
+        return platform in ["xsoar", "xsoar_hosted"] and not is_demisto_version_ge("8.0.0") and not params.get("longRunningPort")
+
+
+    def main():  # pragma: no cover
+        """
+        Main
+        """
+        global PAGE_SIZE, EXTENSIVE_LOGGING
+        params = demisto.params()
+        try:
+            PAGE_SIZE = max(1, int(params.get("page_size") or PAGE_SIZE))
+        except ValueError:
+            demisto.debug(f'Non integer "page_size" provided: {params.get("page_size")}. defaulting to {PAGE_SIZE}')
+        credentials = params.get("credentials") if params.get("credentials") else {}
+        username: str = credentials.get("identifier", "")
+        password: str = credentials.get("password", "")
+
+        EXTENSIVE_LOGGING = params.get("extensive_logging", False)
+
+        if (username and not password) or (password and not username):
+            err_msg: str = "If using credentials, both username and password should be provided."
+            demisto.debug(err_msg)
+            raise DemistoException(err_msg)
+
+        command = demisto.command()
+        demisto.debug(f"Command being called is {command}")
+        commands = {"test-module": test_module, "edl-update": update_edl_command, "export-indicators-list-update": update_edl_command}
+
+        try:
+            if check_platform_and_version(params):
+                raise DemistoException("Please specify a Listen Port, in the integration configuration")
+
+            initialize_edl_context(params)
+            if EXTENSIVE_LOGGING:
+                demisto.debug("EDL context initialized.")
+            if command == "long-running-execution":
+                run_long_running(params)
+            elif command in commands:
+                readable_output, outputs, raw_response = commands[command](demisto.args(), params)
+                return_outputs(readable_output, outputs, raw_response)
+            else:
+                raise NotImplementedError(f'Command "{command}" is not implemented.')
+        except Exception as e:
+            err_msg = f"Error in {INTEGRATION_NAME} Integration [{e}]"
+            return_error(err_msg)
+
+
+
+    ### GENERATED CODE ###: from NGINXApiModule import *  # noqa: E402
+    # This code was inserted in place of an API module.
+    register_module_line('NGINXApiModule', 'start', __line__(), wrapper=-3)
+    import os
+    import subprocess
+    import traceback
+    import uuid
+    from itertools import count
+    from math import ceil
+    from pathlib import Path
+    from signal import SIGUSR1
+    from string import Template
+    from typing import Any
+
+
+    import gevent
+    import requests
+
+    from flask.logging import default_handler
+    from gevent.pywsgi import WSGIHandler, WSGIServer
+
+
+
+
+    class Handler:
+        @staticmethod
+        def write(msg: str):
+            # gevent's pywsgi writes one Common-Log-Format access line per request here.
+            # Tag it so it is easy to grep for and correlate with the nginx access log.
+            # Kept at debug: the structured "wsgi request:".
+            demisto.debug(f"wsgi access: {msg.rstrip()}")
+
+
+    class ErrorHandler:
+        @staticmethod
+        def write(msg: str):
+            demisto.error(f"wsgi error: {msg.rstrip()}")
+
+
+    DEMISTO_LOGGER: Handler = Handler()
+    ERROR_LOGGER: ErrorHandler = ErrorHandler()
+
+
+    # --- Request lifecycle / concurrency instrumentation -------------------------
+    # Monotonic sequence so every request can be correlated across the start line,
+    # the end line and the gevent access line.
+    _REQUEST_SEQ = count(1)
+    # The environ key under which we stash the per-request id so DemistoWSGIHandler
+    # can print the same id on the "wsgi access:" line.
+    REQUEST_ID_ENVIRON_KEY = "nginxapimodule.request_id"
+    # The environ key under which the middleware stashes the number of body bytes the
+    # APP produced, so the gevent handler can compare it against the bytes actually
+    # written to the socket and flag a discrepancy on the "wsgi access:" line.
+    APP_BYTES_ENVIRON_KEY = "nginxapimodule.app_bytes"
+    # When the app-produced bytes and the socket-sent bytes differ by MORE than this
+    # many bytes, the access line includes a short body_diff note (a 1-byte trailing
+    # newline difference is normal and must not be reported).
+    BODY_DIFF_THRESHOLD_BYTES = 1000
+
+
+    def _new_request_id(environ: dict) -> str:
+        """Return a correlation id for the request.
+
+        Prefers nginx's ``X-Request-ID`` (propagated via ``proxy_set_header``) so the
+        same id appears in the nginx access log, the ``wsgi request:`` line and the
+        ``wsgi access:`` line. Falls back to a fresh short uuid when nginx did not
+        forward one (e.g. direct upstream hit during tests).
+        """
+        forwarded = environ.get(_header_env_key("X-Request-ID"))
+        return forwarded if forwarded else uuid.uuid4().hex[:12]
+
+
+    def _next_request_seq() -> int:
+        """Return the next monotonic per-request sequence number."""
+        return next(_REQUEST_SEQ)
+
+
+    def _iso_now() -> str:
+        """Human-readable UTC timestamp for absolute received/responded times in logs."""
+        return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+    # Request headers worth capturing for client/cache/conditional diagnostics.
+    # Shared by both the gevent access log (DemistoWSGIHandler) and the per-request
+    # RequestLoggingMiddleware so the two log lines stay consistent.
+    LOGGED_REQUEST_HEADERS = (
+        "X-Forwarded-For",
+        "X-Real-IP",
+        "X-Forwarded-Proto",
+        "X-Original-URI",
+        "Host",
+        "User-Agent",
+        "Range",
+        "If-None-Match",
+        "If-Modified-Since",
+        "Authorization",
+    )
+
+
+    def _header_env_key(header_name: str) -> str:
+        # WSGI exposes request headers as HTTP_<UPPER_SNAKE> in the environ.
+        return "HTTP_" + header_name.upper().replace("-", "_")
+
+
+    def format_request_headers(environ: dict) -> str:
+        """Render the allow-listed request headers from a WSGI ``environ`` into a log string.
+
+        Produces a space-separated ``Name="value"`` sequence for every header in
+        ``LOGGED_REQUEST_HEADERS`` that is present. The ``Authorization`` header is
+        reduced to ``present`` so credentials are never written to the logs.
+
+        Args:
+            environ (dict): The WSGI request environment.
+
+        Returns:
+            str: e.g. ``X-Forwarded-For="1.2.3.4" Host="server" Authorization="present"``.
+        """
+        header_parts = []
+        for header_name in LOGGED_REQUEST_HEADERS:
+            value = environ.get(_header_env_key(header_name))
+            if value is None:
+                continue
+            if header_name == "Authorization":
+                value = "present"
+            header_parts.append(f'{header_name}="{value}"')
+        return " ".join(header_parts)
+
+
+    class DemistoWSGIHandler(WSGIHandler):
+        """gevent WSGI handler that enriches the access line with transfer diagnostics + headers.
+
+        gevent's ``WSGIServer`` formats one Common-Log-Format access line per request
+        via ``WSGIHandler.format_request()`` and writes it to the configured ``log``
+        (our :class:`Handler`, which prefixes it with ``wsgi access:``). The default
+        line only reports the body bytes gevent sent, which - when compared with the
+        ``content_length`` the app declared in :class:`RequestLoggingMiddleware` - can
+        silently hide truncated/aborted transfers (client disconnects mid-stream).
+
+        To make that gap explicit on a single line, ``format_request`` appends data
+        that only gevent's handler knows:
+          * ``sent_bytes``      - bytes actually written to the socket (``self.response_length``).
+          * ``content_length``  - the ``Content-Length`` the app declared (``-`` if chunked/unset).
+          * ``truncated``       - ``true`` when a numeric ``Content-Length`` was declared but
+                                  fewer bytes reached the socket (i.e. the transfer was cut short).
+          * ``connection``      - ``close`` or ``keep-alive``, derived from ``self.close_connection``.
+        It also appends the allow-listed request headers (via :func:`format_request_headers`)
+        so the real client/conditional headers are visible alongside the byte accounting.
+        """
+
+        @staticmethod
+        def _coerce_int(value: Any) -> int | None:
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return None
+
+        def _transfer_diagnostics(self, environ: dict) -> str:
+            # Bytes gevent actually wrote to the socket for the response body.
+            sent_bytes = getattr(self, "response_length", None)
+            sent_bytes_str = str(sent_bytes) if sent_bytes is not None else "-"
+
+            # The Content-Length the app declared, if any (chunked responses won't have one).
+            declared_length: int | None = None
+            for header_key, header_value in getattr(self, "response_headers", None) or []:
+                if header_key.lower() == "content-length":
+                    declared_length = self._coerce_int(header_value)
+                    break
+            content_length_str = str(declared_length) if declared_length is not None else "-"
+
+            # The number of body bytes the APP produced (counted by RequestLoggingMiddleware
+            # and stashed in environ), so we can compare the two independent counts.
+            app_bytes = self._coerce_int(environ.get(APP_BYTES_ENVIRON_KEY))
+            app_bytes_str = str(app_bytes) if app_bytes is not None else "-"
+
+            # truncated=true only when we can prove fewer bytes reached the socket than promised.
+            if declared_length is not None and isinstance(sent_bytes, int):
+                truncated = "true" if sent_bytes < declared_length else "false"
+            else:
+                truncated = "unknown"
+
+            # Whether the connection is being closed (vs reused for keep-alive).
+            connection = "close" if getattr(self, "close_connection", True) else "keep-alive"
+
+            # client_disconnected mirrors the truncated detection but phrased from the
+            # connection's point of view: a proven short write means the peer went away
+            # (or nginx/the firewall dropped) before the full body was sent.
+            client_disconnected = "true" if truncated == "true" else "false"
+
+            # Number of requests served on this (keep-alive) connection, if gevent tracks it.
+            requests_on_conn = getattr(self, "_requests_on_connection", None)
+            requests_on_conn_str = str(requests_on_conn) if requests_on_conn is not None else "-"
+
+            diagnostics = (
+                f"sent_bytes={sent_bytes_str} app_bytes={app_bytes_str} content_length={content_length_str} "
+                f"truncated={truncated} client_disconnected={client_disconnected} "
+                f"connection={connection} requests_on_conn={requests_on_conn_str}"
+            )
+
+            # When the app produced N bytes but a meaningfully different number reached
+            # the socket, surface a short, human-readable explanation right on the line.
+            diff_note = self._body_diff_note(app_bytes, sent_bytes, declared_length)
+            if diff_note:
+                diagnostics = f"{diagnostics} {diff_note}"
+            return diagnostics
+
+        @staticmethod
+        def _body_diff_note(app_bytes: int | None, sent_bytes: Any, declared_length: int | None) -> str:
+            """Return a short 'body_diff=...' note when app vs socket bytes diverge.
+
+            Only emitted when both counts are known and differ by MORE than
+            ``BODY_DIFF_THRESHOLD_BYTES`` (a normal trailing-newline 1-byte delta is
+            ignored). The note names the likely cause so a reader instantly knows
+            whether the body was truncated on the wire or grew/shrank unexpectedly.
+            """
+            if app_bytes is None or not isinstance(sent_bytes, int):
+                return ""
+            delta = sent_bytes - app_bytes
+            if abs(delta) <= BODY_DIFF_THRESHOLD_BYTES:
+                return ""
+            if delta < 0:
+                # Fewer bytes on the wire than the app produced -> cut short.
+                missing = -delta
+                pct = (missing / app_bytes * 100) if app_bytes else 0.0
+                cause = (
+                    "client/proxy closed the connection before the full body was sent"
+                    if (declared_length is not None and sent_bytes < declared_length)
+                    else "write stopped before the app finished streaming"
+                )
+                detail = (
+                    f'body_diff="app produced {app_bytes} body bytes but only {sent_bytes} '
+                    f"reached the socket; {missing} bytes ({pct:.1f}%) were not sent - "
+                    f'likely {cause}"'
+                )
+            else:
+                extra = delta
+                detail = (
+                    f'body_diff="socket sent {sent_bytes} bytes, {extra} MORE than the '
+                    f"{app_bytes} body bytes the app counted - extra bytes are likely "
+                    f'response framing/headers or a double-write"'
+                )
+            return detail
+
+        def format_request(self):
+            environ = self.environ or {}
+            base_line = super().format_request()
+            rid = environ.get(REQUEST_ID_ENVIRON_KEY, "-")
+            parts = [base_line, f"rid={rid}", self._transfer_diagnostics(environ)]
+            headers_str = format_request_headers(environ)
+            if headers_str:
+                parts.append(headers_str)
+            return " ".join(parts)
+
+
+    class RequestLoggingMiddleware:
+        """WSGI middleware that emits a detailed, structured log line per request.
+
+        This is the Python-side counterpart to the nginx ``edl_detailed`` access log.
+        Because nginx serves cache HITs without ever reaching this upstream, a request
+        that appears in the nginx log with ``cache=HIT`` but is absent here was served
+        entirely from cache - making the cache-vs-upstream distinction explicit.
+
+        For every request it logs: the real client (X-Forwarded-For / X-Real-IP) as
+        forwarded by nginx, the original URI, conditional/range headers, user-agent,
+        the cache status nginx attached (X-Proxy-Cache), the response status, the
+        number of body bytes written, and the wall-clock time spent in the app.
+        """
+
+        def __init__(self, app):
+            self.app = app
+
+        def __call__(self, environ, start_response):
+            # --- request received ------------------------------------------------
+            # Wall-clock for absolute timestamps; perf_counter for accurate durations.
+            t_received = time.time()
+            received_iso = _iso_now()
+            start_perf = time.perf_counter()
+
+            # Correlation id: reuse nginx's X-Request-ID when present, else generate.
+            # Stash it in environ so DemistoWSGIHandler prints the SAME id on the
+            # "wsgi access:" line, tying the two python log lines together.
+            rid = _new_request_id(environ)
+            environ[REQUEST_ID_ENVIRON_KEY] = rid
+
+            method = environ.get("REQUEST_METHOD", "-")
+            path = environ.get("PATH_INFO", "-")
+            query = environ.get("QUERY_STRING", "")
+            full_path = f"{path}?{query}" if query else path
+            remote_addr = environ.get("REMOTE_ADDR", "-")
+
+            # How long the request waited inside nginx (queueing / cache-lock / connect)
+            # BEFORE this app handler started. nginx forwards its forward-time as the
+            # X-Request-Start epoch header; the difference vs our receive time is the
+            # gap that explains why nginx's time_total_secs >> the app's elapsed time.
+            nginx_wait_str = "-"
+            request_start_header = environ.get(_header_env_key("X-Request-Start"))
+            if request_start_header:
+                try:
+                    nginx_wait = t_received - float(request_start_header)
+                    # Clamp tiny negative values from clock skew to 0.
+                    nginx_wait_str = f"{max(0.0, nginx_wait):.3f}s"
+                except (TypeError, ValueError):
+                    nginx_wait_str = "-"
+
+            # Collect the interesting request headers (auth is reduced to presence only).
+            headers_str = format_request_headers(environ)
+
+            # Monotonic sequence per request for correlation across log lines.
+            seq = _next_request_seq()
+
+            # Emit a START line. A request that then hangs for 125s (or never finishes
+            # because the client vanished) is visible here when debug logging is on,
+            # even though its END line would only appear much later (or not at all).
+            # Kept at debug to reduce steady-state volume; the END line is authoritative.
+            demisto.debug(
+                f"wsgi request-start: rid={rid} seq={seq} received={received_iso} "
+                f"nginx_wait={nginx_wait_str} "
+                f'client={remote_addr} method={method} uri="{full_path}" {headers_str}'
+            )
+
+            # Capture the response status/headers via a wrapped start_response.
+            response_info: dict = {"status": "-", "cache": "-", "edl_size": "-", "content_length": "-"}
+            # When start_response is invoked = app produced its response headers
+            # (time-to-headers). Captured via closure so we can log it below.
+            timings: dict = {"t_headers": None, "t_first_byte": None}
+
+            def logging_start_response(status, response_headers, exc_info=None):
+                if timings["t_headers"] is None:
+                    timings["t_headers"] = time.perf_counter()
+                response_info["status"] = status.split(" ", 1)[0] if status else "-"
+                for header_key, header_value in response_headers:
+                    lowered = header_key.lower()
+                    if lowered == "x-proxy-cache":
+                        response_info["cache"] = header_value
+                    elif lowered == "x-edl-size":
+                        response_info["edl_size"] = header_value
+                    elif lowered == "content-length":
+                        response_info["content_length"] = header_value
+                return start_response(status, response_headers, exc_info)
+
+            bytes_sent = 0
+            error_str = "-"
+            t_app_start = time.perf_counter()
+            try:
+                result = self.app(environ, logging_start_response)
+                # Count the bytes actually produced by the app so we can detect
+                # size-vs-bytes mismatches / truncated bodies on the Python side.
+                for chunk in result:
+                    if chunk:
+                        if timings["t_first_byte"] is None:
+                            timings["t_first_byte"] = time.perf_counter()
+                        bytes_sent += len(chunk)
+                        # Continuously expose the app-produced byte count so the gevent
+                        # handler (DemistoWSGIHandler) can compare it with the bytes that
+                        # actually reached the socket - even if we are cut off mid-stream.
+                        environ[APP_BYTES_ENVIRON_KEY] = bytes_sent
+                    yield chunk
+                if hasattr(result, "close"):
+                    result.close()
+            except Exception as exc:  # noqa: BLE001 - we re-raise after logging
+                # A client disconnect / write error surfaces here; record it so the
+                # END line explains why a transfer stopped short.
+                error_str = type(exc).__name__
+                demisto.debug(f"WSGI app raised {error_str} while streaming response; re-raising.\n{traceback.format_exc()}")
+                raise
+            finally:
+                end_perf = time.perf_counter()
+                responded_iso = _iso_now()
+
+                # Phase breakdown so it's obvious WHERE the time went:
+                #   time_to_headers : app entry -> start_response (the "thinking" time).
+                #   ttfb            : request received -> first body byte.
+                #   stream_time     : first byte -> last byte (the streaming cost).
+                #   elapsed         : total time inside the app.
+                elapsed = end_perf - start_perf
+                time_to_headers = (timings["t_headers"] - t_app_start) if timings["t_headers"] else None
+                ttfb = (timings["t_first_byte"] - start_perf) if timings["t_first_byte"] else None
+                stream_time = end_perf - timings["t_first_byte"] if timings["t_first_byte"] else None
+
+                def _fmt(value):
+                    return f"{value:.3f}s" if value is not None else "-"
+
+                demisto.info(
+                    f"wsgi request: rid={rid} seq={seq} "
+                    f"received={received_iso} responded={responded_iso} "
+                    f"client={remote_addr} method={method} uri=\"{full_path}\" "
+                    f"status={response_info['status']} "
+                    f"app_bytes={bytes_sent} content_length={response_info['content_length']} "
+                    f'cache="{response_info["cache"]}" edl_size={response_info["edl_size"]} '
+                    f"nginx_wait={nginx_wait_str} time_to_headers={_fmt(time_to_headers)} ttfb={_fmt(ttfb)} "
+                    f"stream_time={_fmt(stream_time)} elapsed={_fmt(elapsed)} "
+                    f"error={error_str} {headers_str}"
+                )
+
+
+    # nginx server params
+    NGINX_SERVER_ACCESS_LOG = "/var/log/nginx/access.log"
+    NGINX_SERVER_ERROR_LOG = "/var/log/nginx/error.log"
+    NGINX_SERVER_CONF_FILE = "/etc/nginx/conf.d/default.conf"
+    NGINX_SSL_KEY_FILE = "/etc/nginx/ssl/ssl.key"
+    NGINX_SSL_CRT_FILE = "/etc/nginx/ssl/ssl.crt"
+    NGINX_SSL_CERTS = f"""
+        ssl_certificate {NGINX_SSL_CRT_FILE};
+        ssl_certificate_key {NGINX_SSL_KEY_FILE};
+    """
+    # Detailed access log format with self-explanatory key names, grouped so the line
+    # reads top-to-bottom like the life of one request. Fields are ordered:
+    #
+    #   1. IDENTITY (first, so every line starts with "who/when/which request"):
+    #        when_finished         - ISO8601 timestamp of when nginx FINISHED the request
+    #                                and wrote this log line (i.e. request end). NOTE: stock
+    #                                nginx evaluates ALL log variables at write-time, so there
+    #                                is no built-in variable for the absolute arrival time.
+    #                                Derive it from the durations below:
+    #                                  arrival       = when_finished - time_total_secs
+    #                                  sent_upstream = arrival + time_to_upstream_connect_secs
+    #        request_id            - unique id for THIS request; the SAME id is sent to
+    #                                the Python upstream (X-Request-ID) and printed on the
+    #                                "wsgi request:"/"wsgi access:" lines, so one request
+    #                                can be followed across nginx and Python.
+    #        connection_id         - id of the TCP connection (many requests can share one).
+    #        requests_on_connection- how many requests have used this keep-alive connection
+    #                                (rising numbers = reuse; helps spot CLOSE_WAIT buildup).
+    #
+    #   2. WHO CONNECTED (client identity through the proxy chain):
+    #        client_real_ip        - the true client (the firewall), via X-Real-IP.
+    #        client_forwarded_chain- full X-Forwarded-For chain of proxies in between.
+    #        client_nearest_peer   - the immediate TCP peer nginx saw (usually localhost/edge).
+    #        client_user_agent     - the client's User-Agent string.
+    #
+    #   3. WHAT WAS ASKED (the request itself):
+    #        request_method        - GET/HEAD/...
+    #        request_uri           - the full requested URI.
+    #        request_host          - the Host header.
+    #        request_range         - Range header (partial-content requests).
+    #        request_if_none_match - ETag the client already has (conditional GET).
+    #        request_if_modified_since - date the client already has (conditional GET).
+
+    #
+    #   4. WHAT HAPPENED (response outcome + cache decision):
+    #        response_status       - HTTP status code returned.
+    #        cache_status          - HIT/MISS/BYPASS/EXPIRED/STALE/UPDATING/REVALIDATED.
+    #        upstream_address      - which upstream served it (empty on a cache HIT).
+    #        response_etag         - ETag we returned.
+    #
+    #   5. HOW BIG (payload accounting; mismatch = truncated/aborted transfer):
+    #        response_body_bytes   - body bytes sent to the client.
+    #        response_total_bytes  - total bytes sent (headers + body).
+    #        edl_indicator_count   - number of indicators in the EDL response.
+    #        edl_origin_count      - number of origin indicators before filtering.
+    #
+    #   6. HOW LONG (ALL timings grouped together at the end, in seconds). These are the
+    #      source of truth for the timeline - use them to reconstruct WHEN nginx received
+    #      the request from the client and WHEN it forwarded it to the upstream:
+    #        time_total_secs            - total time to serve the request (from when nginx
+    #                                     read the first client bytes until the last byte was
+    #                                     sent to the client). The client request therefore
+    #                                     ARRIVED at: when_finished - time_total_secs.
+    #        time_to_upstream_connect_secs - seconds AFTER arrival that nginx established the
+    #                                     upstream connection. This marks WHEN nginx forwarded
+    #                                     the request to the upstream:
+    #                                       sent_to_upstream = (when_finished - time_total_secs)
+    #                                                          + time_to_upstream_connect_secs
+    #                                     ("-" on a cache HIT, because no upstream request was made.)
+    #        time_upstream_headers_secs - seconds after the upstream request until the upstream
+    #                                     returned its response headers.
+    #        time_upstream_response_secs- seconds after the upstream request until the upstream
+    #                                     finished sending its response.
+    #        time_edl_query_secs        - time the EDL spent building the list (app side).
+    NGINX_LOG_FORMAT = """
+    log_format edl_detailed
+        'when_finished=$time_iso8601 request_id=$request_id '
+        'connection_id=$connection requests_on_connection=$connection_requests '
+        'client_real_ip="$http_x_real_ip" client_forwarded_chain="$http_x_forwarded_for" '
+        'client_nearest_peer=$remote_addr client_user_agent="$http_user_agent" '
+        'request_method=$request_method request_uri="$request_uri" request_host="$host" '
+        'request_range="$http_range" request_if_none_match="$http_if_none_match" '
+        'request_if_modified_since="$http_if_modified_since" '
+        'response_status=$status cache_status=$upstream_cache_status upstream_address="$upstream_addr" '
+        'response_etag="$sent_http_etag" '
+        'response_body_bytes=$body_bytes_sent response_total_bytes=$bytes_sent '
+        'edl_indicator_count="$sent_http_x_edl_size" edl_origin_count="$sent_http_x_edl_origin_size" '
+        'time_total_secs=$request_time time_to_upstream_connect_secs="$upstream_connect_time" '
+        'time_upstream_headers_secs="$upstream_header_time" time_upstream_response_secs="$upstream_response_time" '
+        'time_edl_query_secs="$sent_http_x_edl_query_time_secs"';
+    """
+    NGINX_SERVER_CONF = """
+    $log_format
+
+    # Per-URI concurrency zone used to FAIL (not queue) concurrent cold-MISS requests
+    # for the same URI. Keyed on $request_uri so the limit is per-resource, not per-client.
+    limit_conn_zone $request_uri zone=concurrent_conn_zone:1m;
+    server {
+
+        listen $port default_server $ssl;
+
+        $sslcerts
+
+        # Per-request detailed access log + verbose error log so cache decisions,
+        # real client IPs, timings and upstream warnings are all captured.
+        access_log $access_log_path edl_detailed;
+        error_log $error_log_path info;
+
+
+        proxy_cache_key $scheme$proxy_host$request_uri$extra_cache_key;
+        $proxy_set_range_header
+        $extra_headers
+    # Cache-vs-fetch policy (TWO-TIER, HIT-safe fail-fast on cold MISS)
+    # ---------------------------------------------------------------------------
+    # We want two behaviors that plain `proxy_cache_lock` cannot give together:
+    #   * On a TRUE cold MISS (nothing cached to fall back on), concurrent requests
+    #     for the SAME URI must FAIL FAST (429) instead of queueing behind a lock.
+    #   * On STALE / UPDATING (a cached copy exists but is expired/being refreshed)
+    #     clients must be served the STALE copy and must NEVER be rejected.
+    #
+    # `limit_conn` is the only mechanism that REJECTS (proxy_cache_lock only WAITS),
+    # but it runs in the preaccess phase - before the cache status is known - so
+    # applying it on the public cache location would ALSO count cache HITs and could
+    # 429 two simultaneous HITs of the same URI. nginx's `proxy_cache` cannot route
+    # "only on miss" to a different location within one server, so we use TWO server
+    # blocks:
+    #   Tier 1 = public server on $port : does the cache read. HIT / STALE / UPDATING
+    #            are answered here from the cache (see proxy_cache_use_stale +
+    #            proxy_cache_background_update) and, on a MISS, proxy_pass to Tier 2.
+    #            HIT/STALE/UPDATING never leave Tier 1, so they are never counted and
+    #            never rejected.
+    #   Tier 2 = internal server on localhost:$fetchport : reached ONLY when Tier 1's
+    #            cache must populate a new entry (true MISS / expired-with-no-stale).
+    #            It carries `limit_conn ... 1`, so the first fetch for a URI proceeds
+    #            and every concurrent same-URI fetch is rejected immediately with 429.
+
+    # Cache validity by status
+    proxy_cache_valid 200 301 302 $cache_refresh_rate;
+
+    # Optional: cache other responses briefly (helps absorb spikes)
+    proxy_cache_valid 404 $cache_404_ttl;
+    # NEVER cache the fail-fast rejection: a 429 from the Tier-2 limiter is a
+    # transient "someone else is already building this" signal. Caching it (via the
+    # `any` rule below) would poison the URI and serve 429s even after the real
+    # content is ready. `0s` = do not cache; being status-specific it overrides `any`.
+    proxy_cache_valid 429 0s;
+    # NEVER cache upstream errors / timeouts either. A 504 means the build exceeded
+    # proxy_read_timeout and a 5xx is a transient upstream failure - caching them via
+    # the `any` rule below would poison the URI and keep serving the error (as a
+    # cache HIT) even after a later build would succeed, blocking recovery. `0s` = do
+    # not cache; being status-specific these override `any`. Note: this does NOT stop
+    # `proxy_cache_use_stale timeout http_50x` from serving a previously-cached GOOD
+    # copy on timeout - that stale-serving is desirable and is what we keep.
+    proxy_cache_valid 500 502 503 504 0s;
+    proxy_cache_valid any $cache_default_ttl;
+
+    # Revalidation (use conditional requests when expired)
+    proxy_cache_revalidate on;
+
+    # Serve stale content in failure/update scenarios. `updating` is what lets a
+    # STALE entry be served immediately to every waiting client while a single
+    # background refresh runs - so STALE/UPDATING never reach the Tier-2 limiter.
+    proxy_cache_use_stale
+        updating
+        error
+        timeout
+        invalid_header
+        http_500
+        http_502
+        http_503
+        http_504;
+
+    # Background refresh of expired cache: the refresh runs as a detached subrequest,
+    # so serving stale is always allowed and never fails.
+    proxy_cache_background_update on;
+
+        # Static test file
+        location = /nginx-test {
+            alias /var/lib/nginx/html/index.html;
+            default_type text/html;
+        }
+
+        # ---- Tier 1: public cache front --------------------------------------
+        # Serves HIT / STALE / UPDATING from the cache. On a MISS, the cache module
+        # fetches from Tier 2 (the internal fetch server) where the fail-fast limiter
+        # lives. HITs/STALE/UPDATING are served straight from cache and never reach
+        # Tier 2, so they are never counted by limit_conn and never rejected.
+        location / {
+            proxy_pass http://localhost:$fetchport/;
+
+            # CRITICAL: the base flask-nginx image ENABLES the cache lock in the
+            # http{} block, and that setting is inherited here. While enabled,
+            # concurrent cold-MISS requests for the same URI WAIT for the first
+            # request to populate the cache (then get served HIT) - they never fall
+            # through to Tier 2, so the fail-fast limit_conn never fires. We MUST turn
+            # the inherited lock OFF here so misses proceed to Tier 2 and the 2nd+
+            # concurrent miss is rejected with 429 instead of queued.
+            proxy_cache_lock off;
+
+            # Surface the cache decision both to the client and (via the access log
+            # variable) to our logging: HIT/MISS/BYPASS/EXPIRED/STALE/UPDATING/REVALIDATED.
+            add_header X-Proxy-Cache $upstream_cache_status always;
+            $extra_headers
+            # allow bypassing the cache with an arg of nocache=1 ie http://server:7000/?nocache=1
+            proxy_cache_bypass $arg_nocache;
+            proxy_read_timeout $timeout;
+            proxy_connect_timeout 3600;
+            proxy_send_timeout 3600;
+            send_timeout 3600;
+
+            # Forward the real client identity through the chain so the Python (gevent)
+            # upstream's WSGI middleware can log the actual firewall/client instead of
+            # 127.0.0.1. Tier 2 forwards these on to the app.
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Original-URI $request_uri;
+            # Propagate nginx's per-request id to the upstream so the same request_id
+            # appears in the nginx access log AND the wsgi request/access lines,
+            # giving a single correlation id end-to-end.
+            proxy_set_header X-Request-ID $request_id;
+            # Forward, as an epoch (seconds.ms), the moment nginx is about to hand the
+            # request to the upstream. The WSGI middleware compares this with its own
+            # receive time and logs "nginx_wait" - the time the request spent inside
+            # nginx (queueing / cache-lock / connect) BEFORE the app started working.
+            proxy_set_header X-Request-Start $msec;
+        }
+
+    }
+
+    # ---- Tier 2: internal fetch server (cold-MISS path only) -----------------
+    # Reached ONLY via Tier 1's cache fetch on a MISS. Because Tier 1 answers
+    # HIT/STALE/UPDATING from cache, only requests that actually need the upstream
+    # arrive here, so `limit_conn ... 1` counts ONLY cold-miss fetches: the first
+    # request for a URI builds the cache entry, and every concurrent same-URI fetch
+    # is rejected immediately with 429. Listens on loopback only, so it is never
+    # reachable directly by external clients.
+    server {
+        listen localhost:$fetchport;
+
+        access_log $access_log_path edl_detailed;
+        error_log $error_log_path info;
+
+        location / {
+            limit_conn concurrent_conn_zone 1;
+            limit_conn_status 429;
+
+            # Tier 2 must NOT cache: caching is owned entirely by Tier 1 (the public
+            # server). If proxy_cache is inherited from the http{} block, disable it
+            # here so this tier is purely the rate-limited cold-MISS fetch path.
+            proxy_cache off;
+
+            proxy_pass http://localhost:$serverport/;
+
+            # Preserve the forwarded client identity headers set by Tier 1.
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $http_x_real_ip;
+            proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+            proxy_set_header X-Original-URI $http_x_original_uri;
+            proxy_set_header X-Request-ID $http_x_request_id;
+            proxy_set_header X-Request-Start $http_x_request_start;
+
+            proxy_read_timeout $timeout;
+            proxy_connect_timeout 3600;
+            proxy_send_timeout 3600;
+            send_timeout 3600;
+        }
+    }
+
+    """
+    NGINX_MAX_POLLING_TRIES = 5
+
+
+    def create_nginx_server_conf(file_path: str, port: int, params: dict):
+        """Create nginx conf file
+
+        Args:
+            file_path (str): path of server conf file
+            port (int): listening port. server port to proxy to will be port+1
+            params (Dict): additional nginx params
+
+        Raises:
+            DemistoException: raised if there is a detected config error
+        """
+        params = params if params else demisto.params()
+        template_str = params.get("nginx_server_conf") or NGINX_SERVER_CONF
+        certificate: str = params.get("certificate", "")
+        private_key: str = params.get("key", "")
+        # Normalize all five `cache_*` time params (plus `timeout`) through a single helper so the
+        # rendered nginx directives are always a safe `<int>s` token.
+        timeout = _normalize_nginx_time(params.get("timeout"), default="3600", param_name="timeout")
+        cache_refresh_rate = _normalize_nginx_time(params.get("cache_refresh_rate"), default=timeout, param_name="cache_refresh_rate")
+
+        cache_404_ttl = _normalize_nginx_time(params.get("cache_404_ttl"), default="1m", param_name="cache_404_ttl")
+        cache_default_ttl = _normalize_nginx_time(params.get("cache_default_ttl"), default="1m", param_name="cache_default_ttl")
+
+        # Ensure cache_refresh_rate is at least as large as timeout. All values are now guaranteed to
+        # end in "s" (the helper always returns `<int>s`), so an O(1) integer compare on the prefix is safe.
+        timeout_seconds = int(timeout[:-1])
+        if int(cache_refresh_rate[:-1]) < timeout_seconds:
+            cache_refresh_rate = timeout
+
+        ssl, extra_headers, sslcerts, proxy_set_range_header = "", "", "", ""
+        serverport = port + 1
+        # Internal loopback port for the Tier-2 cold-MISS fetch server. Tier 1 (public,
+        # $port) proxies cache misses to localhost:$fetchport, which applies the
+        # fail-fast `limit_conn` and then proxies on to the gevent app on $serverport.
+        fetchport = serverport + 1
+        extra_cache_keys = []
+        if (certificate and not private_key) or (private_key and not certificate):
+            raise DemistoException("If using HTTPS connection, both certificate and private key should be provided.")
+        if certificate and private_key:
+            demisto.debug("Using HTTPS for nginx conf")
+            with open(NGINX_SSL_CRT_FILE, "w") as f:
+                f.write(certificate)
+            with open(NGINX_SSL_KEY_FILE, "w") as f:
+                f.write(private_key)
+            ssl = "ssl"  # to be included in the listen directive
+            sslcerts = NGINX_SSL_CERTS
+            if argToBoolean(params.get("hsts_header", False)):
+                extra_headers = 'add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;'
+        credentials = params.get("credentials") or {}
+        if credentials.get("identifier"):
+            extra_cache_keys.append("$http_authorization")
+        if get_integration_name() == "TAXII2 Server":
+            extra_cache_keys.append("$http_accept")
+            if params.get("version") == "2.0":
+                proxy_set_range_header = "proxy_set_header Range $http_range;"
+                extra_cache_keys.extend(["$http_range", "$http_content_range"])
+
+        extra_cache_keys_str = "".join(extra_cache_keys)
+        server_conf = Template(template_str).safe_substitute(
+            log_format=NGINX_LOG_FORMAT,
+            port=port,
+            serverport=serverport,
+            fetchport=fetchport,
+            ssl=ssl,
+            sslcerts=sslcerts,
+            extra_cache_key=extra_cache_keys_str,
+            proxy_set_range_header=proxy_set_range_header,
+            timeout=timeout,
+            cache_refresh_rate=cache_refresh_rate,
+            cache_404_ttl=cache_404_ttl,
+            cache_default_ttl=cache_default_ttl,
+            extra_headers=extra_headers,
+            access_log_path=NGINX_SERVER_ACCESS_LOG,
+            error_log_path=NGINX_SERVER_ERROR_LOG,
+        )
+        # Log the effective cache / timeout settings so each (re)start records exactly
+        # which values are active - essential for interpreting cache=HIT/STALE/UPDATING
+        # decisions and the upstream timing fields in the access logs. Kept at debug.
+        demisto.debug(
+            "edl: nginx effective settings -> "
+            f"listen_port={port} upstream_port={serverport} fetch_tier_port={fetchport} ssl={'on' if ssl else 'off'} "
+            f"timeout={timeout} cache_refresh_rate={cache_refresh_rate} "
+            f"cache_404_ttl={cache_404_ttl} cache_default_ttl={cache_default_ttl} "
+            f"extra_cache_keys=[{extra_cache_keys_str}]"
+        )
+        with open(file_path, mode="w+") as f:
+            f.write(server_conf)
+
+
+    def start_nginx_server(port: int, params: dict = {}) -> subprocess.Popen:
+        params = params if params else demisto.params()
+        create_nginx_server_conf(NGINX_SERVER_CONF_FILE, port, params)
+        nginx_global_directives = "daemon off;"
+        global_directives_conf = params.get("nginx_global_directives")
+        if global_directives_conf:
+            nginx_global_directives = f"{nginx_global_directives} {global_directives_conf}"
+        directive_args = ["-g", nginx_global_directives]
+        # we first do a test that all config is good and log it
+        try:
+            nginx_test_command = ["nginx", "-T"]
+            nginx_test_command.extend(directive_args)
+            test_output = subprocess.check_output(nginx_test_command, stderr=subprocess.STDOUT, text=True)
+            demisto.info(f"ngnix test passed. command: [{nginx_test_command}]")
+            # Promote the fully rendered config to info so the active log_format, cache,
+            # timeout and proxy_set_header directives are recorded on every (re)start.
+            demisto.info(f"nginx effective rendered config (nginx -T):\n{test_output}")
+        except subprocess.CalledProcessError as err:
+            raise ValueError(f"Failed testing nginx conf. Return code: {err.returncode}. Output: {err.output}")
+        nginx_command = ["nginx"]
+        nginx_command.extend(directive_args)
+        res = subprocess.Popen(nginx_command, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        demisto.info(f"done starting nginx with pid: {res.pid}")
+        return res
+
+
+    def nginx_log_process(nginx_process: subprocess.Popen):
+        old_access = NGINX_SERVER_ACCESS_LOG + ".old"
+        old_error = NGINX_SERVER_ERROR_LOG + ".old"
+        log_access = False
+        log_error = False
+        # first check if one of the logs are missing. This may happen on rare ocations that we renamed and deleted the file
+        # before nginx completed the role over of the logs
+        missing_log = False
+        if not os.path.isfile(NGINX_SERVER_ACCESS_LOG):
+            missing_log = True
+            demisto.info(f"Missing access log: {NGINX_SERVER_ACCESS_LOG}. Will send roll signal to nginx.")
+        if not os.path.isfile(NGINX_SERVER_ERROR_LOG):
+            missing_log = True
+            demisto.info(f"Missing error log: {NGINX_SERVER_ERROR_LOG}. Will send roll signal to nginx.")
+        if missing_log:
+            nginx_process.send_signal(int(SIGUSR1))
+            demisto.info(
+                f"Done sending roll signal to nginx (pid: {nginx_process.pid}) after detecting missing log file."
+                " Will skip this iteration."
+            )
+            return
+        if os.path.getsize(NGINX_SERVER_ACCESS_LOG):
+            log_access = True
+            Path(NGINX_SERVER_ACCESS_LOG).rename(old_access)
+        if os.path.getsize(NGINX_SERVER_ERROR_LOG):
+            log_error = True
+            Path(NGINX_SERVER_ERROR_LOG).rename(old_error)
+        if log_access or log_error:
+            # nginx rolls the logs when getting sigusr1
+            nginx_process.send_signal(int(SIGUSR1))
+            gevent.sleep(0.5)  # sleep 0.5 to let nginx complete the roll
+        if log_access:
+            with open(old_access) as f:
+                start = 1
+                for lines in batch(f.readlines(), 100):
+                    end = start + len(lines)
+                    demisto.debug(f"nginx access log ({start}-{end-1}): " + "".join(lines))
+                    start = end
+            Path(old_access).unlink()
+        if log_error:
+            with open(old_error) as f:
+                start = 1
+                for lines in batch(f.readlines(), 100):
+                    end = start + len(lines)
+                    demisto.error(f"nginx error log ({start}-{end-1}): " + "".join(lines))
+                    start = end
+            Path(old_error).unlink()
+
+
+    def nginx_log_monitor_loop(nginx_process: subprocess.Popen):
+        """An endless loop to monitor nginx logs. Meant to be spawned as a greenlet.
+        Will run every minute and if needed will dump the nginx logs and roll them if needed.
+
+        Args:
+            nginx_process (subprocess.Popen): the nginx process. Will send signal for log rolling.
+        """
+        while True:
+            gevent.sleep(60)
+            nginx_log_process(nginx_process)
+
+
+    def test_nginx_web_server(port: int, params: dict):
+        polling_tries = 1
+        is_test_done = False
+        try:
+            while polling_tries <= NGINX_MAX_POLLING_TRIES and not is_test_done:
+                try:
+                    # let nginx startup
+                    time.sleep(0.5)
+                    protocol = "https" if params.get("key") else "http"
+                    res = requests.get(
+                        f"{protocol}://localhost:{port}/nginx-test", verify=False, proxies={"http": "", "https": ""}
+                    )  # guardrails-disable-line # nosec
+                    res.raise_for_status()
+                    welcome = "Welcome to nginx"
+                    if welcome not in res.text:
+                        raise ValueError(f'Unexpected response from nginx-test (does not contain "{welcome}"): {res.text}')
+                    is_test_done = True
+                except Exception:
+                    if polling_tries == NGINX_MAX_POLLING_TRIES:
+                        raise
+                    polling_tries += 1
+        except Exception as ex:
+            err_msg = f"Testing nginx server: {ex}"
+            demisto.error(err_msg)
+            raise DemistoException(err_msg) from ex
+
+
+    def test_nginx_server(port: int, params: dict):
+        nginx_process = start_nginx_server(port, params)
+        try:
+            test_nginx_web_server(port, params)
+        finally:
+            try:
+                nginx_process.terminate()
+                nginx_process.wait(1.0)
+            except Exception as ex:
+                demisto.error(f"failed stopping test nginx process: {ex}")
+
+
+    def try_parse_integer(int_to_parse: Any, err_msg: str) -> int:
+        """
+        Tries to parse an integer, and if fails will throw DemistoException with given err_msg
+        """
+        try:
+            res = int(int_to_parse)
+        except (TypeError, ValueError):
+            raise DemistoException(err_msg)
+        return res
+
+
+    def parse_nginx_time_to_seconds(time_str: str) -> int:
+        """Parses an NGINX time string (or a human-readable equivalent) into seconds.
+
+        NGINX uses suffixes to denote time units (e.g., ``"3600"``, ``"1h"``,
+        ``"30m"``, ``"60s"``). Supported suffixes are ``s`` (seconds), ``m``
+        (minutes), ``h`` (hours), ``d`` (days), ``w`` (weeks), ``M`` (30 days),
+        and ``y`` (years). If no suffix is supplied, the value is treated as
+        seconds.
+
+        Additionally, human-readable values used by some integrations (e.g., EDL's
+        ``cache_refresh_rate`` parameter such as ``"5 minutes"``, ``"1 hour"``,
+        ``"2 days"``) are also supported by falling back to ``dateparser``.
+
+        Args:
+            time_str (str): The time string to parse.
+
+        Returns:
+            int: The time converted to seconds.
+
+        Raises:
+            DemistoException: If ``time_str`` is empty, whitespace-only, ``None``,
+                or otherwise cannot be parsed as a valid time value.
+        """
+        if not time_str or not (time_str := time_str.strip()):
+            raise DemistoException(f"Invalid NGINX time format: {time_str}")
+        if time_str.isdigit():
+            return int(time_str)
+
+        units = {
+            "s": 1,
+            "m": 60,
+            "h": 3600,
+            "d": 86400,
+            "w": 604800,
+            "M": 2592000,  # 30 days
+            "y": 31536000,
+        }
+
+        unit = time_str[-1]
+        value_str = time_str[:-1]
+
+        if unit in units and value_str.isdigit():
+            return int(value_str) * units[unit]
+
+        # If it doesn't match the NGINX-native format, try parsing it as a
+        # human-readable relative time (e.g., "5 minutes", "1 hour", "2 days").
+        try:
+            seconds = ceil((datetime.now() - dateparser.parse(time_str)).total_seconds())  # type: ignore[operator]
+            if seconds > 0:
+                return seconds
+        except Exception:
+            pass
+
+        # Last resort: try to interpret the value as an integer number of seconds.
+        try:
+            return int(time_str)
+        except (ValueError, TypeError):
+            raise DemistoException(f"Invalid NGINX time format: {time_str}")
+
+
+    # Human-readable units accepted in the "<int> <unit>" form (e.g. "12 hours",
+    # "1 minute"). Anything outside this allow-list is rejected up-front so we do
+    # not silently inherit dateparser's permissive interpretation of unit-only
+    # tokens (e.g. "hours" -> midnight today) or compound expressions
+    # (e.g. "12 hours and 5 minutes" -> "12 hours ago at 23:25").
+    _NORMALIZE_NGINX_TIME_HUMAN_UNITS = frozenset(
+        {
+            "second",
+            "seconds",
+            "minute",
+            "minutes",
+            "hour",
+            "hours",
+            "day",
+            "days",
+            "week",
+            "weeks",
+            "month",
+            "months",
+            "year",
+            "years",
+        }
+    )
+
+
+    def _normalize_nginx_time(value: Any, default: str, param_name: str) -> str:
+        """Normalize a user-supplied time value to an nginx-valid ``"<int>s"`` token.
+
+        Accepts:
+          * pure ints       : ``300``, ``"300"`` (must be non-negative)
+          * nginx-native    : ``"12h"``, ``"30m"``, ``"1d"``, ``"2w"``, ``"1M"``,
+                              ``"1y"``, ``"60s"``
+          * human-readable  : strict ``"<positive-int> <unit>"`` form, where unit
+                              is one of ``second(s)``, ``minute(s)``, ``hour(s)``,
+                              ``day(s)``, ``week(s)``, ``month(s)``, ``year(s)``.
+
+        Always returns ``f"{seconds}s"`` (e.g. ``"43200s"``) so the rendered nginx
+        directive is unambiguous and unit-safe — the entire class of unit-string
+        typo bugs in the template is eliminated.
+
+        Falls back to ``default`` (which is itself normalized through the same
+        helper) when ``value`` is ``None``, an empty string, or whitespace-only,
+        so callers can pass either form for the default.
+
+        Args:
+            value: The user-supplied value (may be ``None``, ``int``, or ``str``).
+            default: The fallback value used when ``value`` is empty/missing.
+                Accepts the same formats as ``value``.
+            param_name: Name of the originating parameter; included verbatim in
+                error messages so users can pinpoint the offending field.
+
+        Returns:
+            An nginx-valid time token of the form ``"<int>s"``.
+
+        Raises:
+            DemistoException: If ``value`` (or, when ``value`` is empty,
+                ``default``) is non-empty but cannot be parsed as a valid time
+                value, or resolves to a non-positive number of seconds. The
+                message includes ``param_name`` and the original ``value``.
+        """
+        raw = "" if value is None else str(value).strip()
+        if not raw:
+            raw = str(default).strip()
+
+        # Pre-validate the shape before delegating.
+        tokens = raw.split()
+        accepted_shape = (
+            # nginx-native single token: pure int, or <int><unit-letter>
+            (len(tokens) == 1 and (raw.isdigit() or (raw[:-1].isdigit() and raw[-1] in "smhdwMy")))
+            # strict "<int> <unit>" human-readable form
+            or (len(tokens) == 2 and tokens[0].isdigit() and tokens[1].lower() in _NORMALIZE_NGINX_TIME_HUMAN_UNITS)
+        )
+        if not accepted_shape:
+            raise DemistoException(
+                f"Invalid value for parameter '{param_name}': {value!r}. "
+                f"Expected an nginx-native value (e.g. '12h', '30m', '300') "
+                f"or a human-readable value (e.g. '12 hours', '30 minutes')."
+            )
+
+        try:
+            seconds = parse_nginx_time_to_seconds(raw)
+        except DemistoException as e:
+            raise DemistoException(
+                f"Invalid value for parameter '{param_name}': {value!r}. "
+                f"Expected an nginx-native value (e.g. '12h', '30m', '300') "
+                f"or a human-readable value (e.g. '12 hours', '30 minutes'). "
+                f"Original parser error: {e}"
+            )
+        if seconds <= 0:
+            raise DemistoException(
+                f"Invalid value for parameter '{param_name}': {value!r}. " f"Value must resolve to a positive number of seconds."
+            )
+        return f"{seconds}s"
+
+
+    def get_params_port(params: dict = None) -> int:
+        """
+        Gets port from the integration parameters
+        """
+        params = params if params else demisto.params()
+        port_mapping: str = params.get("longRunningPort", "")
+        err_msg: str
+        port: int
+        if port_mapping:
+            err_msg = f"Listen Port must be an integer. {port_mapping} is not valid."
+            if ":" in port_mapping:
+                port = try_parse_integer(port_mapping.split(":")[1], err_msg)
+            else:
+                port = try_parse_integer(port_mapping, err_msg)
+        else:
+            raise ValueError("Please provide a Listen Port.")
+        return port
+
+
+    def run_long_running(params: dict = None, is_test: bool = False):
+        """
+        Start the long running server
+        :param params: Demisto params
+        :param is_test: Indicates whether it's test-module run or regular run
+        :return: None
+        """
+        params = params if params else demisto.params()
+        nginx_process = None
+        nginx_log_monitor = None
+
+        try:
+            nginx_port = get_params_port()
+            server_port = nginx_port + 1
+            # set our own log handlers
+            APP.logger.removeHandler(default_handler)  # type: ignore[name-defined] # pylint: disable=E0602
+            integration_logger = IntegrationLogger()
+            integration_logger.buffering = False
+            log_handler = DemistoHandler(integration_logger)
+            log_handler.setFormatter(logging.Formatter("flask log: [%(asctime)s] %(levelname)s in %(module)s: %(message)s"))
+            APP.logger.addHandler(log_handler)  # type: ignore[name-defined] # pylint: disable=E0602
+            demisto.debug("done setting demisto handler for logging")
+            demisto.info(f"edl: starting server on 0.0.0.0:{server_port}; nginx proxy on port {nginx_port}.")
+
+            if is_test:
+                test_nginx_server(nginx_port, params)
+                server = WSGIServer(
+                    ("0.0.0.0", server_port),
+                    APP,  # type: ignore[name-defined] # pylint: disable=E0602
+                    log=DEMISTO_LOGGER,
+                    error_log=ERROR_LOGGER,
+                )
+                server.start()
+                time.sleep(5)
+                server.stop()
+
+            else:
+                nginx_process = start_nginx_server(nginx_port, params)
+                test_nginx_web_server(nginx_port, params)
+                nginx_log_monitor = gevent.spawn(nginx_log_monitor_loop, nginx_process)
+                wsgi_app = RequestLoggingMiddleware(APP)  # type: ignore[name-defined] # pylint: disable=E0602
+                server = WSGIServer(
+                    ("0.0.0.0", server_port),
+                    wsgi_app,
+                    log=DEMISTO_LOGGER,  # type: ignore[name-defined] # pylint: disable=E0602
+                    error_log=ERROR_LOGGER,
+                    handler_class=DemistoWSGIHandler,
+                )
+                demisto.updateModuleHealth("")
+                server.serve_forever()
+        except Exception as e:
+            error_message = str(e)
+            if isinstance(e, ValueError) and "Try to write when connection closed" in error_message:
+                # This indicates that the XSOAR platform is unreachable, and there is no way to recover from this, so we need to exit.
+                sys.exit(1)  # pylint: disable=E9001
+
+            demisto.error(f"An error occurred: {error_message}. Exception: {traceback.format_exc()}")
+            demisto.updateModuleHealth(f"An error occurred: {error_message}")
+            raise ValueError(error_message)
+
+        finally:
+            if nginx_process:
+                try:
+                    nginx_process.terminate()
+                except Exception as ex:
+                    demisto.error(f"Failed stopping nginx process when exiting: {ex}")
+            if nginx_log_monitor:
+                try:
+                    nginx_log_monitor.kill(timeout=1.0)
+                except Exception as ex:
+                    demisto.error(f"Failed stopping nginx_log_monitor when exiting: {ex}")
+
+    register_module_line('NGINXApiModule', 'end', __line__(), wrapper=1)
+    ### END GENERATED CODE ###
+
+    if __name__ in ["__main__", "__builtin__", "builtins"]:
+        register_signal_handler_profiling_dump(profiling_dump_rows_limit=PROFILING_DUMP_ROWS_LIMIT)
+        main()
+
+    register_module_line('EDL', 'end', __line__())
+  subtype: python3
+  type: python
+sectionorder:
+- Connect
+- Collect
+system: true
