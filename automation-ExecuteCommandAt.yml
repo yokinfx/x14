@@ -1,0 +1,89 @@
+args:
+- description: The incident ids to run the command on. Can be passed in as CSV format
+    for multiple.
+  isArray: true
+  name: incident_ids
+  required: true
+- description: The command name to run.
+  name: command
+  required: true
+- description: 'The arguments to pass into the command. The format should be like:
+    {"argument_name": "argument_value"}.'
+  name: arguments
+comment: A wrapper script for the executeCommandAt command to be used in playbooks
+  or the war-room.
+commonfields:
+  id: ExecuteCommandAt
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.10.0
+    itemVersion: 1.22.58
+    packID: CommonScripts
+    packName: Common Scripts
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: ExecuteCommandAt
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('ExecuteCommandAt', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.22.58'
+  demisto.debug('pack id = CommonScripts, pack version = 1.22.58')
+
+
+  import json
+
+
+  def execute_command_at(command: Any, incident_ids: list, arguments: dict | str) -> Any:
+      # ensure that incident ids is a comma-separated list
+      csv_incident_ids = ",".join(map(str, incident_ids))
+
+      arguments_dict_error_msg = "Failed to execute ExecuteCommandAt. Argument 'arguments' must be in a dict format"
+
+      if isinstance(arguments, list):
+          raise DemistoException(arguments_dict_error_msg)
+
+      if isinstance(arguments, str):
+          try:
+              arguments = json.loads(arguments)
+          except Exception as ex:
+              raise DemistoException(f"Failed to parse Argument 'arguments' {ex}")
+
+          if not isinstance(arguments, dict):
+              raise DemistoException(arguments_dict_error_msg)
+
+      return execute_command("executeCommandAt", {"command": command, "incidents": csv_incident_ids, "arguments": arguments})
+
+
+  def main() -> None:
+      try:
+          args = demisto.args()
+          incident_ids: list = argToList(args.get("incident_ids"))
+          command = args.get("command")
+          arguments = args.get("arguments", {})
+
+          return_results(execute_command_at(command, incident_ids, arguments))
+
+      except Exception as ex:
+          return_error(f"Failed to execute ExecuteCommandAt. Error: {ex}")
+
+
+  if __name__ in ("__main__", "__builtin__", "builtins"):
+      main()
+
+  register_module_line('ExecuteCommandAt', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags: []
+type: python
