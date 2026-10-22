@@ -82,7 +82,6 @@
 	"previewOnly": false,
 	"price": 0,
 	"propagationLabels": [
-		"all",
 		"account1",
 		"account2"
 	],
