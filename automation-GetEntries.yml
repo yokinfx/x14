@@ -1,0 +1,138 @@
+args:
+- description: Optional incident ID to fetch entries from. If not specified, current
+    incident is used.
+  name: id
+- description: The list of tags.
+  isArray: true
+  name: tags
+- description: The list of categories. (commandAndResults, playbookTaskResult, playbookTaskStartAndDone,
+    playbookErrors, justFound, deleted, incidentInfo, chats, evidence, notes, attachments).
+  isArray: true
+  name: categories
+- description: The number of entries to return. Maximum is 1000.
+  name: page_size
+- description: Return entries starting from the specified entry ID and backward.
+  name: last_id
+- description: Return entries starting from the specified entry ID and forward.
+  name: first_id
+- description: Return entries before and after the specified entry ID.
+  name: selected_entry_id
+- description: Return entries with the specified users.
+  isArray: true
+  name: users
+- defaultValue: "false"
+  description: Whether to return entries that include all specified tags.
+  name: tags_and_operator
+  predefined:
+  - "true"
+  - "false"
+- description: Return entries from this time and forward. Format is ISO8601 (i.e.,
+    '2020-04-30T10:35:00.000Z').
+  name: from_time
+- description: The ID of the parent entry.
+  name: parent_id
+comment: Collect entries matching to the conditions in the war room.
+commonfields:
+  id: GetEntries
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.5.0
+    itemVersion: 1.22.58
+    packID: CommonScripts
+    packName: Common Scripts
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: GetEntries
+outputs:
+- contextPath: Entry.ID
+  description: Entry ID.
+- contextPath: Entry.Type
+  description: Entry Type.
+- contextPath: Entry.Tags
+  description: Tags associated with the entry.
+- contextPath: Entry.Category
+  description: Entry categories.
+- contextPath: Entry.Created
+  description: Creation time of the entry.
+- contextPath: Entry.Modified
+  description: Last modified time of the entry.
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('GetEntries', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.22.58'
+  demisto.debug('pack id = CommonScripts, pack version = 1.22.58')
+
+
+
+
+  def main():
+      try:
+          args = demisto.args()
+
+          params = assign_params(
+              id=args.get("id"),
+              filter=assign_params(
+                  tags=argToList(args.get("tags")),
+                  categories=argToList(args.get("categories")),
+                  pageSize=arg_to_number(args.get("page_size")),
+                  lastId=args.get("last_id"),
+                  firstID=args.get("first_id"),
+                  selectedEntryID=args.get("selected_entry_id"),
+                  users=argToList(args.get("users")),
+                  tagsAndOperator=argToBoolean(args.get("tags_and_operator", False)),
+                  fromTime=args.get("from_time"),
+                  parentID=args.get("parent_id"),
+              ),
+          )
+
+          ents = demisto.executeCommand("getEntries", params)
+          if not ents:
+              return_results("No matching entries")
+          else:
+              ents = ents if isinstance(ents, list) else [ents]
+              if is_error(ents) and not demisto.get(ents[0], "ID"):
+                  error_message = get_error(ents)
+                  raise DemistoException(f"Failed to execute getEntries. Error details:\n{error_message}")
+
+              outputs = [
+                  assign_params(
+                      ID=demisto.get(ent, "ID"),
+                      Type=demisto.get(ent, "Type"),
+                      Tags=demisto.get(ent, "Metadata.tags"),
+                      Category=demisto.get(ent, "Metadata.category"),
+                      Created=demisto.get(ent, "Metadata.created"),
+                      Modified=demisto.get(ent, "Metadata.modified"),
+                  )
+                  for ent in ents
+              ]
+              return_results(
+                  CommandResults(
+                      outputs_prefix="Entry", outputs=outputs, readable_output=f"Found {len(ents)} entries.", raw_response=ents
+                  )
+              )
+      except Exception as e:
+          demisto.debug(traceback.format_exc())
+          return_error(f"Failed to execute GetEntries.\nError:\n{type(e)}, {e!s}")
+
+
+  if __name__ in ("__builtin__", "builtins", "__main__"):
+      main()
+
+  register_module_line('GetEntries', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags:
+- Utility
+type: python
