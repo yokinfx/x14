@@ -1,0 +1,86 @@
+args:
+- default: true
+  description: The IPv6 to vriefy.
+  isArray: true
+  name: input
+comment: Verify that the address is a valid IPv6 address.
+commonfields:
+  id: VerifyIPv6Indicator
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 5.5.0
+    itemVersion: 1.22.58
+    packID: CommonScripts
+    packName: Common Scripts
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: VerifyIPv6Indicator
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('VerifyIPv6Indicator', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.22.58'
+  demisto.debug('pack id = CommonScripts, pack version = 1.22.58')
+  from ipaddress import IPv6Address
+
+
+
+
+
+  def is_valid_ipv6_address(address):
+      try:
+          IPv6Address(address)
+          return True
+      except ValueError:
+          return False
+
+
+  def main():
+      the_input = demisto.args().get("input")
+      the_input = argToList(the_input)
+      entries_list = []
+
+      for item in the_input:
+          demisto.info(f"Got IPv6 {item}")
+
+          if re.match(r"(?i)^[g-z]", item):
+              # Can't be an actual IPv6, invalid chars, dropping
+              entries_list.append("")
+              continue
+
+          else:
+              item = re.sub("[^a-f0-9:%th.]+", "", item)  # Remove leading char caught as part of the regex
+              demisto.info(f"Changed item to {item!s}")
+
+          if is_valid_ipv6_address(item):
+              entries_list.append(item)
+          else:
+              entries_list.append("")
+
+      if entries_list:
+          return_results(entries_list)
+      else:
+          return_results("")
+
+
+  # python2 uses __builtin__ python3 uses builtins
+  if __name__ == "__builtin__" or __name__ == "builtins":
+      main()
+
+  register_module_line('VerifyIPv6Indicator', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags:
+- indicator-format
+type: python
