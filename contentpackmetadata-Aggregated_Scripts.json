@@ -1,0 +1,157 @@
+{
+	"author": "Cortex XSOAR",
+	"authorImage": "content/packs/Base/Author_image.png",
+	"beta": false,
+	"cacheVersn": 0,
+	"categories": [
+		"Utilities"
+	],
+	"certification": "certified",
+	"contentItemTypes": [
+		"automation"
+	],
+	"contentItems": {
+		"automation": [
+			{
+				"description": "Blocks a list of URLs in supported integrations.",
+				"name": "block-url",
+				"tags": []
+			},
+			{
+				"description": "The script blocks a list of IP addresses in supported integrations.",
+				"name": "block-external-ip",
+				"tags": []
+			},
+			{
+				"description": "This script gathers user data from multiple integrations and returns an Account entity with consolidated information to the context.",
+				"name": "get-user-data",
+				"tags": []
+			},
+			{
+				"description": "This script executes the 'quarantine-file' command on a specified file via the appropriate agent. This script is used to isolate files identified as suspicious. Currently supported brands are \"Cortex XDR - IR\", \"Cortex Core - IR\", and \"Microsoft Defender Advanced Threat Protection\".",
+				"name": "quarantine-file",
+				"tags": []
+			},
+			{
+				"description": "This script clears user sessions across multiple integrations for a list of usernames.",
+				"name": "clear-user-session",
+				"tags": []
+			},
+			{
+				"description": "This script disables users for multiple services.",
+				"name": "disable-user",
+				"tags": []
+			},
+			{
+				"description": "This script gathers endpoint data from multiple integrations and returns an endpoint entity with consolidated information to the context.",
+				"name": "get-endpoint-data",
+				"tags": []
+			},
+			{
+				"description": "Blocks a list of domain FQDNs across the configured security products.",
+				"name": "block-domain",
+				"tags": []
+			},
+			{
+				"description": "This script expires users password for multiple services.",
+				"name": "expire-password",
+				"tags": []
+			},
+			{
+				"description": "This script isolates endpoints using multiple integrations and returns a success or failure message.",
+				"name": "isolate-endpoint",
+				"tags": []
+			}
+		],
+		"classifier": null,
+		"dashboard": null,
+		"genericfield": null,
+		"generictype": null,
+		"incidentfield": null,
+		"incidenttype": null,
+		"indicatorfield": null,
+		"integration": null,
+		"layoutscontainer": null,
+		"list": null,
+		"playbook": null,
+		"report": null,
+		"reputation": null,
+		"widget": null,
+		"wizard": null
+	},
+	"currentVersion": "1.4.1",
+	"definitionId": "",
+	"dependencies": {
+		"Base": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": true,
+			"minVersion": "1.42.29",
+			"name": "Base"
+		},
+		"Palo_Alto_Networks_WildFire": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": false,
+			"minVersion": "2.1.86",
+			"name": "WildFire by Palo Alto Networks"
+		}
+	},
+	"deprecated": false,
+	"description": "A pack containing all aggregated scripts.",
+	"disabledMonthly": false,
+	"downloads": 0,
+	"eulaLink": "https://github.com/demisto/content/blob/master/LICENSE",
+	"fromServerVersion": "6.1.0",
+	"general": [
+		"generalFieldCertified",
+		"generalFieldByCortexXSOAR",
+		"generalFieldFree",
+		"generalFieldSupportIncluded"
+	],
+	"id": "AggregatedScripts",
+	"installMessage": "",
+	"integrations": [
+		{
+			"imagePath": "content/packs/Palo_Alto_Networks_WildFire/WildFire-Reports_image.png",
+			"name": "Palo Alto Networks WildFire Reports"
+		},
+		{
+			"imagePath": "content/packs/Palo_Alto_Networks_WildFire/WildFire-v2_image.png",
+			"name": "Palo Alto Networks WildFire v2"
+		}
+	],
+	"itemVersion": "1.4.1",
+	"keywords": [],
+	"legacy": true,
+	"name": "Aggregated Scripts",
+	"packID": "AggregatedScripts",
+	"packName": "",
+	"premium": false,
+	"previewOnly": false,
+	"price": 0,
+	"propagationLabels": [
+		"all"
+	],
+	"rawKeywords": null,
+	"rawTags": null,
+	"rawUseCases": null,
+	"readme": "\n#### What does this pack do?\n\nThe Aggregated Scripts pack contains scripts that execute multiple commands, significantly streamlining playbook creation and execution.\n",
+	"searchRank": 0,
+	"serverMaxVersion": "",
+	"serverMinVersion": "6.1.0",
+	"support": "xsoar",
+	"supportDetails": {
+		"email": "",
+		"url": "https://www.paloaltonetworks.com/cortex"
+	},
+	"tags": [
+		"Core"
+	],
+	"toServerVersion": "",
+	"updated": "2026-10-16T10:29:27Z",
+	"useCases": [],
+	"version": -1,
+	"versionInfo": "13532449",
+	"videos": []
+}
