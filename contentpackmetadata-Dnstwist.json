@@ -82,7 +82,9 @@
 	"previewOnly": false,
 	"price": 0,
 	"propagationLabels": [
-		"all"
+		"all",
+		"account1",
+		"account2"
 	],
 	"rawKeywords": null,
 	"rawTags": null,
@@ -101,7 +103,7 @@
 		"Getting Started"
 	],
 	"toServerVersion": "",
-	"updated": "2026-10-19T20:28:43Z",
+	"updated": "2026-10-19T20:28:46Z",
 	"useCases": [],
 	"version": -1,
 	"versionInfo": "13920761",
