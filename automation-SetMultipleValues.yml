@@ -1,0 +1,80 @@
+args:
+- default: true
+  description: The parent key to which we append all the other keys.
+  name: parent
+  required: true
+- description: Separated list of keys separated by the specified delimiter (Comma
+    is the default delimiter).
+  name: keys
+  required: true
+- description: Separated list of values separated by the specified delimiter (Comma
+    is the default delimiter).
+  name: values
+  required: true
+- defaultValue: ','
+  description: |-
+    Delimiter by which the content of the values and keys lists are separated.
+    Eg:  "," , ":", "|||".
+  name: delimiter
+comment: Set multiple keys/values to the context.
+commonfields:
+  id: SetMultipleValues
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 5.0.0
+    itemVersion: 1.22.58
+    packID: CommonScripts
+    packName: Common Scripts
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: SetMultipleValues
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('SetMultipleValues', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.22.58'
+  demisto.debug('pack id = CommonScripts, pack version = 1.22.58')
+
+
+
+
+  def main():
+      delimiter = demisto.args().get("delimiter", ",")
+      keys = [k.strip() for k in demisto.args()["keys"].split(delimiter)]
+      values_str = demisto.args()["values"]
+      if "[" in values_str and "]" in values_str:
+          values_str = f"[{values_str}]"
+      values = argToList(values_str, separator=delimiter)
+
+      ec = {demisto.args()["parent"] + "(true)": dict(zip(keys, values))}
+      demisto.results(
+          {
+              "Type": entryTypes["note"],
+              "Contents": ec,
+              "ContentsFormat": formats["json"],
+              "HumanReadable": "Keys " + ",".join(keys) + " set",
+              "EntryContext": ec,
+          }
+      )
+
+
+  if __name__ in ("__main__", "__builtin__", "builtins"):  # pragma: no cover
+      main()
+
+  register_module_line('SetMultipleValues', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags:
+- Utility
+type: python
