@@ -1,0 +1,1104 @@
+{
+	"cacheVersn": 0,
+	"definitionId": "",
+	"fromDate": "0001-01-01T00:00:00Z",
+	"fromDateLicense": "0001-01-01T00:00:00Z",
+	"fromServerVersion": "6.10.0",
+	"hidePivot": false,
+	"hideSearch": false,
+	"id": "XSOAR Automation Insights",
+	"isCommon": true,
+	"itemVersion": "1.7.24",
+	"layout": [
+		{
+			"forceRange": false,
+			"h": 1,
+			"i": "cebf7c70-951d-11ee-a633-2dfd1005d519",
+			"id": "cebf7c70-951d-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "indicators",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "9cd56ad8-c448-4e19-81bc-5b8de87af8ff",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2023-12-07T16:29:33.761110182Z",
+				"name": "Indicators Marked as Blocked",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"colors": {
+						"isEnabled": true,
+						"items": {
+							"#1DB846": {
+								"value": null
+							},
+							"#D13C3C": {
+								"value": 1
+							}
+						},
+						"type": "above"
+					},
+					"valuesFormat": "abbreviated"
+				},
+				"prevName": "Hashes Automatically Blocked By XSOAR",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "(expirationStatus:active and blocked:T)",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 1,
+				"widgetType": "number"
+			},
+			"x": 4,
+			"y": 1
+		},
+		{
+			"forceRange": false,
+			"h": 1,
+			"i": "43603f50-951f-11ee-a633-2dfd1005d519",
+			"id": "43603f50-951f-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "metrics",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"description": "Playbook runs",
+				"fromServerVersion": "6.2.0",
+				"id": "",
+				"isPredefined": false,
+				"itemVersion": "1.2.38",
+				"modified": "2023-12-01T19:49:56.036998051Z",
+				"name": "Playbook runs",
+				"packID": "CommonWidgets",
+				"packName": "Common Widgets",
+				"packPropagationLabels": [
+					"all"
+				],
+				"params": {
+					"keys": [
+						"sum|executionCount"
+					],
+					"limitType": "top",
+					"showOthers": true,
+					"tableColumns": [
+						{
+							"isDefault": true,
+							"key": "count",
+							"position": 0
+						},
+						{
+							"isDefault": true,
+							"key": "data",
+							"position": 1
+						},
+						{
+							"isDefault": true,
+							"key": "floatData",
+							"position": 2
+						},
+						{
+							"isDefault": true,
+							"key": "groups",
+							"position": 3
+						},
+						{
+							"isDefault": true,
+							"key": "name",
+							"position": 4
+						},
+						{
+							"isDefault": true,
+							"key": "pivot",
+							"position": 5
+						},
+						{
+							"isDefault": true,
+							"key": "color",
+							"position": 6
+						}
+					],
+					"valuesFormat": "abbreviated"
+				},
+				"prevName": "Playbook runs",
+				"propagationLabels": [],
+				"query": "type:playbook",
+				"shouldCommit": false,
+				"size": 5,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 0,
+				"widgetType": "trend"
+			},
+			"x": 8,
+			"y": 1
+		},
+		{
+			"forceRange": false,
+			"h": 4,
+			"i": "836cbb50-951f-11ee-a633-2dfd1005d519",
+			"id": "836cbb50-951f-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "metrics",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"description": "Average runtime per Playbook (top 5)",
+				"fromServerVersion": "6.2.0",
+				"id": "",
+				"isPredefined": false,
+				"itemVersion": "1.2.38",
+				"modified": "2023-12-01T19:49:56.037052112Z",
+				"name": "Average runtime per Playbook (top 5)",
+				"packID": "CommonWidgets",
+				"packName": "Common Widgets",
+				"packPropagationLabels": [
+					"all"
+				],
+				"params": {
+					"groupBy": [
+						"name"
+					],
+					"keys": [
+						"avg|duration"
+					],
+					"limitType": "top",
+					"referenceLine": {
+						"type": "avg"
+					},
+					"showGraphValues": true,
+					"showOthers": false,
+					"tableColumns": [
+						{
+							"isDefault": true,
+							"key": "count",
+							"position": 0
+						},
+						{
+							"isDefault": true,
+							"key": "data",
+							"position": 1
+						},
+						{
+							"isDefault": true,
+							"key": "floatData",
+							"position": 2
+						},
+						{
+							"isDefault": true,
+							"key": "groups",
+							"position": 3
+						},
+						{
+							"isDefault": true,
+							"key": "name",
+							"position": 4
+						},
+						{
+							"isDefault": true,
+							"key": "color",
+							"position": 5
+						}
+					],
+					"valuesFormat": "hours",
+					"xAxisLabel": "Playbook",
+					"yAxisLabel": "Time"
+				},
+				"prevName": "Average runtime per Playbook (top 5)",
+				"propagationLabels": [],
+				"query": "type:playbook",
+				"shouldCommit": false,
+				"size": 5,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 0,
+				"widgetType": "column"
+			},
+			"x": 8,
+			"y": 6
+		},
+		{
+			"forceRange": false,
+			"h": 3,
+			"i": "9c252970-951f-11ee-a633-2dfd1005d519",
+			"id": "9c252970-951f-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "incidents",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "0001-01-01T00:00:00Z",
+				"name": "Incidents Auto Closed by Automation",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"colors": {
+						"isEnabled": false,
+						"items": {},
+						"type": "above"
+					},
+					"groupBy": [
+						"occurred(d)",
+						"type"
+					],
+					"timeFrame": "days",
+					"valuesFormat": "abbreviated",
+					"xAxisLabel": "Close Reason",
+					"yAxisLabel": "Incident Count"
+				},
+				"prevName": "",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "type:* and closingUser:\"DBot\"",
+				"shouldCommit": false,
+				"size": 5,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 0,
+				"widgetType": "line"
+			},
+			"x": 0,
+			"y": 4
+		},
+		{
+			"forceRange": false,
+			"h": 2,
+			"i": "a6c3e2f0-9528-11ee-a633-2dfd1005d519",
+			"id": "a6c3e2f0-9528-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "metrics",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "a331c3c0-0fb0-48f1-822f-95c6f6a83fb3",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2023-12-07T17:47:10.358649786Z",
+				"name": "Total Automated Incident Actions",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"groupBy": [
+						"incidentType"
+					],
+					"hideLegend": false,
+					"keys": [
+						"sum|executionCount"
+					],
+					"showGraphValues": false,
+					"valuesFormat": "abbreviated",
+					"xAxisLabel": ""
+				},
+				"prevName": "Total Automated Actions",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "type:playbook",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 1,
+				"widgetType": "bar"
+			},
+			"x": 0,
+			"y": 2
+		},
+		{
+			"forceRange": false,
+			"h": 1,
+			"i": "2a3295a0-9529-11ee-a633-2dfd1005d519",
+			"id": "2a3295a0-9529-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "incidents",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "55ea661d-2901-41b1-8f5a-906e99526953",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2023-12-07T17:50:50.342265452Z",
+				"name": "XSOAR Metrics",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"text": "# \u003c-:-\u003ePlaybooks and Automations\u003c-:-\u003e\n\n"
+				},
+				"prevName": "XSOAR Metrics",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 2,
+				"widgetType": "text"
+			},
+			"x": 8,
+			"y": 0
+		},
+		{
+			"forceRange": false,
+			"h": 1,
+			"i": "743f7e60-9529-11ee-a633-2dfd1005d519",
+			"id": "743f7e60-9529-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "incidents",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "00c6fd8a-2fc6-4191-8d61-9d63d7c58194",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2023-12-07T17:52:55.412459451Z",
+				"name": "Data Sources and Incident Metrics",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"text": "# \u003c-:-\u003eData Sources and Incident Metrics\u003c-:-\u003e"
+				},
+				"prevName": "Data Sources and Alert Ingestion",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 1,
+				"widgetType": "text"
+			},
+			"x": 0,
+			"y": 0
+		},
+		{
+			"forceRange": false,
+			"h": 1,
+			"i": "b42b2bf0-9529-11ee-a633-2dfd1005d519",
+			"id": "b42b2bf0-9529-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "incidents",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "5541ed47-0674-407e-894f-b7ae15cd98e1",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2023-12-07T17:54:42.509803518Z",
+				"name": "Threat Intel and Attack Surface Management",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"text": "# \u003c-:-\u003eThreat Intel and Attack Surface Management\u003c-:-\u003e"
+				},
+				"prevName": "Network and Threat Intel",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 1,
+				"widgetType": "text"
+			},
+			"x": 4,
+			"y": 0
+		},
+		{
+			"forceRange": false,
+			"h": 2,
+			"i": "be9ea5d0-9529-11ee-a633-2dfd1005d519",
+			"id": "be9ea5d0-9529-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "indicators",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "6.2.0",
+				"id": "",
+				"isPredefined": false,
+				"itemVersion": "1.2.38",
+				"modified": "2023-12-01T19:49:56.037193335Z",
+				"name": "Active Indicators by Verdict",
+				"packID": "CommonWidgets",
+				"packName": "Common Widgets",
+				"packPropagationLabels": [
+					"all"
+				],
+				"params": {
+					"groupBy": [
+						"score"
+					],
+					"showGraphValues": false,
+					"valuesFormat": "abbreviated"
+				},
+				"prevName": "Active Indicators by Verdict",
+				"propagationLabels": [],
+				"query": "expirationStatus:active",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 0,
+				"widgetType": "pie"
+			},
+			"x": 4,
+			"y": 2
+		},
+		{
+			"forceRange": false,
+			"h": 3,
+			"i": "ccf944f0-9529-11ee-a633-2dfd1005d519",
+			"id": "ccf944f0-9529-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "indicators",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "6.2.0",
+				"id": "",
+				"isPredefined": false,
+				"itemVersion": "1.2.38",
+				"modified": "2023-12-01T19:49:56.032690737Z",
+				"name": "Malicious/Suspicious Indicators Observed in Incidents",
+				"packID": "CommonWidgets",
+				"packName": "Common Widgets",
+				"packPropagationLabels": [
+					"all"
+				],
+				"params": {
+					"groupBy": [
+						"score"
+					],
+					"showGraphValues": false,
+					"valuesFormat": "abbreviated"
+				},
+				"prevName": "Malicious/Suspicious Indicators in Incidents",
+				"propagationLabels": [],
+				"query": "(verdict:Malicious or verdict:Suspicious) and incident.id:*",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 0,
+				"widgetType": "bar"
+			},
+			"x": 4,
+			"y": 7
+		},
+		{
+			"forceRange": false,
+			"h": 2,
+			"i": "cedff160-954c-11ee-a633-2dfd1005d519",
+			"id": "cedff160-954c-11ee-a633-2dfd1005d519",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "metrics",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "86b6c4bf-6a6d-407a-8822-59132439ba8b",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2023-12-07T22:05:59.491280384Z",
+				"name": "Automated VS Manual Actions",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"customGroupBy": [
+						{
+							"Manual Actions": {
+								"conditions": [
+									[
+										{
+											"field": "isManual",
+											"operator": "isTrue",
+											"right": "",
+											"type": "boolean"
+										}
+									]
+								],
+								"name": "Manual Actions"
+							},
+							"Playbook Task": {
+								"conditions": [
+									[
+										{
+											"field": "isManual",
+											"operator": "isFalse",
+											"type": "boolean"
+										}
+									]
+								],
+								"name": "Playbook Task"
+							}
+						}
+					],
+					"groupBy": [
+						"isManual"
+					],
+					"keys": [
+						"sum|executionCount"
+					],
+					"legend": [
+						{
+							"color": "#01A2EC",
+							"name": "Playbook Task"
+						}
+					],
+					"showGraphValues": true,
+					"showOthers": false,
+					"valuesFormat": "abbreviated"
+				},
+				"prevName": "Automated VS Manual Actions",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "type:automation",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 1,
+				"widgetType": "pie"
+			},
+			"x": 8,
+			"y": 2
+		},
+		{
+			"forceRange": false,
+			"h": 1,
+			"i": "85e57e30-ec2c-11ee-aab1-99a3eff3f897",
+			"id": "85e57e30-ec2c-11ee-aab1-99a3eff3f897",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "incidents",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "738c65fe-6b90-45f3-8633-4a837969b0b1",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2024-03-25T07:41:11.58546694Z",
+				"name": "Incident Dropped Count",
+				"packID": "",
+				"packName": "",
+				"params": {
+					"colors": {
+						"isEnabled": true,
+						"items": {
+							"#D13C3C": {
+								"value": 1
+							}
+						},
+						"type": "above"
+					},
+					"keys": [
+						"sum|droppedCount"
+					],
+					"valuesFormat": "abbreviated"
+				},
+				"prevName": "Incidents Dropped Count",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "droppedCount:\u003e0",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 1,
+				"widgetType": "number"
+			},
+			"x": 0,
+			"y": 1
+		},
+		{
+			"forceRange": false,
+			"h": 2,
+			"i": "65237500-ec52-11ee-8bcf-ef9fbb2fd5c5",
+			"id": "65237500-ec52-11ee-8bcf-ef9fbb2fd5c5",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "metrics",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"description": "Command executions per Integration Category",
+				"fromServerVersion": "6.2.0",
+				"id": "",
+				"isPredefined": false,
+				"itemVersion": "1.2.48",
+				"modified": "2024-02-23T14:34:35.492390234Z",
+				"name": "Command executions per Integration Category",
+				"packID": "CommonWidgets",
+				"packName": "Common Widgets",
+				"packPropagationLabels": [
+					"all"
+				],
+				"params": {
+					"groupBy": [
+						"category"
+					],
+					"keys": [
+						"sum|executionCount"
+					],
+					"showGraphValues": false,
+					"showOthers": false,
+					"tableColumns": [
+						{
+							"isDefault": true,
+							"key": "count",
+							"position": 0
+						},
+						{
+							"isDefault": true,
+							"key": "data",
+							"position": 1
+						},
+						{
+							"isDefault": true,
+							"key": "floatData",
+							"position": 2
+						},
+						{
+							"isDefault": true,
+							"key": "groups",
+							"position": 3
+						},
+						{
+							"isDefault": true,
+							"key": "name",
+							"position": 4
+						},
+						{
+							"isDefault": true,
+							"key": "pivot",
+							"position": 5
+						},
+						{
+							"isDefault": true,
+							"key": "color",
+							"position": 6
+						}
+					],
+					"valuesFormat": "regular"
+				},
+				"prevName": "Command executions per Integration Category",
+				"propagationLabels": [],
+				"query": "type:integration",
+				"shouldCommit": false,
+				"size": 5,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 0,
+				"widgetType": "column"
+			},
+			"x": 8,
+			"y": 4
+		},
+		{
+			"forceRange": false,
+			"h": 3,
+			"i": "d799cbe0-ec55-11ee-8bcf-ef9fbb2fd5c5",
+			"id": "d799cbe0-ec55-11ee-8bcf-ef9fbb2fd5c5",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "scripts",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "",
+						"byTo": "",
+						"field": "",
+						"fromValue": null,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "",
+				"id": "9eb1c8bd-0010-48d5-8882-221cf01b3cc6",
+				"isPredefined": false,
+				"itemVersion": "",
+				"modified": "2024-03-27T16:19:50.935877072Z",
+				"name": "Use Case Adoption Coverage",
+				"packID": "",
+				"packName": "",
+				"params": {},
+				"prevName": "Use Case Adoption Coverage",
+				"propagationLabels": [
+					"all"
+				],
+				"query": "AdoptionMetrics",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 1,
+				"widgetType": "text"
+			},
+			"x": 0,
+			"y": 7
+		},
+		{
+			"forceRange": false,
+			"h": 3,
+			"i": "804c2300-ec56-11ee-8bcf-ef9fbb2fd5c5",
+			"id": "804c2300-ec56-11ee-8bcf-ef9fbb2fd5c5",
+			"reflectDimensions": true,
+			"w": 4,
+			"widget": {
+				"Cache": null,
+				"cacheVersn": 0,
+				"category": "",
+				"commitMessage": "",
+				"created": "0001-01-01T00:00:00Z",
+				"dataType": "indicators",
+				"dateRange": {
+					"fromDate": "0001-01-01T00:00:00Z",
+					"fromDateLicense": "0001-01-01T00:00:00Z",
+					"period": {
+						"by": "",
+						"byFrom": "days",
+						"byTo": "",
+						"field": "",
+						"fromValue": 7,
+						"toValue": null
+					},
+					"toDate": "0001-01-01T00:00:00Z"
+				},
+				"definitionId": "",
+				"fromServerVersion": "5.0.0",
+				"id": "indicators-activity-type",
+				"isPredefined": true,
+				"itemVersion": "1.2.48",
+				"modified": "2024-02-23T14:34:35.493620748Z",
+				"name": "Indicators Activity by Type",
+				"packID": "CommonWidgets",
+				"packName": "Common Widgets",
+				"packPropagationLabels": [
+					"all"
+				],
+				"params": {
+					"groupBy": [
+						"calculatedTime(d)",
+						"type"
+					]
+				},
+				"prevName": "Indicators Activity by Type",
+				"propagationLabels": [],
+				"query": "",
+				"shouldCommit": false,
+				"sizeInBytes": 0,
+				"toServerVersion": "",
+				"vcShouldIgnore": false,
+				"vcShouldKeepItemLegacyProdMachine": false,
+				"version": 21,
+				"widgetType": "line"
+			},
+			"x": 4,
+			"y": 4
+		}
+	],
+	"locked": false,
+	"modulePage": false,
+	"name": "XSOAR Automation Insights",
+	"owner": "",
+	"packID": "CommonDashboards",
+	"packName": "Common Dashboards",
+	"packPropagationLabels": [
+		"all"
+	],
+	"period": {
+		"by": "",
+		"byFrom": "days",
+		"byTo": "",
+		"field": "",
+		"fromValue": 180,
+		"toValue": null
+	},
+	"propagationLabels": [],
+	"system": true,
+	"toDate": "0001-01-01T00:00:00Z",
+	"toServerVersion": "",
+	"version": -1
+}
