@@ -1,0 +1,155 @@
+{
+	"author": "Cortex XSOAR",
+	"authorImage": "content/packs/Base/Author_image.png",
+	"beta": false,
+	"cacheVersn": 0,
+	"categories": [
+		"Data Enrichment \u0026 Threat Intelligence"
+	],
+	"certification": "certified",
+	"contentItemTypes": [
+		"integration"
+	],
+	"contentItems": {
+		"automation": null,
+		"classifier": null,
+		"dashboard": null,
+		"genericfield": null,
+		"generictype": null,
+		"incidentfield": null,
+		"incidenttype": null,
+		"indicatorfield": null,
+		"integration": [
+			{
+				"category": "Data Enrichment \u0026 Threat Intelligence",
+				"commands": [
+					{
+						"description": "Enrich an IP address with Unit 42 threat intelligence context.",
+						"name": "ip"
+					},
+					{
+						"description": "Enrich a domain with Unit 42 threat intelligence context.",
+						"name": "domain"
+					},
+					{
+						"description": "Enrich a URL with Unit 42 threat intelligence context.",
+						"name": "url"
+					},
+					{
+						"description": "Enrich a file hash with Unit 42 threat intelligence context.",
+						"name": "file"
+					}
+				],
+				"description": "Enrich indicators with Unit 42 threat intelligence context including verdicts, threat object associations, and relationships.",
+				"id": "Unit 42 Intelligence",
+				"name": "Unit 42 Intelligence"
+			},
+			{
+				"category": "Data Enrichment \u0026 Threat Intelligence",
+				"commands": [
+					{
+						"description": "Gets indicators from the feed.",
+						"name": "unit42-get-indicators"
+					},
+					{
+						"description": "Gets threat objects from the feed.",
+						"name": "unit42-get-threat-objects"
+					}
+				],
+				"description": "Unit 42 Feed integration provides threat intelligence from Palo Alto Networks Unit 42 research team.",
+				"id": "Unit 42 Feed",
+				"name": "Unit 42 Feed"
+			}
+		],
+		"layoutscontainer": null,
+		"list": null,
+		"playbook": null,
+		"report": null,
+		"reputation": null,
+		"widget": null,
+		"wizard": null
+	},
+	"currentVersion": "1.1.1",
+	"definitionId": "",
+	"dependencies": {
+		"Base": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": true,
+			"minVersion": "1.42.29",
+			"name": "Base"
+		},
+		"CommonScripts": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": true,
+			"minVersion": "1.22.58",
+			"name": "Common Scripts"
+		}
+	},
+	"deprecated": false,
+	"description": "Use the Unit 42 Threat Intelligence by Palo Alto Networks integrations to enrich indicators with threat intelligence data and fetch threat intelligence feeds.",
+	"disabledMonthly": false,
+	"downloads": 0,
+	"eulaLink": "https://github.com/demisto/content/blob/master/LICENSE",
+	"fromServerVersion": "6.10.0",
+	"general": [
+		"generalFieldCertified",
+		"generalFieldByCortexXSOAR",
+		"generalFieldFree",
+		"generalFieldSupportIncluded"
+	],
+	"id": "Unit42ThreatIntelligencebyPaloAltoNetworks",
+	"installMessage": "",
+	"integrations": [
+		{
+			"imagePath": "content/packs/Unit42ThreatIntelligencebyPaloAltoNetworks/Unit42Feed_image.png",
+			"name": "Unit 42 Feed"
+		},
+		{
+			"imagePath": "content/packs/Unit42ThreatIntelligencebyPaloAltoNetworks/Unit42Intelligence_image.png",
+			"name": "Unit 42 Intelligence"
+		}
+	],
+	"itemVersion": "1.1.1",
+	"keywords": [
+		"Feed",
+		"TIM",
+		"Unit 42",
+		"Threat Intelligence",
+		"Palo Alto Networks"
+	],
+	"legacy": true,
+	"name": "Unit 42 Threat Intelligence by Palo Alto Networks",
+	"packID": "Unit42ThreatIntelligencebyPaloAltoNetworks",
+	"packName": "",
+	"premium": false,
+	"previewOnly": false,
+	"price": 0,
+	"propagationLabels": [
+		"all"
+	],
+	"rawKeywords": null,
+	"rawTags": null,
+	"rawUseCases": null,
+	"readme": "# Unit 42 Threat Intelligence by Palo Alto Networks\n\nThis pack provides the Unit 42 Intelligence integration and the Unit 42 Feed integration, delivering high-fidelity threat intelligence curated by the Unit 42 team and derived from telemetry across the Palo Alto Networks product ecosystem.\n\nBuilt by Unit 42, Palo Alto Networks' threat research organization, this pack brings world-class research, adversary expertise, and at-scale telemetry together to enrich investigations and automate high-quality indicator ingestion.\n\n## What does this pack do?\n\nThe Unit 42 Threat Intelligence content pack includes integrations that allow you to:\n\n- **Enrich indicators** with threat intelligence context from the Unit 42 research team\n- **Get verdicts** for IP addresses, domains, URLs, and file hashes (SHA256)\n- **Surface associations** between indicators and threat objects (actors, malware, campaigns, techniques) as determined by Unit 42 research\n- **Optionally create relationships** in your tenant based on returned associations\n- **Access comprehensive metadata** including first seen, last seen, and source information\n\n## Prerequisites\n\n- Cortex Threat Intelligence Management (TIM) license\n\n## Integrations\n\n### Unit 42 Intelligence\n\nAn enrichment integration that provides threat intelligence lookups for indicators. This integration replaces the deprecated AutoFocus V2 integration with enhanced capabilities and improved context quality.\n\n**Supported Commands:**\n\n- `!ip` - Enrich IP addresses\n- `!domain` - Enrich domain names\n- `!url` - Enrich URLs\n- `!file` - Enrich file hashes (SHA256)\n\n**Key Features:**\n\n- Real-time indicator enrichment\n- Threat object associations returned by Unit 42\n- Verdict classification (malicious, suspicious, benign, unknown)\n- Optional relationship creation based on returned associations\n- Comprehensive threat intelligence metadata\n\n### Unit 42 Feed\n\nA read-only feed integration that continuously fetches indicators and threat objects (plus their relationships) from Unit 42 data sources. When relationship creation is enabled, relationships between ingested indicators and threat objects are created in your tenant based on the feed data.\n\n### Setup\n\n1. Install the Unit 42 by Palo Alto Networks content pack\n2. Configure the Unit 42 Intelligence integration\n3. Configure the Unit 42 Feed integration if you need indicator feeds\n4. Test the integrations using the test commands\n\n## Use Cases\n\n- **Incident Response**: Enrich indicators found during investigations with threat intelligence\n- **Threat Hunting**: Identify malicious indicators and their associated threat campaigns\n- **IOC Management**: Automatically ingest and classify threat indicators\n- **Threat Intelligence**: Build a graph of indicators and threat objects with relationships created from returned enrichment and feed data\n\n## Support\n\nThis pack is supported by Cortex XSOAR. For technical support, please contact Palo Alto Networks support.\n\n### Pack Contributors:\n\n---\n - Maximilian Lehrbaum\n\nContributions are welcome and appreciated. For more info, visit our [Contribution Guide](https://xsoar.pan.dev/docs/contributing/contributing).",
+	"searchRank": 0,
+	"serverMaxVersion": "",
+	"serverMinVersion": "6.10.0",
+	"support": "xsoar",
+	"supportDetails": {
+		"email": "",
+		"url": "https://www.paloaltonetworks.com/cortex"
+	},
+	"tags": [
+		"TIM",
+		"Threat Intelligence Management",
+		"Palo Alto Networks Products"
+	],
+	"toServerVersion": "",
+	"updated": "2026-10-11T20:20:37Z",
+	"useCases": [],
+	"version": -1,
+	"versionInfo": "13532449",
+	"videos": []
+}
