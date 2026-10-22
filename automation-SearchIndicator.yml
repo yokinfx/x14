@@ -1,0 +1,121 @@
+args:
+- description: 'Query to use to find the Indicators, same as you''d use on the Threat
+    Intel page. '
+  name: query
+  required: true
+- defaultValue: "25"
+  description: The number of indicators to return, defaults to a max of 25.
+  name: size
+- description: 'A comma separated list of fields to return to the context (default:
+    id,indicator_type,value,score,verdict)).'
+  name: add_fields_to_context
+comment: |-
+  Searches Cortex XSOAR Indicators.
+
+  Search for XSOAR Indicators and returns the id, indicator_type, value, and score/verdict.
+
+  You can add additional fields from the indicators using the add_field_to_context argument.
+commonfields:
+  id: SearchIndicator
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.5.0
+    itemVersion: 1.22.58
+    packID: CommonScripts
+    packName: Common Scripts
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: SearchIndicator
+outputs:
+- contextPath: foundIndicators.id
+  description: The id of the indicator in the XSOAR database.
+- contextPath: foundIndicators.indicator_type
+  description: The type of indicator (for example IP, Domain, URL).
+- contextPath: foundIndicators.value
+  description: The value of the indicator.
+- contextPath: foundIndicators.score
+  description: The numeric score of the indicator (0 = Unknown, 0.5 = Informational,
+    1 = Good, 2 = Suspicious, 3 = Bad, 4 = Critical).
+- contextPath: foundIndicators.verdict
+  description: The human readable score/verdict of the Indicator.
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |-
+  // pack version: 1.22.58
+  var res = executeCommand('findIndicators', {
+      query: args.query,
+      size: args.size
+  });
+
+  if (!isValidRes(res)) {
+      if (res[0].Contents) {
+          return {
+              ContentsFormat: formats.markdown,
+              Type: entryTypes.error,
+              Contents: res[0].Contents
+          };
+      }
+  }
+
+  var filteredIndicators = []
+  if (
+      res &&
+      res[0] &&
+      res[0].Contents
+  ) {
+      filteredIndicators = []
+
+      fields = ["id", "indicator_type", "value", "score"]
+
+
+      if (args.add_fields_to_context) {
+          fields = fields.concat(args.add_fields_to_context.split(","));
+          fields = fields.map(x => x.trim()); // clear out whitespace
+      }
+
+      for (var indicator of res[0].Contents) {
+          var styleIndicator = {};
+          for (var field of fields) {
+              styleIndicator[field] =
+                  indicator[field] !== undefined ? indicator[field] :
+                  (indicator.CustomFields && indicator.CustomFields[field] !== undefined ?
+                      indicator.CustomFields[field] :
+                      "n/a");
+          }
+
+          styleIndicator["verdict"] = scoreToReputation(styleIndicator["score"])
+
+          filteredIndicators.push(styleIndicator);
+      }
+
+      var headers = fields.concat(["verdict"]);
+
+  }
+
+  var ec = {
+      'foundIndicators(val.id && val.id == obj.id)': filteredIndicators
+  };
+
+  return {
+      Type: entryTypes.note,
+      ReadableContentsFormat: formats.markdown,
+      Contents: filteredIndicators,
+      ContentsFormat: formats.json,
+      HumanReadable: tableToMarkdown("Indicators Found", filteredIndicators, headers),
+      EntryContext: ec,
+      IgnoreAutoExtract: true
+  };
+scripttarget: 0
+system: true
+tags:
+- Utility
+type: javascript
