@@ -1,0 +1,140 @@
+args:
+- default: true
+  description: The value on which the transformer is applied.
+  isArray: true
+  name: value
+- auto: PREDEFINED
+  defaultValue: "Yes"
+  description: Whether to ignore the case of the item for which you are searching.
+    Default is "Yes".
+  name: ignore_case
+  predefined:
+  - "yes"
+  - "no"
+- auto: PREDEFINED
+  defaultValue: "No"
+  description: Whether to match the exact item in the list, or look for any string
+    that contains it. Default is "No".
+  name: match_exact
+  predefined:
+  - "yes"
+  - "no"
+- defaultValue: \n
+  description: A string used to delimit fields. For example, a new line "\n" should
+    match the list separator configuration.
+  name: delimiter
+- description: A list of patterns to remove from the value. This can be a single string
+    or a list of patterns, separated by the pattern defined in the delimiter argument.
+    Unless match_exact is yes, regex pattern is supported.
+  name: filters
+  required: true
+comment: |-
+  Removes items from the given list of values if they match any of the patterns in the provided `filters`.
+  If the match_exact argument is 'yes', direct string compare is used, otherwise the comparison is done using regex.
+commonfields:
+  id: RemoveMatches
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.10.0
+    itemVersion: 1.4.30
+    packID: FiltersAndTransformers
+    packName: Filters And Transformers
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: RemoveMatches
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('RemoveMatches', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.4.30'
+  demisto.debug('pack id = FiltersAndTransformers, pack version = 1.4.30')
+  import re
+
+
+
+
+  def filter_items(values: list, filter_list: list, ignore_case: bool, match_exact: bool):
+      """Filter the values by the filter list.
+      If an item matches an entry in the filter_list, than do not return it.
+
+      Args:
+          values (_type_): The value on which to apply the transformer
+          filter_list (_type_): The list of pattern to filter from the values
+          ignore_case (_type_): If True, ignore the case of the value
+          match_exact (_type_): If True, only filter out values exactly matching the pattern
+
+      Returns:
+          _type_: The values not matching any of the patterns in the given list
+      """
+      filtered_items = []
+
+      regex_ignore_case_flag = re.IGNORECASE if ignore_case else 0
+      list_to_lowercase = [list_item.lower().strip() for list_item in filter_list]
+      for value in values:
+          if match_exact:
+              if ignore_case:
+                  if value.lower() in list_to_lowercase:
+                      continue
+              else:
+                  if value in filter_list:
+                      continue
+          else:
+              filtered = False
+              for filter_string in filter_list:
+                  filter_string = filter_string.strip()  # remove trailing/leading whitespace
+                  if filter_string and re.search(filter_string, value, regex_ignore_case_flag):
+                      filtered = True
+                      break
+              if filtered:
+                  continue
+          filtered_items.append(value)
+
+      return filtered_items
+
+
+  """ MAIN FUNCTION """
+
+
+  def main():  # pragma: no cover
+      try:
+          args = demisto.args()
+          ignore_case = argToBoolean(args.get("ignore_case", "True"))
+          match_exact = argToBoolean(args.get("match_exact", "False"))
+          values = argToList(args.get("value"))
+          delimiter = args.get("delimiter", "\n")
+          list: str = args.get("filters", "")
+          if not list:
+              filtered_items = values
+          else:
+              filters = re.split(delimiter, list)
+              filtered_items = filter_items(values=values, filter_list=filters, ignore_case=ignore_case, match_exact=match_exact)
+          return_results(filtered_items)
+      except Exception as ex:
+          return_error(f"Failed to execute FilterByListTransformer. Error: {ex!s}")
+
+
+  """ ENTRY POINT """
+
+
+  if __name__ in ("__main__", "__builtin__", "builtins"):
+      main()
+
+  register_module_line('RemoveMatches', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags:
+- transformer
+- entirelist
+- general
+type: python
