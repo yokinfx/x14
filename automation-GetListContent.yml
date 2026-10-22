@@ -1,0 +1,120 @@
+args:
+- description: The name of the List to open.
+  name: value
+- auto: PREDEFINED
+  defaultValue: string
+  description: The format to return the list content in, such as 'json' or 'string'.
+    The Type does not have to match the format configured in the list, but controls
+    how the content of the list is handled.
+  name: type
+  predefined:
+  - string
+  - json
+comment: Returns the content of the List with the given Name as a string or JSON object,
+  depending on the selected `type`.
+commonfields:
+  id: GetListContent
+  version: -1
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.10.0
+    itemVersion: 1.4.30
+    packID: FiltersAndTransformers
+    packName: Filters And Transformers
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+dockerimage: demisto/python3:3.12.13.10404775
+enabled: true
+engineinfo: {}
+mainengineinfo: {}
+name: GetListContent
+pswd: ""
+runas: DBotWeakRole
+runonce: false
+script: |
+  register_module_line('GetListContent', 'start', __line__())
+  CONSTANT_PACK_VERSION = '1.4.30'
+  demisto.debug('pack id = FiltersAndTransformers, pack version = 1.4.30')
+  """GetListContent Automation/Transformer for Cortex XSOAR (aka Demisto)
+  This Automation returns the content of the List with the given name.
+  If type is JSON, the content of the list will be parsed as a JSON object
+  """
+
+  from typing import Any
+  import traceback
+
+
+
+
+  """ STANDALONE FUNCTION """
+
+
+  def get_list_content_internal(list_name: str) -> str | None:
+      content = None
+      lists = json.loads(demisto.internalHttpRequest("GET", "/lists/").get("body", {}))
+      for list_entry in lists:
+          if list_entry["id"] == list_name:
+              content = list_entry["data"]
+              break
+
+      return content
+
+
+  """ COMMAND FUNCTION """
+
+
+  def get_list_content(list_name: str, return_type: str) -> Any | None:
+      list_data = get_list_content_internal(list_name)
+
+      if not list_data:
+          return None
+
+      if return_type == "string":
+          list_data = str(list_data)
+      elif return_type == "json":
+          list_data = json.loads(list_data)
+      else:
+          pass
+
+      return list_data
+
+
+  def get_list_content_command(args: dict) -> Any | None:
+      list_name = args.get("value")
+      return_type = args.get("type", "string")
+      if not list_name:
+          raise DemistoException("Value must not be empty")
+
+      content = get_list_content(list_name, return_type)
+      return content
+
+
+  """ MAIN FUNCTION """
+
+
+  def main():
+      try:
+          return_results(get_list_content_command(demisto.args()))
+
+      except Exception as ex:
+          demisto.error(traceback.format_exc())  # print the traceback
+          return_error(f"Failed to execute GetListContent. Error: {str(ex)}")
+
+
+  """ ENTRY POINT """
+
+
+  if __name__ in ("__main__", "__builtin__", "builtins"):
+      main()
+
+  register_module_line('GetListContent', 'end', __line__())
+scripttarget: 0
+subtype: python3
+system: true
+tags:
+- transformer
+type: python
