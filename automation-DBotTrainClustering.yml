@@ -103,7 +103,7 @@ contentitemexportablefields:
   contentitemfields:
     definitionid: ""
     fromServerVersion: 6.2.0
-    itemVersion: 1.42.30
+    itemVersion: 1.42.36
     packID: Base
     packName: Base
     packPropagationLabels:
@@ -111,7 +111,7 @@ contentitemexportablefields:
     prevname: ""
     propagationLabels: []
     toServerVersion: ""
-dockerimage: demisto/mlclustering:1.0.0.11879924
+dockerimage: demisto/mlclustering:1.0.0.13053055
 engineinfo: {}
 mainengineinfo: {}
 name: DBotTrainClustering
@@ -124,8 +124,8 @@ runas: DBotWeakRole
 runonce: false
 script: |
   register_module_line('DBotTrainClustering', 'start', __line__())
-  CONSTANT_PACK_VERSION = '1.42.30'
-  demisto.debug('pack id = Base, pack version = 1.42.30')
+  CONSTANT_PACK_VERSION = '1.42.36'
+  demisto.debug('pack id = Base, pack version = 1.42.36')
   import builtins
   import collections
   import math
