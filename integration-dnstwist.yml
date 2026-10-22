@@ -11,7 +11,6 @@ contentitemexportablefields:
     packID: dnstwist
     packName: Dnstwist
     packPropagationLabels:
-    - all
     - account1
     - account2
     prevname: ""
