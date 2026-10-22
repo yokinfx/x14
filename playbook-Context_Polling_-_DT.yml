@@ -1,0 +1,299 @@
+contentitemexportablefields:
+  contentitemfields:
+    definitionid: ""
+    fromServerVersion: 6.10.0
+    itemVersion: 2.8.9
+    packID: CommonPlaybooks
+    packName: Common Playbooks
+    packPropagationLabels:
+    - all
+    prevname: ""
+    propagationLabels: []
+    toServerVersion: ""
+description: This playbook polls a context value until a specific condition, defined
+  by a DT expression, is met.
+id: Context Polling - DT
+inputSections:
+- description: Generic group for inputs
+  inputs:
+  - value_dt
+  - eval_dt
+  - playbook_id
+  - frequency
+  - timeout
+  - tags
+  - extract_mode
+  name: General (Inputs group)
+inputs:
+- description: The DT expression for retrieving a value from the context data.
+  key: value_dt
+  playbookInputQuery: null
+  required: true
+  value: {}
+- description: The DT expression for retrieving data for the evaluation from the data
+    returned by `value_dt`.
+  key: eval_dt
+  playbookInputQuery: null
+  required: false
+  value: {}
+- description: The sub-playbook ID for retrieving its local context from the context
+    data. Use ${currentPlaybookID} to specify the current sub-playbook ID.
+  key: playbook_id
+  playbookInputQuery: null
+  required: false
+  value: {}
+- description: How often to check (in minutes).
+  key: frequency
+  playbookInputQuery: null
+  required: true
+  value:
+    simple: "1"
+- description: When to timeout (in minutes).
+  key: timeout
+  playbookInputQuery: null
+  required: true
+  value:
+    simple: "10"
+- description: Tags of waiting tasks to be completed upon polling completion.
+  key: tags
+  playbookInputQuery: null
+  required: false
+  value: {}
+- description: Indicator Extraction mode for the command sequence. (In XSOAR 8 and
+    above, for first run command set manually the RunPollingCommand task in the playbook,
+    Advanced -> Indicator Extraction mode).
+  key: extract_mode
+  playbookInputQuery: null
+  required: false
+  value: {}
+name: Context Polling - DT
+outputSections:
+- description: Generic group for outputs
+  name: General (Outputs group)
+  outputs: []
+outputs: []
+starttaskid: "0"
+system: true
+tasks:
+  "0":
+    continueonerrortype: ""
+    id: "0"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "1"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: 22e2029d-1615-4fd2-8b9a-97b6cdca8180
+      iscommand: false
+      name: ""
+      version: -1
+    taskid: 22e2029d-1615-4fd2-8b9a-97b6cdca8180
+    timertriggers: []
+    type: start
+    view: |-
+      {
+        "position": {
+          "x": 162.5,
+          "y": 50
+        }
+      }
+  "1":
+    continueonerrortype: ""
+    id: "1"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    loop:
+      exitCondition: ""
+      iscommand: false
+      max: 100
+      wait: 1
+    nexttasks:
+      '#none#':
+      - "10"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      AdditionalPollingCommandArgNames:
+        simple: dt_encoding,value_dt,eval_dt,playbook_id
+      AdditionalPollingCommandArgValues:
+        simple: url,${inputs.value_dt=encodeURIComponent(val)},${inputs.eval_dt=encodeURIComponent(val)},${inputs.playbook_id}
+      ExtractMode:
+        simple: ${inputs.extract_mode}
+      Ids:
+        simple: id
+      Interval:
+        complex:
+          root: inputs.frequency
+      PollingCommandArgName:
+        simple: id
+      PollingCommandName:
+        simple: EvaluateContextValue
+      Timeout:
+        complex:
+          root: inputs.timeout
+      dt:
+        simple: EvaluateContextValue(val.id=='id' && val.ok==false).id
+    separatecontext: true
+    skipunavailable: false
+    task:
+      brand: ""
+      description: |-
+        Use this playbook as a sub-playbook to block execution of the master playbook until a remote action is complete.
+        This playbook implements polling by continuously running the command in Step \#2 until the operation completes.
+        The remote action should have the following structure:
+
+        1. Initiate the operation.
+        2. Poll to check if the operation completed.
+        3. (optional) Get the results of the operation.
+
+        NOTE: This playbook should be run only when the playbook's context is using the "Private to sub-playbook" option.
+      id: 180a4266-789f-4315-ab4d-3bc7a552770a
+      iscommand: false
+      name: GenericPolling
+      playbookId: GenericPolling
+      type: playbook
+      version: -1
+    taskid: 180a4266-789f-4315-ab4d-3bc7a552770a
+    timertriggers: []
+    type: playbook
+    view: |-
+      {
+        "position": {
+          "x": 162.5,
+          "y": 210
+        }
+      }
+  "8":
+    continueonerrortype: ""
+    id: "8"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: d90c99f0-ec70-4b2a-87ae-6b9c0cb163f4
+      iscommand: false
+      name: Done
+      type: title
+      version: -1
+    taskid: d90c99f0-ec70-4b2a-87ae-6b9c0cb163f4
+    timertriggers: []
+    type: title
+    view: |-
+      {
+        "position": {
+          "x": 162.5,
+          "y": 720
+        }
+      }
+  "9":
+    continueonerrortype: ""
+    id: "9"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#none#':
+      - "8"
+    note: false
+    quietmode: 0
+    scriptarguments:
+      id:
+        complex:
+          root: inputs.tags
+          transformers:
+          - args:
+              delimiter:
+                value:
+                  simple: ','
+            operator: splitAndTrim
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: Builtin
+      description: commands.local.cmd.task.complete
+      id: 3cccb08c-ed99-48e5-803a-e8f4206d5634
+      iscommand: true
+      name: Complete Waiting Tasks
+      script: Builtin|||taskComplete
+      type: regular
+      version: -1
+    taskid: 3cccb08c-ed99-48e5-803a-e8f4206d5634
+    timertriggers: []
+    type: regular
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 550
+        }
+      }
+  "10":
+    conditions:
+    - condition:
+      - - left:
+            iscontext: true
+            value:
+              simple: inputs.tags
+          operator: isNotEmpty
+          right:
+            value: {}
+      label: "yes"
+    continueonerrortype: ""
+    id: "10"
+    ignoreworker: false
+    isautoswitchedtoquietmode: false
+    isoversize: false
+    nexttasks:
+      '#default#':
+      - "8"
+      "yes":
+      - "9"
+    note: false
+    quietmode: 0
+    separatecontext: false
+    skipunavailable: false
+    task:
+      brand: ""
+      id: 3fc4e8a3-b17f-4119-89a7-8de5ec556408
+      iscommand: false
+      name: Are tags given to complete tasks?
+      type: condition
+      version: -1
+    taskid: 3fc4e8a3-b17f-4119-89a7-8de5ec556408
+    timertriggers: []
+    type: condition
+    view: |-
+      {
+        "position": {
+          "x": 162.5,
+          "y": 380
+        }
+      }
+version: -1
+view: |-
+  {
+    "linkLabelsPosition": {
+      "10_9_yes": 0.26
+    },
+    "paper": {
+      "dimensions": {
+        "height": 730,
+        "width": 492.5,
+        "x": 50,
+        "y": 50
+      }
+    }
+  }
