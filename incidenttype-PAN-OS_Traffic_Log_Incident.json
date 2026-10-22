@@ -1,0 +1,39 @@
+{
+	"autorun": false,
+	"cacheVersn": 0,
+	"closureScript": "",
+	"color": "#f1dd12",
+	"days": 0,
+	"daysR": 0,
+	"default": false,
+	"definitionId": "",
+	"detached": false,
+	"disabled": false,
+	"extractSettings": {
+		"fieldCliNameToExtractSettings": {},
+		"mode": "Specific"
+	},
+	"fromServerVersion": "6.10.0",
+	"hours": 0,
+	"hoursR": 0,
+	"id": "PAN-OS Traffic Log Incident",
+	"itemVersion": "2.6.49",
+	"layout": "",
+	"locked": false,
+	"name": "PAN-OS Traffic Log Incident",
+	"onChangeRepAlg": 0,
+	"packID": "PAN-OS",
+	"packName": "PAN-OS by Palo Alto Networks",
+	"packPropagationLabels": [
+		"all"
+	],
+	"preProcessingScript": "",
+	"propagationLabels": [],
+	"readonly": false,
+	"reputationCalc": 0,
+	"system": true,
+	"toServerVersion": "",
+	"version": -1,
+	"weeks": 0,
+	"weeksR": 0
+}
