@@ -1,0 +1,499 @@
+{
+	"author": "Cortex XSOAR",
+	"authorImage": "content/packs/Base/Author_image.png",
+	"beta": false,
+	"cacheVersn": 0,
+	"categories": [
+		"Utilities"
+	],
+	"certification": "certified",
+	"contentItemTypes": [
+		"automation",
+		"widget"
+	],
+	"contentItems": {
+		"automation": [
+			{
+				"description": "Returns a table widget of enabled feed integration instances that errors out on indicators fetch.",
+				"name": "FeedIntegrationErrorWidget",
+				"tags": [
+					"widget"
+				]
+			},
+			{
+				"description": "A no-op placeholder script used by visual-only widgets (e.g. Page Break, Text Widget) that require a script dataType but do not need to query any data source. Returns a mock result to prevent unnecessary database queries.",
+				"name": "WidgetNoOp",
+				"tags": [
+					"widget"
+				]
+			},
+			{
+				"description": "Script Widget - RSS Feed.",
+				"name": "RSSWidget",
+				"tags": [
+					"widget"
+				]
+			},
+			{
+				"description": "A script that creates a table of all the ToDo tasks assigned to the current user.",
+				"name": "MyToDoTasksWidget",
+				"tags": [
+					"widget"
+				]
+			}
+		],
+		"classifier": null,
+		"dashboard": null,
+		"genericfield": null,
+		"generictype": null,
+		"incidentfield": null,
+		"incidenttype": null,
+		"indicatorfield": null,
+		"integration": null,
+		"layoutscontainer": null,
+		"list": null,
+		"playbook": null,
+		"report": null,
+		"reputation": null,
+		"widget": [
+			{
+				"name": "Detection SLA by Status"
+			},
+			{
+				"name": "Active vs Expired Indicators"
+			},
+			{
+				"name": "Incidents By Close Reason"
+			},
+			{
+				"name": "Incidents Dropped in Preprocessing"
+			},
+			{
+				"name": "Task executions"
+			},
+			{
+				"name": "Mean Time to Resolution (Occurred)"
+			},
+			{
+				"name": "Late Incidents"
+			},
+			{
+				"name": "Command executions per Incident Type"
+			},
+			{
+				"name": "Remediation SLA by Status"
+			},
+			{
+				"name": "Late SLA by Type"
+			},
+			{
+				"name": "Server Memory Usage % (last 24h)"
+			},
+			{
+				"name": "Indicators in Related Incidents"
+			},
+			{
+				"name": "Return On Investment (ROI)"
+			},
+			{
+				"name": "Feeds Errors"
+			},
+			{
+				"name": "Incidents by Role"
+			},
+			{
+				"name": "Most Active Integrations"
+			},
+			{
+				"name": "Memory Usage % per Engine (last 24h)"
+			},
+			{
+				"name": "My Messages"
+			},
+			{
+				"name": "Failed Manual Tasks"
+			},
+			{
+				"name": "Active Incidents Assigned by User"
+			},
+			{
+				"name": "Executions by status per Manual Tasks (top 5)"
+			},
+			{
+				"name": "Active Incidents - Pie chart"
+			},
+			{
+				"name": "Mean Time to Triage"
+			},
+			{
+				"name": "Top Users Closed Manual Tasks"
+			},
+			{
+				"name": "Incidents Top Close Analysts"
+			},
+			{
+				"name": "TopMaliciousRatioIndicators"
+			},
+			{
+				"name": "My Tasks"
+			},
+			{
+				"name": "MTTD by Type"
+			},
+			{
+				"name": "MTTR by Severity"
+			},
+			{
+				"name": "Unassigned Pending Incidents"
+			},
+			{
+				"name": "Closed By Dbot"
+			},
+			{
+				"name": "MTTR by Type (in minutes)"
+			},
+			{
+				"name": "Elastic Disk Current Usage"
+			},
+			{
+				"name": "Within SLA by Type"
+			},
+			{
+				"name": "Running playbooks"
+			},
+			{
+				"name": "Unit 42 Blog Feed"
+			},
+			{
+				"name": "MTTR by Type"
+			},
+			{
+				"name": "Incident Severity by Type"
+			},
+			{
+				"name": "Failed Automation executions per Incident Types (top 5)"
+			},
+			{
+				"name": "Command executions per Integration Category"
+			},
+			{
+				"name": "Late Tasks"
+			},
+			{
+				"name": "Indicators Activity"
+			},
+			{
+				"name": "Command execution errors per Integration Category"
+			},
+			{
+				"name": "Playbook run errors"
+			},
+			{
+				"name": "Top Active Playbooks"
+			},
+			{
+				"name": "Elastic JVM Memory Current Usage"
+			},
+			{
+				"name": "Unassigned Incidents"
+			},
+			{
+				"name": "Unassigned Closed Incidents"
+			},
+			{
+				"name": "Command execution errors per Instance"
+			},
+			{
+				"name": "Memory Current Usage"
+			},
+			{
+				"name": "Average runtime per Automation (top 5)"
+			},
+			{
+				"name": "Errors by Incident Type per Command (top 5)"
+			},
+			{
+				"name": "MTTC by Severity"
+			},
+			{
+				"name": "Unassigned Incidents"
+			},
+			{
+				"name": "Server CPU Usage % (last 24h)"
+			},
+			{
+				"name": "Average runtime by Instance per Command (top 5)"
+			},
+			{
+				"name": "CPU Usage % per Engine"
+			},
+			{
+				"name": "Mean Time to Detection"
+			},
+			{
+				"name": "Active Incidents by Role"
+			},
+			{
+				"name": "Least executed Commands per Instance"
+			},
+			{
+				"name": "MTTT by Severity"
+			},
+			{
+				"name": "Disk Current Usage"
+			},
+			{
+				"name": "Top 10 Attack Pattern Indicators in Related Incidents"
+			},
+			{
+				"name": "Image"
+			},
+			{
+				"name": "Disk Usage % per Engine (last 24h)"
+			},
+			{
+				"name": "Indicators Activity by Type"
+			},
+			{
+				"name": "Feed Integrations Errors"
+			},
+			{
+				"name": "Open Tasks Per User"
+			},
+			{
+				"name": "Relationship Generating Integrations"
+			},
+			{
+				"name": "Least executed Commands"
+			},
+			{
+				"name": "SLA by Incident Type"
+			},
+			{
+				"name": "Most Active Users"
+			},
+			{
+				"name": "Manual Verdict Indicators by User"
+			},
+			{
+				"name": "Workers per Engine"
+			},
+			{
+				"name": "Manual Command execution errors (top 5)"
+			},
+			{
+				"name": "Failed Playbooks runs"
+			},
+			{
+				"name": "Commands executed"
+			},
+			{
+				"name": "Incidents in Error Run Status"
+			},
+			{
+				"name": "Incidents by Phase"
+			},
+			{
+				"name": "CPU Usage % per Engine (last 24h)"
+			},
+			{
+				"name": "Late Tasks by User"
+			},
+			{
+				"name": "Text Widget"
+			},
+			{
+				"name": "Average Incident Duration by Role (Avg)"
+			},
+			{
+				"name": "Command executions errors"
+			},
+			{
+				"name": "Active Indicators Volumes by Feed"
+			},
+			{
+				"name": "Malicious Indicators Activity by Type"
+			},
+			{
+				"name": "Disk Usage % per Engine"
+			},
+			{
+				"name": "Tasks By State"
+			},
+			{
+				"name": "Memory Usage % per Engine"
+			},
+			{
+				"name": "Command execution errors"
+			},
+			{
+				"name": "Command execution type"
+			},
+			{
+				"name": "Investigation Activity Timeline"
+			},
+			{
+				"name": "Latest Messages"
+			},
+			{
+				"name": "Busy Workers per Engine (last 24h)"
+			},
+			{
+				"name": "Active Indicators by Verdict"
+			},
+			{
+				"name": "Busy Workers Count per Engine"
+			},
+			{
+				"name": "Executions by status per Automated Tasks (top 5)"
+			},
+			{
+				"name": "Malicious Indicators Activity"
+			},
+			{
+				"name": "Malicious/Suspicious Indicators in Incidents"
+			},
+			{
+				"name": "Active Incidents - Line chart"
+			},
+			{
+				"name": "Top executed Commands"
+			},
+			{
+				"name": "Incidents Occurred Per Day"
+			},
+			{
+				"name": "Page Break Widget"
+			},
+			{
+				"name": "MTTD by Severity"
+			},
+			{
+				"name": "My ToDo Tasks"
+			},
+			{
+				"name": "Top 10 File Indicators in Related Incidents"
+			},
+			{
+				"name": "Important Messages"
+			},
+			{
+				"name": "Mentions"
+			},
+			{
+				"name": "Playbook runs"
+			},
+			{
+				"name": "MTTR Occurred by Type"
+			},
+			{
+				"name": "Most Active Investigations"
+			},
+			{
+				"name": "Incident Types by Severity"
+			},
+			{
+				"name": "Average runtime by Incident Type per Playbook (top 5)"
+			},
+			{
+				"name": "Command average runtime per Instance (top 5)"
+			},
+			{
+				"name": "Late Incidents"
+			},
+			{
+				"name": "Unassigned Active Incidents"
+			},
+			{
+				"name": "Closed Incidents by Role"
+			},
+			{
+				"name": "Mean Time to Containment"
+			},
+			{
+				"name": "Average runtime per Playbook (top 5)"
+			},
+			{
+				"name": "Manual Verdict Indicators"
+			},
+			{
+				"name": "Elastic CPU Current Usage"
+			},
+			{
+				"name": "CPU Current Usage"
+			},
+			{
+				"name": "Task execution errors"
+			},
+			{
+				"name": "Average runtime for Playbooks"
+			}
+		],
+		"wizard": null
+	},
+	"currentVersion": "1.3.5",
+	"definitionId": "",
+	"dependencies": {
+		"Base": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": true,
+			"minVersion": "1.42.6",
+			"name": "Base"
+		},
+		"CommonScripts": {
+			"author": "Cortex XSOAR",
+			"certification": "certified",
+			"mandatory": true,
+			"minVersion": "1.22.33",
+			"name": "Common Scripts"
+		}
+	},
+	"deprecated": false,
+	"description": "Frequently used widgets pack.",
+	"disabledMonthly": false,
+	"downloads": 0,
+	"eulaLink": "https://github.com/demisto/content/blob/master/LICENSE",
+	"fromServerVersion": "5.0.0",
+	"general": [
+		"generalFieldCertified",
+		"generalFieldByCortexXSOAR",
+		"generalFieldFree",
+		"generalFieldSupportIncluded"
+	],
+	"id": "CommonWidgets",
+	"installMessage": "",
+	"integrations": [],
+	"itemVersion": "1.3.5",
+	"keywords": [],
+	"legacy": true,
+	"name": "Common Widgets",
+	"packID": "CommonWidgets",
+	"packName": "",
+	"premium": false,
+	"previewOnly": false,
+	"price": 0,
+	"propagationLabels": [
+		"all"
+	],
+	"rawKeywords": null,
+	"rawTags": null,
+	"rawUseCases": null,
+	"searchRank": 0,
+	"serverMaxVersion": "",
+	"serverMinVersion": "5.0.0",
+	"support": "xsoar",
+	"supportDetails": {
+		"email": "",
+		"url": "https://www.paloaltonetworks.com/cortex"
+	},
+	"tags": [
+		"Core"
+	],
+	"toServerVersion": "",
+	"updated": "2026-10-11T20:20:05Z",
+	"useCases": [],
+	"version": -1,
+	"versionInfo": "10935523",
+	"videos": []
+}
